@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema 
+    targetNamespace="http://csemver.org/schemas/2015"
+    elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://csemver.org/schemas/2015"
+>
+  <xs:simpleType name="versionMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="ZeroTimed" />
+      <xs:enumeration value="LastReleaseBased" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="RepositoryInfo">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="IgnoreModifiedFiles" minOccurs="0" >
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Add" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Branches" minOccurs="0" >
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Branch" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="CIVersionMode" type="versionMode" default="None" />
+                  <xs:attribute name="Name" type="xs:string" use="required" />
+                  <xs:attribute name="VersionName" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="StartingVersionForCSemVer" minOccurs="0" type="xs:string" />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)\..\NativeBinaries\amd64\git2-e0902fb.dll">
+
+			<Link>NativeBinaries\amd64\git2-e0902fb.dll</Link>
+
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+
+		</None>
+
+		<None Include="$(MSBuildThisFileDirectory)\..\NativeBinaries\x86\git2-e0902fb.dll">
+
+			<Link>NativeBinaries\x86\git2-e0902fb.dll</Link>
+
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+
+		</None>
+
+	</ItemGroup>
+
+</Project>

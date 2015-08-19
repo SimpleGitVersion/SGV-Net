@@ -1,0 +1,36 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="2.8">
+    <id>SimpleGitVersion.Core</id>
+    <version>0.1.0</version>
+    <title>SimpleGitVersion.Core</title>
+    <authors>Invenietis</authors>
+    <owners>Invenietis</owners>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <projectUrl>http://github.com/SimpleGitVersion/SGV-Net</projectUrl>
+    <iconUrl>https://raw.github.com/SimpleGitVersion/SGV-Net/SimpleGitVersion.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>
+      Core implementation of 'Constrained Semantic Version' on Git.
+    </summary>
+    <description>
+      Extracts RepositoryInfo from a git repository that describes possible CSemVer and/or actual CSemVer version to use based on repository tags and topology.
+      This assembly is bundled into SimpleGitVersionTask MSBuild extension but can be used independently.
+    </description>
+    <language>en-US</language>
+    <tags>Git, Tag, Versioning, NuGet, SemVer, CSemVer</tags>
+    <developmentDependency>true</developmentDependency>
+    <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
+  </metadata>
+  <files>
+    <file src="SimpleGitVersion.Core\bin\Release\ILMerged\SimpleGitVersion.Core.dll" target="lib\net45" />
+    <file src="SimpleGitVersion.Core\bin\Release\ILMerged\SimpleGitVersion.Core.pdb" target="lib\net45" />
+    <file src="SimpleGitVersion.Core\bin\Release\SimpleGitVersion.Core.xml" target="lib\net45" />
+    <file src="SimpleGitVersion.Core\bin\Release\NativeBinaries\amd64\*.dll" target="NativeBinaries\amd64" />
+    <file src="SimpleGitVersion.Core\bin\Release\NativeBinaries\x86\*.dll" target="NativeBinaries\x86" />
+
+    <file src="SimpleGitVersion.Core\NuGetAssets\SimpleGitVersion.Core.props" target="Build" />
+    <file src="SimpleGitVersionTask\NuGetAssets\RepositoryInfo.xsd" target="RepositoryInfo.xsd" />
+  </files>
+
+</package>

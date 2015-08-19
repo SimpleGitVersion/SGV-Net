@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\LibGit2Sharp.0.21.0.176\build\net40\LibGit2Sharp.props" Condition="Exists('..\packages\LibGit2Sharp.0.21.0.176\build\net40\LibGit2Sharp.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{053309DF-B585-4DCB-972B-634669733244}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SimpleGitVersion.Core</RootNamespace>
+    <AssemblyName>SimpleGitVersion.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>159c4909</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartAction>Program</StartAction>
+    <StartProgram>$(MSBuildBinPath)\MSBuild.exe</StartProgram>
+    <StartWorkingDirectory>$(SolutionDir)Tests\TestProject\</StartWorkingDirectory>
+    <StartArguments>&gt; BuildLog.txt</StartArguments>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\SimpleGitVersion.Core.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\SharedKey.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LibGit2Sharp">
+      <HintPath>..\packages\LibGit2Sharp.0.21.0.176\lib\net40\LibGit2Sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ILogger.cs" />
+    <Compile Include="SimpleRepositoryInfo.cs" />
+    <Compile Include="ReleaseTagVersion\CIBuildDescriptor.cs" />
+    <Compile Include="ReleaseTagVersion\ReleaseTagFormat.cs" />
+    <Compile Include="RepositoryInfo\Options\CIBranchVersionMode.cs" />
+    <Compile Include="UsefulExtensions.cs" />
+    <Compile Include="GitExtensions.cs" />
+    <Compile Include="GitHelper.cs" />
+    <Compile Include="ReleaseTagVersion\ReleaseTagKind.cs" />
+    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.OrderedVersion.cs" />
+    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.Parse.cs" />
+    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.ToString.cs" />
+    <Compile Include="RepositoryInfo\CommitBaseVersions.cs" />
+    <Compile Include="RepositoryInfo\CommitVersion.cs" />
+    <Compile Include="RepositoryInfo\Options\RepositoryInfoOptionsBranch.cs" />
+    <Compile Include="RepositoryInfo\ReleaseTagParsingMode.cs" />
+    <Compile Include="RepositoryInfo\RepositoryInfo.TagCollector.cs" />
+    <Compile Include="RepositoryInfo\RepositoryInfo.cs" />
+    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RepositoryInfo\Options\RepositoryInfoOptions.cs" />
+    <Compile Include="RepositoryInfo\TagCommit.cs" />
+    <Compile Include="RepositoryWriter\RepositoryWriter.cs" />
+    <Compile Include="SGVSchema.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NuGetAssets\SimpleGitVersion.Core.props" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\LibGit2Sharp.0.21.0.176\build\net40\LibGit2Sharp.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.0.21.0.176\build\net40\LibGit2Sharp.props'))" />
+  </Target>
+  <Target Name="AfterBuild">
+    <MakeDir Directories="$(TargetDir)ILMerged\" />
+    <Exec Command="&quot;$(SolutionDir)Tools\ILmerge.exe&quot;  /allowDup /keyfile:&quot;$(SolutionDir)SharedKey.snk&quot; /out:&quot;$(TargetDir)ILMerged\$(TargetFileName)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)LibGit2Sharp.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot; /internalize " />
+  </Target>
+</Project>
