@@ -11,7 +11,41 @@ namespace SimpleGitVersion.Core.Tests
         [TestFixture]
         public class ReleaseTagVersionTests
         {
-            [TestCase( "v0.0.0-alpha.0.999" )]
+
+        [TestCase( "0.1.2" )]
+        [TestCase( "0.1.1" )]
+        [TestCase( "0.1.0" )]
+        [TestCase( "1.0.0" )]
+        [TestCase( "1.0.0-alpha" )]
+        [TestCase( "4.3.2" )]
+        [TestCase( "4.3.2-alpha" )]
+        [TestCase( "4.3.2-alpha.0.1" )]
+        [TestCase( "4.3.2-rc" )]
+        [TestCase( "4.3.2-rc.0.1" )]
+        [TestCase( "4.3.2-rc.99.99" )]
+        [TestCase( "99999.99999.9999" )]
+        public void display_successors_samples( string v )
+        {
+            ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
+            var succ = t.GetDirectSuccessors( false );
+
+            Console.WriteLine( " -> - found {0} successors for '{1}' (Ordered Version={2}, File={3}.{4}.{5}.{6}):",
+                                succ.Count(),
+                                t,
+                                t.OrderedVersion,
+                                t.OrderedVersionMajor,
+                                t.OrderedVersionMinor,
+                                t.OrderedVersionBuild,
+                                t.OrderedVersionRevision
+                                );
+            Console.WriteLine( "      " + String.Join( ", ", succ.Select( s => s.ToString() ) ) );
+
+            var closest = t.GetDirectSuccessors( true ).Select( s => s.ToString() ).ToList();
+            Console.WriteLine( "    - {0} closest successors:", closest.Count, t );
+            Console.WriteLine( "      " + String.Join( ", ", closest ) );
+        }
+
+        [TestCase( "v0.0.0-alpha.0.999" )]
             public void fix_parsing_syntax_error_helper_max_prerelease_fix(string tag)
             {
                 var error = String.Format( "Fix Number must be between 1 and {0}.", ReleaseTagVersion.MaxPreReleaseFix );
@@ -217,37 +251,6 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( t.Equals( t2 ) );
             }
 
-            [TestCase( "0.1.0" )]
-            [TestCase( "0.1.1" )]
-            [TestCase( "1.0.0" )]
-            [TestCase( "1.0.0-alpha" )]
-            [TestCase( "4.3.2" )]
-            [TestCase( "4.3.2-alpha" )]
-            [TestCase( "4.3.2-alpha.0.1" )]
-            [TestCase( "4.3.2-rc" )]
-            [TestCase( "4.3.2-rc.0.1" )]
-            [TestCase( "4.3.2-rc.99.99" )]
-            [TestCase( "99999.99999.9999" )]
-            public void display_successors_samples( string v )
-            {
-                ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
-                var succ = t.GetDirectSuccessors( false );
-
-                Console.WriteLine( " -> - found {0} successors for '{1}' (Ordered Version={2}, File={3}.{4}.{5}.{6}):", 
-                                    succ.Count(), 
-                                    t, 
-                                    t.OrderedVersion,
-                                    t.OrderedVersionMajor,
-                                    t.OrderedVersionMinor,
-                                    t.OrderedVersionBuild,
-                                    t.OrderedVersionRevision
-                                    );
-                Console.WriteLine( "      " + String.Join( ", ", succ.Select( s => s.ToString() ) ) );
-                
-                var closest = t.GetDirectSuccessors( true ).Select( s => s.ToString() ).ToList();
-                Console.WriteLine( "    - {0} closest successors:", closest.Count, t );
-                Console.WriteLine( "      " + String.Join( ", ", closest ) );
-            }
 
             [Test]
             public void checking_version_ordering()

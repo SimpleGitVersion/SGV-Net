@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using LibGit2Sharp;
+using System.IO;
 
 namespace SimpleGitVersion
 {
@@ -366,7 +367,7 @@ namespace SimpleGitVersion
         /// and a function that can create a <see cref="RepositoryInfoOptions"/> from the actual Git repository path. 
         /// </summary>
         /// <param name="path">The path to lookup.</param>
-        /// <param name="optionsBuilder">Function that can create a <see cref="RepositoryInfoOptions"/> from the actual Git repository path.</param>
+        /// <param name="optionsBuilder">Function that can create a <see cref="RepositoryInfoOptions"/> from the path of the Git repository (the Solution folder).</param>
         /// <returns>An immutable RepositoryInfo instance.</returns>
         public static RepositoryInfo LoadFromPath( string path, Func<string,RepositoryInfoOptions> optionsBuilder )
         {
@@ -375,7 +376,17 @@ namespace SimpleGitVersion
 
             using( var repo = GitHelper.LoadFromPath( path ) )
             {
-                return new RepositoryInfo( repo, optionsBuilder( repo.Info.Path ) );
+                string gitPath = repo.Info.Path;
+                char lastChar = gitPath[gitPath.Length - 1];
+                if( lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar )
+                {
+                    gitPath = gitPath.Substring( 0, gitPath.Length - 1 );
+                }
+                if( gitPath.EndsWith( Path.DirectorySeparatorChar + ".git" ) || gitPath.EndsWith( Path.AltDirectorySeparatorChar + ".git" ) )
+                {
+                    gitPath = gitPath.Substring( 0, gitPath.Length - 5 );
+                }
+                return new RepositoryInfo( repo, optionsBuilder( gitPath ) );
             }
         }
     }

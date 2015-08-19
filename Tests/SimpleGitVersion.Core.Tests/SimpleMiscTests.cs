@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LibGit2Sharp;
 using NUnit.Framework;
 using Semver;
+using System.IO;
 
 namespace SimpleGitVersion.Core.Tests
 {
