@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8">
     <id>SimpleGitVersionTask</id>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <title>SimpleGitVersionTask</title>
     <authors>Invenietis</authors>
     <owners>Invenietis</owners>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
-    <projectUrl>http://github.com/SimpleGitVersion/SGV-Net</projectUrl>
-    <iconUrl>https://raw.github.com/SimpleGitVersion/SGV-Net/SimpleGitVersion.png</iconUrl>
+    <projectUrl>https://github.com/SimpleGitVersion/SGV-Net</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-Net/master/SimpleGitVersion.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       MSBuild task that implements 'Constrained Semantic Version' on Git and stamps produced assembly by 

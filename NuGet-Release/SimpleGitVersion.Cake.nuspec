@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8">
     <id>SimpleGitVersion.Cake</id>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <title>SimpleGitVersion.Cake</title>
     <authors>Invenietis</authors>
     <owners>Invenietis</owners>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
-    <projectUrl>http://github.com/SimpleGitVersion/SGV-Net</projectUrl>
-    <iconUrl>https://raw.github.com/SimpleGitVersion/SGV-Net/SimpleGitVersion.png</iconUrl>
+    <projectUrl>https://github.com/SimpleGitVersion/SGV-Net</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-Net/master/SimpleGitVersion.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>
       Cake extension that enables Cake scripts to obtain the SimpleGitVersion.RepositoryInfo.
@@ -21,7 +21,7 @@
     <developmentDependency>true</developmentDependency>
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
     <dependencies>
-      <dependency id="SimpleGitVersion.Core" version="0.1.0" />
+      <dependency id="SimpleGitVersion.Core" version="0.1.1" />
       <dependency id="Cake.Core" version="0.5.2" />
    </dependencies>
   </metadata>

@@ -218,6 +218,7 @@ namespace SimpleGitVersion.Core.Tests
             }
 
             [TestCase( "0.1.0" )]
+            [TestCase( "0.1.1" )]
             [TestCase( "1.0.0" )]
             [TestCase( "1.0.0-alpha" )]
             [TestCase( "4.3.2" )]

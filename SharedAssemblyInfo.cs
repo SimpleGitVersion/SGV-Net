@@ -17,9 +17,10 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible( false )]
 
 // 0.1.0 ==> Ordered Version = 1300140001, File = 0.0.19838.36833
+// 0.1.1 ==> Ordered Version = 1300270002, File = 0.0.19840.35762
 [assembly: AssemblyVersion( "0.0" )]
-[assembly: AssemblyFileVersion( "0.0.19838.36833" )]
-[assembly: AssemblyInformationalVersion( "0.1.0" )]
+[assembly: AssemblyFileVersion( "0.0.19840.35762" )]
+[assembly: AssemblyInformationalVersion( "0.1.1" )]
 
 
 #if DEBUG
