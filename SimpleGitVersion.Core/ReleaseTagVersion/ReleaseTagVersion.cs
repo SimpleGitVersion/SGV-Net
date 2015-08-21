@@ -39,7 +39,7 @@ namespace SimpleGitVersion
         /// Gets the standard pre release name among <see cref="StandardPreReleaseNames"/>.
         /// <see cref="string.Empty"/> when this is not a pre release version.
         /// </summary>
-        public string PreReleaseName { get { return IsPreRelease ? _standardNames[PreReleaseNameIdx] : String.Empty; } }
+        public string PreReleaseName { get { return IsPreRelease ? _standardNames[PreReleaseNameIdx] : string.Empty; } }
         /// <summary>
         /// Gets whether this is a pre release.
         /// </summary>
@@ -67,7 +67,7 @@ namespace SimpleGitVersion
         public bool IsPreReleaseFix { get { return PreReleaseFix > 0; } }
         /// <summary>
         /// Gets the marker if ("+valid", "+published" or "+invalid").
-        /// Normalized in lowercase and <see cref="String.Empty"/> when <see cref="IsMarked"/> is false.
+        /// Normalized in lowercase and <see cref="string.Empty"/> when <see cref="IsMarked"/> is false.
         /// </summary>
         public readonly string Marker;
         /// <summary>
@@ -221,7 +221,7 @@ namespace SimpleGitVersion
                             }
                         }
                     }
-                    yield return new ReleaseTagVersion( null, Major, Minor, Patch, String.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                    yield return new ReleaseTagVersion( null, Major, Minor, Patch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                 }
                 else
                 {
@@ -237,7 +237,7 @@ namespace SimpleGitVersion
                                 yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
                             }
                         }
-                        yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, String.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                        yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                     }
                 }
                 int nextMinor = Minor + 1;
@@ -251,7 +251,7 @@ namespace SimpleGitVersion
                             yield return new ReleaseTagVersion( null, Major, nextMinor, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
                         }
                     }
-                    yield return new ReleaseTagVersion( null, Major, nextMinor, 0, String.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                    yield return new ReleaseTagVersion( null, Major, nextMinor, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                 }
                 int nextMajor = Major + 1;
                 if( nextMajor <= MaxMajor )
@@ -264,7 +264,7 @@ namespace SimpleGitVersion
                             yield return new ReleaseTagVersion( null, nextMajor, 0, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
                         }
                     }
-                    yield return new ReleaseTagVersion( null, nextMajor, 0, 0, String.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                    yield return new ReleaseTagVersion( null, nextMajor, 0, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                 }
             }
         }

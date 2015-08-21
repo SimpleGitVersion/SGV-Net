@@ -55,8 +55,8 @@ namespace Semver
             this.Patch = patch;
 
             // strings are interned to be able to compare by reference in equals method
-            this.Prerelease = String.Intern( prerelease ?? "" );
-            this.Build = String.Intern( build ?? "" );
+            this.Prerelease = string.Intern( prerelease ?? "" );
+            this.Build = string.Intern( build ?? "" );
         }
 
         /// <summary>
@@ -76,15 +76,15 @@ namespace Semver
                 this.Patch = version.Revision;
             }
 
-            this.Prerelease = String.Intern( "" );
+            this.Prerelease = string.Intern( "" );
 
             if( version.Build > 0 )
             {
-                this.Build = String.Intern( version.Build.ToString() );
+                this.Build = string.Intern( version.Build.ToString() );
             }
             else
             {
-                this.Build = String.Intern( "" );
+                this.Build = string.Intern( "" );
             }
         }
 
@@ -242,9 +242,9 @@ namespace Semver
         public override string ToString()
         {
             var version = "" + Major + "." + Minor + "." + Patch;
-            if( !String.IsNullOrEmpty( Prerelease ) )
+            if( !string.IsNullOrEmpty( Prerelease ) )
                 version += "-" + Prerelease;
-            if( !String.IsNullOrEmpty( Build ) )
+            if( !string.IsNullOrEmpty( Build ) )
                 version += "+" + Build;
             return version;
         }
@@ -334,8 +334,8 @@ namespace Semver
 
         static int CompareComponent( string a, string b, bool lower = false )
         {
-            var aEmpty = String.IsNullOrEmpty( a );
-            var bEmpty = String.IsNullOrEmpty( b );
+            var aEmpty = string.IsNullOrEmpty( a );
+            var bEmpty = string.IsNullOrEmpty( b );
             if( aEmpty && bEmpty )
                 return 0;
 
@@ -367,7 +367,7 @@ namespace Semver
                         return -1;
                     if( isbnum )
                         return 1;
-                    r = String.CompareOrdinal( ac, bc );
+                    r = string.CompareOrdinal( ac, bc );
                     if( r != 0 )
                         return r;
                 }

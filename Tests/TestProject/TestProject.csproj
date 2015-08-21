@@ -52,21 +52,33 @@
   <ItemGroup>
     <Content Include="BuildLog.txt" />
   </ItemGroup>
-  <PropertyGroup>
-    <NuGetPachageName>TestProject.By.SimpleVersionGit</NuGetPachageName>
-  </PropertyGroup>
+
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  
   <UsingTask TaskName="SimpleGitVersion.GetGitRepositoryInfoTask" AssemblyFile="$(SolutionDir)..\..\SimpleGitVersionTask\bin\Debug\SimpleGitVersionTask.dll" />
   <UsingTask TaskName="SimpleGitVersion.CreateAssemblyInfoTask" AssemblyFile="$(SolutionDir)..\..\SimpleGitVersionTask\bin\Debug\SimpleGitVersionTask.dll" />
+  
   <Target Name="BeforeBuild">
-    <SimpleGitVersion.GetGitRepositoryInfoTask SolutionDirectory="$(SolutionDir)">
+    <SimpleGitVersion.GetGitRepositoryInfoTask>
+      <Output TaskParameter="GitSolutionDirectory" PropertyName="SGVGitSolutionDirectory" />
       <Output TaskParameter="MajorMinor" PropertyName="SGVMajorMinor" />
+      <Output TaskParameter="MajorMinorPatch" PropertyName="SGVMajorMinorPatch" />
+      <Output TaskParameter="SemVer" PropertyName="SGVSemVer" />
       <Output TaskParameter="NuGetVersion" PropertyName="SGVNuGetVersion" />
       <Output TaskParameter="DottedOrderedVersion" PropertyName="SGVFileVersion" />
       <Output TaskParameter="CommitSha" PropertyName="SGVCommitSha" />
       <Output TaskParameter="CurrentUserName" PropertyName="SGVCurrentUserName" />
     </SimpleGitVersion.GetGitRepositoryInfoTask>
-    <SimpleGitVersion.CreateAssemblyInfoTask IntermediateOutputPath="$(IntermediateOutputPath)" AssemblyVersionInfo="$(SGVMajorMinor)" AssemblyFileVersionInfo="$(SGVFileVersion)" AssemblyInformationalVersionInfo="$(SGVNuGetVersion) Sha:$(SGVCommitSha) User:$(SGVCurrentUserName)">
+    
+    <SimpleGitVersion.CreateAssemblyInfoTask 
+            GitSolutionDirectory="$(SGVGitSolutionDirectory)"
+            IntermediateOutputPath="$(IntermediateOutputPath)"
+            MajorMinor="$(SGVMajorMinor)" 
+            MajorMinorPatch="$(SGVMajorMinorPatch)" 
+            SemVer="$(SGVSemVer)" 
+            AssemblyFileVersionInfo="$(SGVFileVersion)" 
+            AssemblyInformationalVersionInfo="$(SGVNuGetVersion) Sha:$(SGVCommitSha) User:$(SGVCurrentUserName)"
+            >
       <Output TaskParameter="AssemblyInfoTempFilePath" PropertyName="AssemblyInfoTempFilePath" />
     </SimpleGitVersion.CreateAssemblyInfoTask>
     <ItemGroup>

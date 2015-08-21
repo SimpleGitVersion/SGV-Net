@@ -177,7 +177,7 @@ namespace SimpleGitVersion
                     // Same version from child. This is valid only if applicable is true.
                     if( !applicable )
                     {
-                        errors.AppendLine( String.Format( "Invalid repository: version '{0}' on {1} is also on {2} but the content is not the same! Fix the repository by deleting one of the tag (or create a '+invalid' one if it is already pushed).",
+                        errors.AppendLine( string.Format( "Invalid repository: version '{0}' on {1} is also on {2} but the content is not the same! Fix the repository by deleting one of the tag (or create a '+invalid' one if it is already pushed).",
                                                             _bestTag.ToString(), CommitSha, child.CommitSha ) );
                     }
                     return false;
@@ -193,7 +193,7 @@ namespace SimpleGitVersion
                 {
                     if( _bestTag == _thisTag )
                     {
-                        errors.AppendLine( String.Format( "Invalid repository: version '{0}' on '{1}' is greater than version '{2}' on '{3}'. Fix the repository by deleting one of the tag (or create a '+invalid' one if it is already pushed).",
+                        errors.AppendLine( string.Format( "Invalid repository: version '{0}' on '{1}' is greater than version '{2}' on '{3}'. Fix the repository by deleting one of the tag (or create a '+invalid' one if it is already pushed).",
                                                         _bestTag.ToString(), CommitSha, tagChild.ToString(), child.CommitSha ) );
                     }
                     return false;

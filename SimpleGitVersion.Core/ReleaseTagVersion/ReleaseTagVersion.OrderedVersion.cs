@@ -98,7 +98,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the very last possible version.
         /// </summary>
-        public static readonly ReleaseTagVersion VeryLastVersion = new ReleaseTagVersion( String.Format( "{0}.{1}.{2}", MaxMajor, MaxMinor, MaxPatch ), MaxMajor, MaxMinor, MaxPatch, String.Empty, -1, 0, 0, ReleaseTagKind.Release );
+        public static readonly ReleaseTagVersion VeryLastVersion = new ReleaseTagVersion( string.Format( "{0}.{1}.{2}", MaxMajor, MaxMinor, MaxPatch ), MaxMajor, MaxMinor, MaxPatch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
 
         /// <summary>
         /// Initializes a new tag from an ordered version that must be between 0 (invalid tag) and <see cref="VeryLastVersion"/>.<see cref="OrderedVersion"/>.
@@ -144,7 +144,7 @@ namespace SimpleGitVersion
                 {
                     v -= MulPatch;
                     PreReleaseNameIdx = -1;
-                    PreReleaseNameFromTag = String.Empty;
+                    PreReleaseNameFromTag = string.Empty;
                     Kind = ReleaseTagKind.Release;
                 }
                 Major = (int)(v / MulMajor);

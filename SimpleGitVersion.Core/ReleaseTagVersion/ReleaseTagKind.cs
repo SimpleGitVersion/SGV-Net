@@ -111,7 +111,7 @@ namespace SimpleGitVersion
                 case ReleaseTagKind.MarkedPublished: return prefixPlus ? "+published" : "published";
                 case ReleaseTagKind.MarkedInvalid: return prefixPlus ? "+invalid" : "invalid";
             }
-            return String.Empty;
+            return string.Empty;
         }
 
 

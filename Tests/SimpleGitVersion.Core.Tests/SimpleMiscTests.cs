@@ -84,5 +84,15 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCIPrev,  sNuGet ) < 0, "{0} < {1}", sNuGetCIPrev, sNuGet );
             Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCIPrev, sNuGetCINext ) < 0, "{0} < {1}", sNuGetCIPrev, sNuGetCINext );
         }
+
+        [Test]
+        [Explicit]
+        public void test_on_repository()
+        {
+            RepositoryInfo i = RepositoryInfo.LoadFromPath( @"E:\Dev\CK-Core" );
+            Assert.That( i.ValidReleaseTag, Is.Null );
+            SimpleRepositoryInfo si = new SimpleRepositoryInfo( new ConsoleLogger(), i );
+
+        }
     }
 }

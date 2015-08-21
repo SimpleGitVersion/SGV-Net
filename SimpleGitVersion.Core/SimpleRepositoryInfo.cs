@@ -14,6 +14,7 @@ namespace SimpleGitVersion
     {
         /// <summary>
         /// Gets the <see cref="RepositoryInfo"/> onto which this simplified representation is built.
+        /// Never null.
         /// </summary>
         public RepositoryInfo Info { get; private set; }
 
@@ -116,15 +117,15 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets the version in <see cref="ReleaseTagFormat.SemVer"/> format.
-        /// When <see cref="IsValid"/> is false, it is null.
+        /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
+        /// any attempt to use this to actually package something will fail.
         /// </summary>
         public string SemVer { get; private set; }
 
         /// <summary>
         /// Gets the NuGet version to use.
         /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
-        /// any attempt to use this to actually package something will fail and this is used as the InformationalVersionInfo (Windows Product version) content
-        /// so that it immediately appears that the assembly is not a good one to use.
+        /// any attempt to use this to actually package something will fail.
         /// </summary>
         public string NuGetVersion { get; private set; }
 
@@ -208,8 +209,8 @@ namespace SimpleGitVersion
                     }
                 }
             }
-            MajorMinor = String.Format( "{0}.{1}", Major, Minor );
-            MajorMinorPatch = String.Format( "{0}.{1}", MajorMinor, Patch );
+            MajorMinor = string.Format( "{0}.{1}", Major, Minor );
+            MajorMinorPatch = string.Format( "{0}.{1}", MajorMinor, Patch );
         }
 
         void LogPossibleVersions( ILogger logger, RepositoryInfo info )
@@ -224,7 +225,7 @@ namespace SimpleGitVersion
             }
             else
             {
-                logger.Info( "Possible release tags are: {0}", String.Join( ", ", info.AllPossibleVersions ) );
+                logger.Info( "Possible release tags are: {0}", string.Join( ", ", info.AllPossibleVersions ) );
             }
         }
 
@@ -264,13 +265,13 @@ namespace SimpleGitVersion
             Major = 0;
             Minor = 0;
             Patch = 0;
-            PreReleaseName = String.Empty;
+            PreReleaseName = string.Empty;
             PreReleaseNumber = 0;
             PreReleaseFix = 0;
             DottedOrderedVersion = "0.0.0.0";
             OrderedVersion = 0;
             NuGetVersion = reason;
-            SemVer = null;
+            SemVer = reason;
         }
     }
 }

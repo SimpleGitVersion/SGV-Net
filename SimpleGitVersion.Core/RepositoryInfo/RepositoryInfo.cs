@@ -17,6 +17,12 @@ namespace SimpleGitVersion
     public partial class RepositoryInfo
     {
         /// <summary>
+        /// Gets the solution directory: the one that contains the .git folder.
+        /// Null only if <see cref="RepositoryError"/> is 'No Git repository.'.
+        /// </summary>
+        public readonly string GitSolutionDirectory;
+
+        /// <summary>
         /// Gets the repository level error if any: it is one line of text or null ('No Git repository.' or 'Unitialized Git repository.').
         /// </summary>
         public readonly string RepositoryError;
@@ -144,17 +150,19 @@ namespace SimpleGitVersion
 
         RepositoryInfo()
         {
-            CurrentUserName = String.IsNullOrWhiteSpace( Environment.UserDomainName )
+            CurrentUserName = string.IsNullOrWhiteSpace( Environment.UserDomainName )
                            ? Environment.UserName
                            : string.Format( @"{0}\{1}", Environment.UserDomainName, Environment.UserName );
         }
 
-        RepositoryInfo( Repository r, RepositoryInfoOptions options = null )
+        RepositoryInfo( Repository r, RepositoryInfoOptions options, string gitSolutionDir )
             : this()
         {
             if( r == null ) RepositoryError = "No Git repository.";
             else
             {
+                Debug.Assert( gitSolutionDir != null );
+                GitSolutionDirectory = gitSolutionDir;
                 if( options == null ) options = new RepositoryInfoOptions();
                 Commit commit;
                 CIBranchVersionMode ciVersionMode;
@@ -224,7 +232,7 @@ namespace SimpleGitVersion
                                             // If there is no previous release, we fall back to ZeroTimed mode.
                                             if( ciVersionMode == CIBranchVersionMode.ZeroTimed || PreviousRelease == null )
                                             {
-                                                var name = String.Format( "0.0.0--ci-{0}-{1:u}", ciVersionName, commit.Committer.When );
+                                                var name = string.Format( "0.0.0--ci-{0}-{1:u}", ciVersionName, commit.Committer.When );
                                                 string suffix = PreviousRelease != null ? '+' + PreviousRelease.ToString() : null;
                                                 CIBuildVersionNuGet = CIBuildVersion = ciVersionName + suffix;
                                             }
@@ -250,11 +258,11 @@ namespace SimpleGitVersion
                                             errors.Append( "Release tag '" )
                                                     .Append( cv.Tag.OriginalTagText )
                                                     .Append( "' is not valid here. Possible tags are: " )
-                                                    .Append( String.Join( ", ", PossibleVersions ) );
+                                                    .Append( string.Join( ", ", PossibleVersions ) );
                                             if( PossibleVersionsFromContent.Count > 0 )
                                             {
                                                 errors.Append( " or (from content): '" )
-                                                    .Append( String.Join( ", ", PossibleVersionsFromContent ) );
+                                                    .Append( string.Join( ", ", PossibleVersionsFromContent ) );
                                             }
                                             errors.AppendLine();
                                         }
@@ -307,10 +315,10 @@ namespace SimpleGitVersion
             string commitSha = options.StartingCommitSha;
 
             // Find current commit (the head) if none is provided.
-            if( String.IsNullOrWhiteSpace( commitSha ) )
+            if( string.IsNullOrWhiteSpace( commitSha ) )
             {
                 string branchName;
-                if( String.IsNullOrWhiteSpace( options.StartingBranchName ) )
+                if( string.IsNullOrWhiteSpace( options.StartingBranchName ) )
                 {
                     commit = r.Head.Tip;
                     if( commit == null ) return "Unitialized Git repository.";
@@ -319,7 +327,7 @@ namespace SimpleGitVersion
                 else
                 {
                     Branch br = r.Branches[options.StartingBranchName];
-                    if( br == null ) return String.Format( "Unknown StartingBranchName: '{0}'.", options.StartingBranchName );
+                    if( br == null ) return string.Format( "Unknown StartingBranchName: '{0}'.", options.StartingBranchName );
                     commit = br.Tip;
                     branchName = br.Name;
                 }
@@ -329,13 +337,13 @@ namespace SimpleGitVersion
                     && bOpt.CIVersionMode != CIBranchVersionMode.None )
                 {
                     ciVersionMode = bOpt.CIVersionMode;
-                    branchNameForCIVersion = String.IsNullOrWhiteSpace( bOpt.VersionName ) ? bOpt.Name : bOpt.VersionName;
+                    branchNameForCIVersion = string.IsNullOrWhiteSpace( bOpt.VersionName ) ? bOpt.Name : bOpt.VersionName;
                 }
             }
             else
             {
                 commit = r.Lookup<Commit>( commitSha );
-                if( commit == null ) return String.Format( "Commit '{0}' not found.", commitSha );
+                if( commit == null ) return string.Format( "Commit '{0}' not found.", commitSha );
             }
             return null;
         }
@@ -352,13 +360,13 @@ namespace SimpleGitVersion
         /// </summary>
         /// <param name="path">The path to lookup.</param>
         /// <param name="options">Optional <see cref="RepositoryInfoOptions"/>.</param>
-        /// <returns>An immutable RepositoryInfo instance.</returns>
+        /// <returns>An immutable RepositoryInfo instance. Never null.</returns>
         public static RepositoryInfo LoadFromPath( string path, RepositoryInfoOptions options = null )
         {
             if( path == null ) throw new ArgumentNullException( nameof( path ) );
             using( var repo = GitHelper.LoadFromPath( path ) )
             {
-                return new RepositoryInfo( repo, options );
+                return new RepositoryInfo( repo, options, repo != null ? GetGitDirectory( repo ) : null );
             }
         }
 
@@ -368,7 +376,7 @@ namespace SimpleGitVersion
         /// </summary>
         /// <param name="path">The path to lookup.</param>
         /// <param name="optionsBuilder">Function that can create a <see cref="RepositoryInfoOptions"/> from the path of the Git repository (the Solution folder).</param>
-        /// <returns>An immutable RepositoryInfo instance.</returns>
+        /// <returns>An immutable RepositoryInfo instance. Never null.</returns>
         public static RepositoryInfo LoadFromPath( string path, Func<string,RepositoryInfoOptions> optionsBuilder )
         {
             if( path == null ) throw new ArgumentNullException( nameof( path ) );
@@ -376,18 +384,26 @@ namespace SimpleGitVersion
 
             using( var repo = GitHelper.LoadFromPath( path ) )
             {
-                string gitPath = repo.Info.Path;
-                char lastChar = gitPath[gitPath.Length - 1];
-                if( lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar )
-                {
-                    gitPath = gitPath.Substring( 0, gitPath.Length - 1 );
-                }
-                if( gitPath.EndsWith( Path.DirectorySeparatorChar + ".git" ) || gitPath.EndsWith( Path.AltDirectorySeparatorChar + ".git" ) )
-                {
-                    gitPath = gitPath.Substring( 0, gitPath.Length - 5 );
-                }
-                return new RepositoryInfo( repo, optionsBuilder( gitPath ) );
+                if( repo == null ) return new RepositoryInfo( null, null, null );
+                string gitPath = GetGitDirectory( repo );
+                return new RepositoryInfo( repo, optionsBuilder( gitPath ), gitPath );
             }
+        }
+
+        private static string GetGitDirectory( Repository repo )
+        {
+            string gitPath = repo.Info.Path;
+            char lastChar = gitPath[gitPath.Length - 1];
+            if( lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar )
+            {
+                gitPath = gitPath.Substring( 0, gitPath.Length - 1 );
+            }
+            if( gitPath.EndsWith( Path.DirectorySeparatorChar + ".git" ) || gitPath.EndsWith( Path.AltDirectorySeparatorChar + ".git" ) )
+            {
+                gitPath = gitPath.Substring( 0, gitPath.Length - 5 );
+            }
+
+            return gitPath;
         }
     }
 }

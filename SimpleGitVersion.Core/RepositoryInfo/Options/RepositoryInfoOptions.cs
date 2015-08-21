@@ -57,6 +57,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets or sets an enumerable of commits' sha with tags. Defaults to null.
         /// All commit sha MUST exist in the repository otherwise an error will be added to the error collector.
+        /// If the key is "head" (instead of a SHA1) the tags are applied on the current head of the repository.
         /// These tags are applied as if they exist in the repository.
         /// </summary>
         /// <remarks>

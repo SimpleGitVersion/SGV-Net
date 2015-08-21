@@ -33,7 +33,7 @@ namespace SimpleGitVersion
 
             if( f == ReleaseTagFormat.DottedOrderedVersion )
             {
-                return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}.{3}", OrderedVersionMajor, OrderedVersionMinor, OrderedVersionBuild, OrderedVersionRevision );
+                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}.{3}", OrderedVersionMajor, OrderedVersionMinor, OrderedVersionBuild, OrderedVersionRevision );
             }
 
             string prName = usePreReleaseNameFromTag ? PreReleaseNameFromTag : PreReleaseName;
@@ -53,34 +53,34 @@ namespace SimpleGitVersion
                             {
                                 if( isCIBuild )
                                 {
-                                    return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                                 }
-                                return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                             }
                             if( PreReleaseNumber > 0 )
                             {
                                 if( isCIBuild )
                                 {
-                                    return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-00-{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-00-{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                                 }
-                                return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                             }
                             if( isCIBuild )
                             {
-                                return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-00-00-{4}", Major, Minor, Patch, prName, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-00-00-{4}", Major, Minor, Patch, prName, suffix );
                             }
-                            return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, suffix );
+                            return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, suffix );
                         }
                         if( isCIBuild )
                         {
-                            return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}--{3}", Major, Minor, Patch+1, suffix );
+                            return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}--{3}", Major, Minor, Patch+1, suffix );
                         }
-                        return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}{3}", Major, Minor, Patch, suffix );
+                        return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}{3}", Major, Minor, Patch, suffix );
                     }
                 case ReleaseTagFormat.SemVer:
                 case ReleaseTagFormat.SemVerWithMarker:
                     {
-                        string suffix = f == ReleaseTagFormat.SemVerWithMarker ? Marker : String.Empty;
+                        string suffix = f == ReleaseTagFormat.SemVerWithMarker ? Marker : string.Empty;
                         bool isCIBuild = buildInfo != null && buildInfo.IsApplicable;
                         if( isCIBuild )
                         {
@@ -92,29 +92,29 @@ namespace SimpleGitVersion
                             {
                                 if( isCIBuild )
                                 {
-                                    return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}.{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}.{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                                 }
-                                return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                             }
                             if( PreReleaseNumber > 0 )
                             {
                                 if( isCIBuild )
                                 {
-                                    return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.0.{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.0.{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                                 }
-                                return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                             }
                             if( isCIBuild )
                             {
-                                return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.0.0.{4}", Major, Minor, Patch, prName, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.0.0.{4}", Major, Minor, Patch, prName, suffix );
                             }
-                            return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, suffix );
+                            return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, suffix );
                         }
                         if( isCIBuild )
                         {
-                            return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}--{3}", Major, Minor, Patch+1, suffix );
+                            return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}--{3}", Major, Minor, Patch+1, suffix );
                         }
-                        return String.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}{3}", Major, Minor, Patch, suffix );
+                        return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}{3}", Major, Minor, Patch, suffix );
                     }
                 default:
                     {
@@ -123,15 +123,15 @@ namespace SimpleGitVersion
                         {
                             if( IsPreReleaseFix )
                             {
-                                return String.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, Marker );
+                                return string.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, Marker );
                             }
                             if( PreReleaseNumber > 0 )
                             {
-                                return String.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}.{4}{5}", Major, Minor, Patch, prName, PreReleaseNumber, Marker );
+                                return string.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}.{4}{5}", Major, Minor, Patch, prName, PreReleaseNumber, Marker );
                             }
-                            return String.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, Marker );
+                            return string.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, Marker );
                         }
-                        return String.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}{3}", Major, Minor, Patch, Marker );
+                        return string.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}{3}", Major, Minor, Patch, Marker );
                     }
             }
         }

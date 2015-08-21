@@ -83,14 +83,30 @@ namespace SimpleGitVersion
                 {
                     foreach( var k in overridenTags )
                     {
-                        Commit o = repo.Lookup<Commit>( k.Key );
-                        if( o == null )
+                        Commit o = null;
+                        if( string.IsNullOrEmpty( k.Key ) )
                         {
-                            errors.AppendFormat( "Overriden commit '{0}' does not exist.", k.Key ).AppendLine();
+                            errors.AppendFormat( "Invalid overriden commit: the key is null or empty." ).AppendLine();
                         }
-                        else foreach( string tagName in k.Value )
+                        else if( k.Key.Equals( "head", StringComparison.OrdinalIgnoreCase ) )
                         {
-                            RegisterTag( errors, o, tagName, analyseInvalidTagSyntax, ref startingVersionForCSemVerFound );
+                            o = repo.Head.Tip;
+                            Debug.Assert( o != null, "Unitialized Git repository. Already handled." );
+                        }
+                        else
+                        {
+                            o = repo.Lookup<Commit>( k.Key );
+                            if( o == null )
+                            {
+                                errors.AppendFormat( "Overriden commit '{0}' does not exist.", k.Key ).AppendLine();
+                            }
+                        }
+                        if( o != null)
+                        {
+                            foreach( string tagName in k.Value )
+                            {
+                                RegisterTag( errors, o, tagName, analyseInvalidTagSyntax, ref startingVersionForCSemVerFound );
+                            }
                         }
                     }
                 }
@@ -146,8 +162,7 @@ namespace SimpleGitVersion
                     var first = existingVersions[0].ThisTag;
                     if( _startingVersionForCSemVer == null && !first.IsDirectPredecessor( null ) )
                     {
-                        errors.AppendFormat( "First existing version is '{0}' (on '{1}'). One of the possible first versions is missing: ", first, existingVersions[0].CommitSha )
-                                .Append( String.Join( ", ", ReleaseTagVersion.FirstPossibleVersions ) )
+                        errors.AppendFormat( "First existing version is '{0}' (on '{1}'). One or more previous versions are missing.", first, existingVersions[0].CommitSha )
                                 .AppendLine();
                     }
                     for( int i = 0; i < existingVersions.Count - 1; ++i )

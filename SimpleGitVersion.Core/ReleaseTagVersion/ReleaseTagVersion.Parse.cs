@@ -21,7 +21,7 @@ namespace SimpleGitVersion
         ReleaseTagVersion( string tag, bool isMalformed, string errorMessage )
         {
             Debug.Assert( tag != null );
-            Debug.Assert( !String.IsNullOrWhiteSpace( errorMessage ) );
+            Debug.Assert( !string.IsNullOrWhiteSpace( errorMessage ) );
             OriginalTagText = tag;
             Kind = ReleaseTagKind.None;
             if( isMalformed )
@@ -29,7 +29,7 @@ namespace SimpleGitVersion
                 Kind = ReleaseTagKind.Malformed;
                 DefinitionStrength = 1;
             }
-            ParseErrorMessage = isMalformed ? String.Format( "Tag '{0}': {1}", tag, errorMessage ) : errorMessage;
+            ParseErrorMessage = isMalformed ? string.Format( "Tag '{0}': {1}", tag, errorMessage ) : errorMessage;
             PreReleaseNameIdx = -1;
             PreReleaseFix = 0;
         }
@@ -71,9 +71,9 @@ namespace SimpleGitVersion
             string sPatch = m.Groups[3].Value;
 
             int major, minor, patch;
-            if( !Int32.TryParse( sMajor, out major ) || major > MaxMajor ) return new ReleaseTagVersion( s, true, String.Format( "Incorrect Major version. Must not be greater than {0}.", MaxMajor ) );
-            if( !Int32.TryParse( sMinor, out minor ) || minor > MaxMinor ) return new ReleaseTagVersion( s, true, String.Format( "Incorrect Minor version. Must not be greater than {0}.", MaxMinor ) );
-            if( !Int32.TryParse( sPatch, out patch ) || patch > MaxPatch ) return new ReleaseTagVersion( s, true, String.Format( "Incorrect Patch version. Must not be greater than {0}.", MaxPatch ) );
+            if( !Int32.TryParse( sMajor, out major ) || major > MaxMajor ) return new ReleaseTagVersion( s, true, string.Format( "Incorrect Major version. Must not be greater than {0}.", MaxMajor ) );
+            if( !Int32.TryParse( sMinor, out minor ) || minor > MaxMinor ) return new ReleaseTagVersion( s, true, string.Format( "Incorrect Minor version. Must not be greater than {0}.", MaxMinor ) );
+            if( !Int32.TryParse( sPatch, out patch ) || patch > MaxPatch ) return new ReleaseTagVersion( s, true, string.Format( "Incorrect Patch version. Must not be greater than {0}.", MaxPatch ) );
 
             string sPRName = m.Groups[4].Value;
             string sPRNum = m.Groups[5].Value;
@@ -87,7 +87,7 @@ namespace SimpleGitVersion
             {
                 if( sPRFix.Length > 0 ) prFix = Int32.Parse( sPRFix );
                 if( sPRNum.Length > 0 ) prNum = Int32.Parse( sPRNum );
-                if( prFix == 0 && prNum == 0 && sPRNum.Length > 0 ) return new ReleaseTagVersion( s, true, String.Format( "Incorrect '.0' Release Number version. 0 can appear only to fix the first pre release (ie. '.0.F' where F is between 1 and {0}).", MaxPreReleaseFix ) );
+                if( prFix == 0 && prNum == 0 && sPRNum.Length > 0 ) return new ReleaseTagVersion( s, true, string.Format( "Incorrect '.0' Release Number version. 0 can appear only to fix the first pre release (ie. '.0.F' where F is between 1 and {0}).", MaxPreReleaseFix ) );
             }
             ReleaseTagKind kind = prNameIdx >= 0 ? ReleaseTagKind.PreRelease : ReleaseTagKind.Release;
             if( sBuldMetaData.Length > 0 )
@@ -116,17 +116,17 @@ namespace SimpleGitVersion
                     string[] dotParts = prerelease.Split( '.' );
                     if( !Regex.IsMatch( dotParts[0], "^[a-z]+$", RegexOptions.CultureInvariant ) )
                     {
-                        return "Pre release name must be only alpha (a-z) and should be: " + String.Join( ", ", _standardNames );
+                        return "Pre release name must be only alpha (a-z) and should be: " + string.Join( ", ", _standardNames );
                     }
                     if( dotParts.Length > 1 )
                     {
                         int prNum, prFix;
-                        if( !Int32.TryParse( dotParts[1], out prNum ) || prNum < 0 || prNum > MaxPreReleaseNumber ) return String.Format( "Pre Release Number must be between 1 and {0}.", MaxPreReleaseNumber );
+                        if( !Int32.TryParse( dotParts[1], out prNum ) || prNum < 0 || prNum > MaxPreReleaseNumber ) return string.Format( "Pre Release Number must be between 1 and {0}.", MaxPreReleaseNumber );
                         if( dotParts.Length > 2 )
                         {
-                            if( !Int32.TryParse( dotParts[2], out prFix ) || prFix < 1 || prFix > MaxPreReleaseFix ) return String.Format( "Fix Number must be between 1 and {0}.", MaxPreReleaseFix );
+                            if( !Int32.TryParse( dotParts[2], out prFix ) || prFix < 1 || prFix > MaxPreReleaseFix ) return string.Format( "Fix Number must be between 1 and {0}.", MaxPreReleaseFix );
                         }
-                        else if( prNum == 0 ) return String.Format( "Incorrect '.0' release Number version. 0 can appear only to fix the first pre release (ie. '.0.XX' where XX is between 1 and {0}).", MaxPreReleaseFix );
+                        else if( prNum == 0 ) return string.Format( "Incorrect '.0' release Number version. 0 can appear only to fix the first pre release (ie. '.0.XX' where XX is between 1 and {0}).", MaxPreReleaseFix );
                     }
                     if( dotParts.Length > 3 ) return "Too much parts: there can be at most two trailing numbers like in '-alpha.1.2'.";
                 }

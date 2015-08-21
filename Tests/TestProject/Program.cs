@@ -23,9 +23,13 @@ namespace TestProject
             var iInfo = Assembly.GetCallingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>();
 
             Console.WriteLine( "Attributes:" );
-            Console.WriteLine( "AssemblyVersion: {0}", aInfo );
-            Console.WriteLine( "AssemblyFileVersion: {0}", fInfo != null ? fInfo.Version : "(null)" );
-            Console.WriteLine( "AssemblyInformationalVersion: {0}", iInfo != null ? iInfo.InformationalVersion : "(null)" );
+            Console.WriteLine( "  AssemblyVersion: {0}", aInfo );
+            Console.WriteLine( "  AssemblyFileVersion: {0}", fInfo != null ? fInfo.Version : "(null)" );
+            Console.WriteLine( "  AssemblyInformationalVersion: {0}", iInfo != null ? iInfo.InformationalVersion : "(null)" );
+
+            object thisAttr = Assembly.GetExecutingAssembly().GetCustomAttributes().FirstOrDefault( a => a.GetType().Name == "SimpleGitVersionInfoAttribute" );
+            Console.WriteLine( "  SimpleGitVersionInfo: {0}", thisAttr != null ? thisAttr.ToString() : "(null)" );
+
             Console.ReadKey();
         }
     }

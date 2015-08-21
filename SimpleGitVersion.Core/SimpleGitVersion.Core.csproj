@@ -15,12 +15,14 @@
     <NuGetPackageImportStamp>159c4909</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
   </PropertyGroup>
+  
   <PropertyGroup>
     <StartAction>Program</StartAction>
     <StartProgram>$(MSBuildBinPath)\MSBuild.exe</StartProgram>
     <StartWorkingDirectory>$(SolutionDir)Tests\TestProject\</StartWorkingDirectory>
     <StartArguments>&gt; BuildLog.txt</StartArguments>
   </PropertyGroup>
+  
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>

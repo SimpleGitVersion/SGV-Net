@@ -14,13 +14,17 @@ namespace SimpleGitVersion
     /// </summary>
     public class GetGitRepositoryInfoTask : Task 
     {
-        [Required]
-        public string SolutionDirectory { get; set; }
+        /// <summary>
+        /// Gets the solution directory: the one that contains the .git folder.
+        /// </summary>
+        [Output]
+        public string GitSolutionDirectory { get; set; }
 
         /// <summary>
         /// Gets whether a release can be produced from the current commit point.
         /// It is either a release or a CI build (see <see cref="IsValidRelease"/> and <see cref="IsValidCIBuild"/>).
         /// </summary>
+        [Output]
         public bool IsValid { get { return OrderedVersion != 0m; } }
 
         /// <summary>
@@ -35,9 +39,20 @@ namespace SimpleGitVersion
         [Output]
         public bool IsValidCIBuild { get; set; }
 
+        /// <summary>
+        /// Gets the semantic version.
+        /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
+        /// any attempt to use this to actually package something will fail.
+        /// </summary>
         [Output]
         public string SemVer { get; set; }
 
+        /// <summary>
+        /// Gets the NuGet version to use.
+        /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
+        /// any attempt to use this to actually package something will fail and this is used as the InformationalVersionInfo (Windows Product version) content
+        /// so that it immediately appears that the assembly is not a good one to use.
+        /// </summary>
         [Output]
         public string NuGetVersion { get; set; }
 
@@ -120,7 +135,8 @@ namespace SimpleGitVersion
         {
             try
             {
-                var i = SimpleRepositoryInfo.LoadFromPath( new Logger( this ), SolutionDirectory );
+                var i = SimpleRepositoryInfo.LoadFromPath( new Logger( this ), BuildEngine.ProjectFileOfTaskNode );
+                GitSolutionDirectory = i.Info.GitSolutionDirectory;
                 IsValidRelease = i.IsValidRelease;
                 IsValidCIBuild = i.IsValidCIBuild;
                 SemVer = i.SemVer;

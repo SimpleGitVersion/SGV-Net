@@ -40,19 +40,19 @@ namespace SimpleGitVersion
     {
         static public void Error( this ILogger @this, string msg, params object[] parameters )
         {
-            @this.Error( String.Format( msg, parameters ) );
+            @this.Error( string.Format( msg, parameters ) );
         }
         static public void Warn( this ILogger @this, string msg, params object[] parameters )
         {
-            @this.Warn( String.Format( msg, parameters ) );
+            @this.Warn( string.Format( msg, parameters ) );
         }
         static public void Info( this ILogger @this, string msg, params object[] parameters )
         {
-            @this.Info( String.Format( msg, parameters ) );
+            @this.Info( string.Format( msg, parameters ) );
         }
         static public void Trace( this ILogger @this, string msg, params object[] parameters )
         {
-            @this.Trace( String.Format( msg, parameters ) );
+            @this.Trace( string.Format( msg, parameters ) );
         }
     }
 }

@@ -8,22 +8,22 @@ namespace SimpleGitVersion
     {
         public static void LogError( this ITask @this, string message, string file = null )
         {
-            @this.BuildEngine.LogErrorEvent( new BuildErrorEventArgs( String.Empty, String.Empty, file, 0, 0, 0, 0, message, String.Empty, "SimpleGitVersionTask" ) );
+            @this.BuildEngine.LogErrorEvent( new BuildErrorEventArgs( string.Empty, string.Empty, file, 0, 0, 0, 0, message, string.Empty, "SimpleGitVersionTask" ) );
         }
 
         public static void LogWarning( this ITask @this, string message, params object[] parameters )
         {
-            @this.BuildEngine.LogWarningEvent( new BuildWarningEventArgs( string.Empty, String.Empty, null, 0, 0, 0, 0, String.Format( message, parameters ), String.Empty, "SimpleGitVersionTask" ) );
+            @this.BuildEngine.LogWarningEvent( new BuildWarningEventArgs( string.Empty, string.Empty, null, 0, 0, 0, 0, string.Format( message, parameters ), string.Empty, "SimpleGitVersionTask" ) );
         }
 
         public static void LogInfo( this ITask @this, string message, params object[] parameters )
         {
-            @this.BuildEngine.LogMessageEvent( new BuildMessageEventArgs( String.Format( message, parameters ), String.Empty, "SimpleGitVersionTask", MessageImportance.High ) );
+            @this.BuildEngine.LogMessageEvent( new BuildMessageEventArgs( string.Format( message, parameters ), string.Empty, "SimpleGitVersionTask", MessageImportance.High ) );
         }
 
         public static void LogTrace( this ITask @this, string message, params object[] parameters )
         {
-            @this.BuildEngine.LogMessageEvent( new BuildMessageEventArgs( String.Format( message, parameters ), String.Empty, "SimpleGitVersionTask", MessageImportance.Normal ) );
+            @this.BuildEngine.LogMessageEvent( new BuildMessageEventArgs( string.Format( message, parameters ), string.Empty, "SimpleGitVersionTask", MessageImportance.Normal ) );
         }
 
     }

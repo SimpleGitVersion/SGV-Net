@@ -12,6 +12,7 @@ namespace SimpleGitVersion.Core.Tests
         public class ReleaseTagVersionTests
         {
 
+        [TestCase( "0.2.0" )]
         [TestCase( "0.1.2" )]
         [TestCase( "0.1.1" )]
         [TestCase( "0.1.0" )]
@@ -29,7 +30,7 @@ namespace SimpleGitVersion.Core.Tests
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
             var succ = t.GetDirectSuccessors( false );
 
-            Console.WriteLine( " -> - found {0} successors for '{1}' (Ordered Version={2}, File={3}.{4}.{5}.{6}):",
+            Console.WriteLine( " -> - found {0} successors for '{1}' (Ordered Version = {2}, File = {3}.{4}.{5}.{6}):",
                                 succ.Count(),
                                 t,
                                 t.OrderedVersion,
@@ -38,17 +39,17 @@ namespace SimpleGitVersion.Core.Tests
                                 t.OrderedVersionBuild,
                                 t.OrderedVersionRevision
                                 );
-            Console.WriteLine( "      " + String.Join( ", ", succ.Select( s => s.ToString() ) ) );
+            Console.WriteLine( "      " + string.Join( ", ", succ.Select( s => s.ToString() ) ) );
 
             var closest = t.GetDirectSuccessors( true ).Select( s => s.ToString() ).ToList();
             Console.WriteLine( "    - {0} closest successors:", closest.Count, t );
-            Console.WriteLine( "      " + String.Join( ", ", closest ) );
+            Console.WriteLine( "      " + string.Join( ", ", closest ) );
         }
 
         [TestCase( "v0.0.0-alpha.0.999" )]
             public void fix_parsing_syntax_error_helper_max_prerelease_fix(string tag)
             {
-                var error = String.Format( "Fix Number must be between 1 and {0}.", ReleaseTagVersion.MaxPreReleaseFix );
+                var error = string.Format( "Fix Number must be between 1 and {0}.", ReleaseTagVersion.MaxPreReleaseFix );
 
                 ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag, true );
                 Assert.That(t.ParseErrorMessage, Contains.Substring(error));
@@ -165,7 +166,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( t.OrderedVersionMinor, Is.EqualTo( oMinor ) );
                 Assert.That( t.OrderedVersionBuild, Is.EqualTo( oBuild ) );
                 Assert.That( t.OrderedVersionRevision, Is.EqualTo( oRevision ) );
-                Assert.That( t.ToString( ReleaseTagFormat.DottedOrderedVersion ), Is.EqualTo( String.Format("{0}.{1}.{2}.{3}", oMajor, oMinor, oBuild, oRevision ) ) );
+                Assert.That( t.ToString( ReleaseTagFormat.DottedOrderedVersion ), Is.EqualTo( string.Format("{0}.{1}.{2}.{3}", oMajor, oMinor, oBuild, oRevision ) ) );
             }
 
             [TestCase( "0", false )]
@@ -362,7 +363,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( rStart != null && rStart.IsValid );
                 // Checks successors (and that they are ordered).
                 var cNext = rStart.GetDirectSuccessors( true ).Select( v => v.ToString() ).ToArray();
-                CollectionAssert.AreEqual( next, cNext, start + " => " + String.Join( ", ", cNext ) );
+                CollectionAssert.AreEqual( next, cNext, start + " => " + string.Join( ", ", cNext ) );
                 Assert.That( rStart.GetDirectSuccessors( true ), Is.Ordered );
                 // For each successor, check that the start is a predecessor.
                 foreach( var n in rStart.GetDirectSuccessors( true ) )
@@ -437,10 +438,10 @@ namespace SimpleGitVersion.Core.Tests
                 if( count > _greatersuccessorCount )
                 {
                     Console.WriteLine( " -> - found {0} successors for '{1}':", count, t );
-                    Console.WriteLine( "      " + String.Join( ", ", t.GetDirectSuccessors( false ).Select( s => s.ToString() ) ) );
+                    Console.WriteLine( "      " + string.Join( ", ", t.GetDirectSuccessors( false ).Select( s => s.ToString() ) ) );
                     var closest = t.GetDirectSuccessors( true ).Select( s => s.ToString() ).ToList();
                     Console.WriteLine( "    - {0} closest successors:", closest.Count, t );
-                    Console.WriteLine( "      " + String.Join( ", ", closest ) );
+                    Console.WriteLine( "      " + string.Join( ", ", closest ) );
                     _greatersuccessorCount = count;
                 }
                 return t;

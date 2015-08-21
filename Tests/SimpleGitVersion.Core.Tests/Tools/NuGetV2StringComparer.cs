@@ -25,7 +25,7 @@ namespace SimpleGitVersion
             if( vX.Prerelease.Length == 0 && vY.Prerelease.Length == 0 ) return 0;
             if( vX.Prerelease.Length == 0 ) return 1;
             if( vY.Prerelease.Length == 0 ) return -1;
-            return String.CompareOrdinal( vX.Prerelease, vY.Prerelease );
+            return string.CompareOrdinal( vX.Prerelease, vY.Prerelease );
         }
     }
 }

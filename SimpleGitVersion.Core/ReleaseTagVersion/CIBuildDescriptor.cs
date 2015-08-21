@@ -46,7 +46,7 @@ namespace SimpleGitVersion
         /// </summary>
         public bool IsApplicable
         {
-            get { return BuildIndex > 0 && !String.IsNullOrWhiteSpace( BranchName ); }
+            get { return BuildIndex > 0 && !string.IsNullOrWhiteSpace( BranchName ); }
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SimpleGitVersion
         /// <returns></returns>
         public override string ToString()
         {
-            return IsApplicable ? String.Format( "ci-{0}.{1}", BranchName, BuildIndex ) : String.Empty;
+            return IsApplicable ? string.Format( "ci-{0}.{1}", BranchName, BuildIndex ) : string.Empty;
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace SimpleGitVersion
         public string ToStringPadded( char nameNumberSeparator )
         {
             Debug.Assert( MaxBuildIndex.ToString().Length == 6 );
-            return IsApplicable ? String.Format( "ci-{0}{1}{2:000000}", BranchName, nameNumberSeparator, BuildIndex ) : String.Empty;
+            return IsApplicable ? string.Format( "ci-{0}{1}{2:000000}", BranchName, nameNumberSeparator, BuildIndex ) : string.Empty;
         }
 
     }
