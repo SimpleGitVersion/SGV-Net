@@ -11,6 +11,7 @@ namespace SimpleGitVersion
     static class TestHelper
     {
         static string _solutionFolder;
+        static string _testGitRepositoryFolder;
         static RepositoryTester _testGitRepository;
 
         public static string SolutionFolder
@@ -24,7 +25,24 @@ namespace SimpleGitVersion
 
         public static string TestGitRepositoryFolder
         {
-            get { return Path.GetFullPath( Path.Combine( SolutionFolder, @"..\TestGitRepository" ) ); }
+            get
+            {
+                if( _testGitRepositoryFolder == null )
+                {
+                    _testGitRepositoryFolder = Path.GetFullPath( Path.Combine( SolutionFolder, @"Tests\TestGitRepository" ) );
+                    string gitPath = _testGitRepositoryFolder + @"\.git";
+                    if( !Directory.Exists( gitPath ) )
+                    {
+                        Directory.CreateDirectory( _testGitRepositoryFolder );
+                        gitPath = Repository.Clone( "https://github.com/SimpleGitVersion/TestGitRepository.git", _testGitRepositoryFolder );
+                    }
+                    using( var r = new Repository( gitPath ) )
+                    {
+                        r.Fetch( "origin", new FetchOptions() { TagFetchMode = TagFetchMode.All } );
+                    }
+                }
+                return _testGitRepositoryFolder;
+            }
         }
 
         static public RepositoryTester TestGitRepository

@@ -255,7 +255,7 @@ namespace SimpleGitVersion
                         b.ParentTagSha = best.TagOrParentTagSha;
                         b.DepthFromParent = best.DepthFromParent + 1;
                     }
-                    b.ParentContentTags = parents.SelectMany( p => p.ContentOrParentContentTags ).ToArray();
+                    b.ParentContentTags = parents.SelectMany( p => p.ContentOrParentContentTags ).Distinct().ToArray();
                     return b;
                 }
             }

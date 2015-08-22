@@ -219,9 +219,14 @@ namespace SimpleGitVersion
                                         else if( cv.Tag != null && ExistingVersions[idx].Equals( cv.Tag ) ) idx = 1;
                                         if( idx < ExistingVersions.Count ) successors = successors.Where( s => s.CompareTo( ExistingVersions[idx] ) < 0 );
                                     }
+                                    // Always removes proposals that are lower than the StartingVersionForCSemVer if it exists.
+                                    if( collector.StartingVersionForCSemVer != null )
+                                    {
+                                        successors = successors.Where( s => s.CompareTo( collector.StartingVersionForCSemVer ) >= 0 );
+                                    }
                                     PossibleVersions = successors.ToArray();
                                     // Now... "Save the Cherry Pick" operation!
-                                    PossibleVersionsFromContent = ComputePossibleVersionsFromContent( cv );
+                                    PossibleVersionsFromContent = ComputePossibleVersionsFromContent( cv, collector.StartingVersionForCSemVer );
                                     AllPossibleVersions = PossibleVersions.Concat( PossibleVersionsFromContent ).OrderBy( t => t ).ToArray();
                                     if( cv.Tag == null )
                                     {
@@ -290,7 +295,7 @@ namespace SimpleGitVersion
             return false;
         }
 
-        IReadOnlyList<ReleaseTagVersion> ComputePossibleVersionsFromContent( CommitVersions cv )
+        IReadOnlyList<ReleaseTagVersion> ComputePossibleVersionsFromContent( CommitVersions cv, ReleaseTagVersion startingVersionForCSemVer )
         {
             HashSet<ReleaseTagVersion> result = new HashSet<ReleaseTagVersion>();
             foreach( var t in cv.BaseVersions.ContentTags.Concat( cv.BaseVersions.ParentContentTags ) )
@@ -304,6 +309,11 @@ namespace SimpleGitVersion
                 result.UnionWith( succ );
             }
             result.ExceptWith( PossibleVersions );
+            // Always removes proposals that are lower than the StartingVersionForCSemVer if it exists.
+            if( startingVersionForCSemVer != null )
+            {
+                result.RemoveWhere( s => s.CompareTo( startingVersionForCSemVer ) < 0 );
+            }
             return result.OrderBy( t => t ).ToArray();
         }
 
@@ -326,10 +336,10 @@ namespace SimpleGitVersion
                 }
                 else
                 {
-                    Branch br = r.Branches[options.StartingBranchName];
-                    if( br == null ) return string.Format( "Unknown StartingBranchName: '{0}'.", options.StartingBranchName );
+                    Branch br = r.Branches[options.StartingBranchName] ?? r.Branches[ options.RemoteName + '/' + options.StartingBranchName];
+                    if( br == null ) return string.Format( "Unknown StartingBranchName: '{0}' (also tested on remote '{1}/{0}').", options.StartingBranchName, options.RemoteName );
                     commit = br.Tip;
-                    branchName = br.Name;
+                    branchName = options.StartingBranchName;
                 }
                 RepositoryInfoOptionsBranch bOpt;
                 if( options.Branches != null
@@ -366,7 +376,7 @@ namespace SimpleGitVersion
             if( path == null ) throw new ArgumentNullException( nameof( path ) );
             using( var repo = GitHelper.LoadFromPath( path ) )
             {
-                return new RepositoryInfo( repo, options, repo != null ? GetGitDirectory( repo ) : null );
+                return new RepositoryInfo( repo, options, repo != null ? repo.Info.WorkingDirectory : null );
             }
         }
 
@@ -375,7 +385,7 @@ namespace SimpleGitVersion
         /// and a function that can create a <see cref="RepositoryInfoOptions"/> from the actual Git repository path. 
         /// </summary>
         /// <param name="path">The path to lookup.</param>
-        /// <param name="optionsBuilder">Function that can create a <see cref="RepositoryInfoOptions"/> from the path of the Git repository (the Solution folder).</param>
+        /// <param name="optionsBuilder">Function that can create a <see cref="RepositoryInfoOptions"/> from the Git working directory (the Solution folder).</param>
         /// <returns>An immutable RepositoryInfo instance. Never null.</returns>
         public static RepositoryInfo LoadFromPath( string path, Func<string,RepositoryInfoOptions> optionsBuilder )
         {
@@ -385,25 +395,9 @@ namespace SimpleGitVersion
             using( var repo = GitHelper.LoadFromPath( path ) )
             {
                 if( repo == null ) return new RepositoryInfo( null, null, null );
-                string gitPath = GetGitDirectory( repo );
-                return new RepositoryInfo( repo, optionsBuilder( gitPath ), gitPath );
+                return new RepositoryInfo( repo, optionsBuilder( repo.Info.WorkingDirectory ), repo.Info.WorkingDirectory );
             }
         }
 
-        private static string GetGitDirectory( Repository repo )
-        {
-            string gitPath = repo.Info.Path;
-            char lastChar = gitPath[gitPath.Length - 1];
-            if( lastChar == Path.DirectorySeparatorChar || lastChar == Path.AltDirectorySeparatorChar )
-            {
-                gitPath = gitPath.Substring( 0, gitPath.Length - 1 );
-            }
-            if( gitPath.EndsWith( Path.DirectorySeparatorChar + ".git" ) || gitPath.EndsWith( Path.AltDirectorySeparatorChar + ".git" ) )
-            {
-                gitPath = gitPath.Substring( 0, gitPath.Length - 5 );
-            }
-
-            return gitPath;
-        }
     }
 }

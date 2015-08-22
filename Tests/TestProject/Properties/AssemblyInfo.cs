@@ -15,9 +15,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture( "" )]
 
 [assembly: ComVisible( false )]
-
-/*
-[assembly: AssemblyVersion( "1.2" )]
-[assembly: AssemblyFileVersion( "0.0.987.9871" )]
-[assembly: AssemblyInformationalVersion( "1.2.0-alpha[NuGet]-98ef65468421387464cd87" )]
-*/

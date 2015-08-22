@@ -12,9 +12,7 @@ namespace SimpleGitVersion.Core.Tests
         public class ReleaseTagVersionTests
         {
 
-        [TestCase( "0.2.0" )]
-        [TestCase( "0.1.2" )]
-        [TestCase( "0.1.1" )]
+        [TestCase( "0.3.0-rc" )]
         [TestCase( "0.1.0" )]
         [TestCase( "1.0.0" )]
         [TestCase( "1.0.0-alpha" )]

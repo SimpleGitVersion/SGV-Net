@@ -15,14 +15,12 @@
     <NuGetPackageImportStamp>159c4909</NuGetPackageImportStamp>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  
   <PropertyGroup>
     <StartAction>Program</StartAction>
     <StartProgram>$(MSBuildBinPath)\MSBuild.exe</StartProgram>
     <StartWorkingDirectory>$(SolutionDir)Tests\TestProject\</StartWorkingDirectory>
     <StartArguments>&gt; BuildLog.txt</StartArguments>
   </PropertyGroup>
-  
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
@@ -45,6 +43,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\SimpleGitVersion.Core.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>

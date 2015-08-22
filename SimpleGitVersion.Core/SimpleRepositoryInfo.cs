@@ -254,7 +254,7 @@ namespace SimpleGitVersion
         void SetInvalidValuesAndLog( ILogger logger, string reason, bool isWarning )
         {
             if( isWarning ) logger.Warn( reason );
-            else logger.Trace( reason );
+            else logger.Info( reason );
             if( !InvalidValuesAlreadySet ) SetInvalidValues( reason );
         }
 

@@ -129,7 +129,7 @@ namespace SimpleGitVersion.Core.Tests
                 CollectionAssert.Contains( i.PossibleVersions.Select( t => t.ToString() ), "v4.0.3-beta.0.1", "v4.0.3-beta.1", "v4.0.3-delta", "v4.0.3", "v4.1.0-rc", "v4.1.0", "v5.0.0" );
             }
 
-            // Commit before the StartingVersionForCSemVer are open to any FirstPossibleVersions.
+            // Commit before the StartingVersionForCSemVer has no PossibleVersions.
             {
                 var cBelow = repoTest.Commits.First( sc => sc.Message.StartsWith( "On master again" ) );
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
@@ -141,7 +141,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.PreviousRelease, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                CollectionAssert.AreEqual( ReleaseTagVersion.FirstPossibleVersions, i.PossibleVersions );
+                CollectionAssert.IsEmpty( i.PossibleVersions );
             }
             {
                 var cBelow = repoTest.Commits.First( sc => sc.Message.StartsWith( "Merge branch 'a' into b" ) );
@@ -154,7 +154,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.PreviousRelease, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                CollectionAssert.AreEqual( ReleaseTagVersion.FirstPossibleVersions, i.PossibleVersions );
+                CollectionAssert.IsEmpty( i.PossibleVersions );
             }
         }
 

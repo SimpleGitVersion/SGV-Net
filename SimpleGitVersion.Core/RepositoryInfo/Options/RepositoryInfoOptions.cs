@@ -13,6 +13,7 @@ namespace SimpleGitVersion
     /// </summary>
     public class RepositoryInfoOptions
     {
+        string _remoteName;
 
         class PathComparer : IEqualityComparer<string>
         {
@@ -82,6 +83,16 @@ namespace SimpleGitVersion
         /// It is empty by default.
         /// </summary>
         public ISet<string> IgnoreModifiedFiles { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the name of the remote repository that will be considered when
+        /// working with branches. Defaults to "origin" (can nerver be null or empty).
+        /// </summary>
+        public string RemoteName
+        {
+            get { return string.IsNullOrWhiteSpace( _remoteName ) ? "origin" : _remoteName; }
+            set { _remoteName = value; }
+        }
 
         /// <summary>
         /// Reads <see cref="RepositoryInfoOptions"/> from a xml file.

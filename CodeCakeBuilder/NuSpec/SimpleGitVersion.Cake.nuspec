@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8">
     <id>SimpleGitVersion.Cake</id>
-    <version>0.3.0-rc</version>
+    <version>$version$</version>
     <title>SimpleGitVersion.Cake</title>
     <authors>Invenietis</authors>
     <owners>Invenietis</owners>
@@ -21,13 +21,13 @@
     <developmentDependency>true</developmentDependency>
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
     <dependencies>
-      <dependency id="SimpleGitVersion.Core" version="0.3.0-rc" />
+      <dependency id="SimpleGitVersion.Core" version="$version$" />
       <dependency id="Cake.Core" version="0.5.2" />
    </dependencies>
   </metadata>
   <files>
-    <file src="SimpleGitVersion.Cake\bin\Release\SimpleGitVersion.Cake.dll" target="lib\net45" />
-    <file src="SimpleGitVersion.Cake\bin\Release\SimpleGitVersion.Cake.xml" target="lib\net45" />
+    <file src="SimpleGitVersion.Cake\bin\{{configuration}}\SimpleGitVersion.Cake.dll" target="lib\net45" />
+    <file src="SimpleGitVersion.Cake\bin\{{configuration}}\SimpleGitVersion.Cake.xml" target="lib\net45" />
   </files>
 
 </package>

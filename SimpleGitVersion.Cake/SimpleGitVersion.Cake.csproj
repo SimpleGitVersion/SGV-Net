@@ -33,6 +33,11 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\SimpleGitVersion.Cake.xml</DocumentationFile>
   </PropertyGroup>
+
+  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  
   <ItemGroup>
     <Reference Include="Cake.Core, Version=0.5.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Cake.Core.0.5.2\lib\net45\Cake.Core.dll</HintPath>

@@ -84,7 +84,7 @@ class SimpleGitVersionInfoAttribute : Attribute
                 FieldInfo semVerField = thisAttr.GetType().GetField( "SemVer" );
                 object thisVersion = semVerField.GetValue( thisAttr );
 
-                this.LogInfo( string.Format( "SimpleGitVersionTask {3}: AssemblyVersion = '{0}', AssemblyFileVersion = '{1}', AssemblyInformationalVersion = '{2}'.", MajorMinor, AssemblyFileVersionInfo, AssemblyInformationalVersionInfo, thisVersion ) );
+                this.LogInfo( string.Format( "SimpleGitVersionTask ({3}): AssemblyVersion = '{0}', AssemblyFileVersion = '{1}', AssemblyInformationalVersion = '{2}'.", MajorMinor, AssemblyFileVersionInfo, AssemblyInformationalVersionInfo, thisVersion ) );
                 if( !Directory.Exists( IntermediateOutputPath ) )
                 {
                     this.LogInfo( string.Format( "Creating IntermediateOutputPath='{0}' directory.", IntermediateOutputPath ) );
