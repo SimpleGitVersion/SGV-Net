@@ -12,15 +12,15 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
-
   <PropertyGroup>
     <StartAction>Program</StartAction>
     <StartProgram>$(MSBuildBinPath)\MSBuild.exe</StartProgram>
     <StartWorkingDirectory>$(SolutionDir)Tests\TestProject\</StartWorkingDirectory>
     <StartArguments>&gt; BuildLog.txt</StartArguments>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
@@ -78,6 +78,7 @@
     </None>
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleGitVersion.Core\SimpleGitVersion.Core.csproj">
@@ -89,5 +90,12 @@
   <Target Name="AfterBuild">
     <MakeDir Directories="$(TargetDir)ILMerged\" />
     <Exec Command="&quot;$(SolutionDir)Tools\ILmerge.exe&quot;  /allowDup /keyfile:&quot;$(SolutionDir)SharedKey.snk&quot; /out:&quot;$(TargetDir)ILMerged\$(TargetFileName)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)SimpleGitVersion.Core.dll&quot; &quot;$(TargetDir)LibGit2Sharp.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot; /internalize " />
+  </Target>
+  <Import Project="..\packages\SimpleGitVersionTask.0.3.0-rc\Build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.3.0-rc\Build\SimpleGitVersionTask.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.3.0-rc\Build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.3.0-rc\Build\SimpleGitVersionTask.targets'))" />
   </Target>
 </Project>

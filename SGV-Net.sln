@@ -25,14 +25,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersionTask.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "Tests\TestProject\TestProject.csproj", "{D97A8EA9-3534-45A3-A3BA-289525A950AE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet-Release", "NuGet-Release", "{BF6A9E5A-735F-4D8D-B7CA-BE46E67A1152}"
-	ProjectSection(SolutionItems) = preProject
-		NuGet-Release\NuGetPackage.ps1 = NuGet-Release\NuGetPackage.ps1
-		NuGet-Release\SimpleGitVersion.Cake.nuspec = NuGet-Release\SimpleGitVersion.Cake.nuspec
-		NuGet-Release\SimpleGitVersion.Core.nuspec = NuGet-Release\SimpleGitVersion.Core.nuspec
-		NuGet-Release\SimpleGitVersionTask.nuspec = NuGet-Release\SimpleGitVersionTask.nuspec
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCakeBuilder", "CodeCakeBuilder\CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
 EndProject
 Global
