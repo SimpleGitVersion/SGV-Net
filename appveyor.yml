@@ -1,0 +1,6 @@
+# Basic appveyor configuration.
+version: v{build}
+install:
+- CodeCakeBuilder/Bootstrap.ps1
+build_script:
+- CodeCakeBuilder/bin/Release/CodeCakeBuilder.exe

@@ -20,13 +20,13 @@ namespace CodeCake
     /// Sample build "script".
     /// It can be decorated with AddPath attributes that inject paths into the PATH environment variable. 
     /// </summary>
-    [AddPath( "%LOCALAPPDATA%/NuGet" )]
+    [AddPath( "CodeCakeBuilder/tools" )]
     [AddPath( "packages/**/tools*" )]
     public class Build : CodeCakeHost
     {
         public Build()
         {
-            var nugetOutputDir = Cake.Directory( "CodeCakeBuilder/Release" );
+            var releasesDir = Cake.Directory( "CodeCakeBuilder/Releases" );
             string configuration = null;
             SimpleRepositoryInfo gitInfo = null;
 
@@ -45,7 +45,7 @@ namespace CodeCake
                 {
                     Cake.CleanDirectories( "**/bin/" + configuration, d => !d.Path.Segments.Contains( "CodeCakeBuilder" ) );
                     Cake.CleanDirectories( "**/obj/" + configuration, d => !d.Path.Segments.Contains( "CodeCakeBuilder" ) );
-                    Cake.CleanDirectories( nugetOutputDir );
+                    Cake.CleanDirectories( releasesDir );
                 } );
 
             Task( "Restore-NuGet-Packages" )
@@ -89,20 +89,20 @@ namespace CodeCake
                 .IsDependentOn( "Unit-Testing" )
                 .Does( () =>
                 {
-                    Cake.CreateDirectory( nugetOutputDir );
+                    Cake.CreateDirectory( releasesDir );
                     var settings = new NuGetPackSettings()
                     {
                         Version = gitInfo.NuGetVersion,
                         BasePath = Cake.Environment.WorkingDirectory,
-                        OutputDirectory = nugetOutputDir
+                        OutputDirectory = releasesDir
                     };
-                    Cake.CopyFiles( "CodeCakeBuilder/NuSpec/*.nuspec", nugetOutputDir );
-                    foreach( var nuspec in Cake.GetFiles( nugetOutputDir.Path + "/*.nuspec" ) )
+                    Cake.CopyFiles( "CodeCakeBuilder/NuSpec/*.nuspec", releasesDir );
+                    foreach( var nuspec in Cake.GetFiles( releasesDir.Path + "/*.nuspec" ) )
                     {
                         Cake.TransformTextFile( nuspec, "{{", "}}" ).WithToken( "configuration", configuration ).Save( nuspec );
                         Cake.NuGetPack( nuspec, settings );
                     }
-                    Cake.DeleteFiles( nugetOutputDir.Path + "/*.nuspec" );
+                    Cake.DeleteFiles( releasesDir.Path + "/*.nuspec" );
                 } );
 
             Task( "Default" ).IsDependentOn( "Create-NuGet-Packages" );
