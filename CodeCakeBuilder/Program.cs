@@ -13,12 +13,14 @@ namespace CodeCake
         static void Main( string[] args )
         {
             var app = new CodeCakeApplication();
-            app.Run( args );
-            // From: http://stackoverflow.com/questions/1188658/how-can-a-c-sharp-windows-console-application-tell-if-it-is-run-interactively
-            if( Console.OpenStandardInput( 1 ) != Stream.Null && Environment.UserInteractive )
+            var a = new List<string>( args );
+            int idx = a.FindIndex( s => s.Equals( "-nowait", StringComparison.OrdinalIgnoreCase ) );
+            if( idx >= 0 ) a.RemoveAt( idx );
+            app.Run( a.ToArray() );
+            Console.WriteLine();
+            if( idx < 0 )
             {
-                Console.WriteLine();
-                Console.WriteLine( "Interactive mode detected: hit any key to exit." );
+                Console.WriteLine( "Hit any key to exit. (Use -nowait parameter to end immediately)" );
                 Console.ReadKey();
             }
         }

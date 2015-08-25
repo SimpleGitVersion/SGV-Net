@@ -3,4 +3,4 @@ version: v{build}
 install:
 - ps: CodeCakeBuilder\Bootstrap.ps1
 build_script:
-- CodeCakeBuilder\bin\Release\CodeCakeBuilder.exe
+- CodeCakeBuilder\bin\Release\CodeCakeBuilder.exe -nowait
