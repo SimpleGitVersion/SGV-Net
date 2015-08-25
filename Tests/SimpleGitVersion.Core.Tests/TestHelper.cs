@@ -50,6 +50,12 @@ namespace SimpleGitVersion
             get { return _testGitRepository ?? (_testGitRepository = new RepositoryTester( TestGitRepositoryFolder ));}
         }
 
+        public static string RepositoryXSDPath
+        {
+            get { return Path.Combine( TestHelper.SolutionFolder, "SimpleGitVersionTask", "NuGetAssets", "RepositoryInfo.xsd" ); }
+        }
+
+
         static void InitalizePaths()
         {
             string p = new Uri( System.Reflection.Assembly.GetExecutingAssembly().CodeBase ).LocalPath;

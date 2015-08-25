@@ -25,8 +25,9 @@ namespace SimpleGitVersion
         /// <param name="e">The xml element.</param>
         public RepositoryInfoOptionsBranch( XElement e )
         {
-            Name = (string)e.Attribute( SGVSchema.Name ); 
-            var a = e.Attribute( SGVSchema.CIVersionMode );
+            Name = (string)(e.Attribute( SGVSchema.Name ) ?? e.Attribute( SGVSchema.NameNoNS )); 
+            VersionName = (string)(e.Attribute( SGVSchema.VersionName ) ?? e.Attribute( SGVSchema.VersionNameNoNS )); 
+            var a = e.Attribute( SGVSchema.CIVersionMode ) ?? e.Attribute( SGVSchema.CIVersionModeNoNS );
             CIBranchVersionMode mode;
             if( a != null && Enum.TryParse<CIBranchVersionMode>( a.Value, true, out mode ) ) 
             {

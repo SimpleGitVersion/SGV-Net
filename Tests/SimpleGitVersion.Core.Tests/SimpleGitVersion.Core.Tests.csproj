@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="RepositoryInfoXmlFileTests.cs" />
     <Compile Include="Tools\NuGetV2StringComparer.cs" />
     <Compile Include="Tools\RandomExtensions.cs" />
     <Compile Include="ReleaseTagVersionTests.cs" />

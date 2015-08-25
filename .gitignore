@@ -196,4 +196,4 @@ FakesAssemblies/
 *.opt
 
 Tests/TestGitRepository
-Tools/nuget.exe
+CodeCakeBuilder/Tools/nuget.exe
