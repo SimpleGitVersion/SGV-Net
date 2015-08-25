@@ -13,14 +13,12 @@ namespace CodeCake
         static int Main( string[] args )
         {
             var app = new CodeCakeApplication();
-            var a = new List<string>( args );
-            int idx = a.FindIndex( s => s.Equals( "-nowait", StringComparison.OrdinalIgnoreCase ) );
-            if( idx >= 0 ) a.RemoveAt( idx );
-            int result = app.Run( a.ToArray() );
+            bool interactive = !args.Contains( "-nointeractive", StringComparer.OrdinalIgnoreCase );
+            int result = app.Run( args );
             Console.WriteLine();
-            if( idx < 0 )
+            if( interactive )
             {
-                Console.WriteLine( "Hit any key to exit. (Use -nowait parameter to exit immediately)" );
+                Console.WriteLine( "Hit any key to exit. (Use -nointeractive parameter to exit immediately)" );
                 Console.ReadKey();
             }
             return result;

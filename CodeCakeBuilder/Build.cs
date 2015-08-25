@@ -13,6 +13,7 @@ using Cake.Common.Tools.NuGet.Pack;
 using System;
 using System.Linq;
 using Cake.Core.Diagnostics;
+using Cake.Common.Tools.NuGet.Push;
 
 namespace CodeCake
 {
@@ -30,7 +31,7 @@ namespace CodeCake
             string configuration = null;
             SimpleRepositoryInfo gitInfo = null;
 
-            Task( "Check-Repoitory" )
+            Task( "Check-Repository" )
                 .Does( () =>
                 {
                     gitInfo = Cake.GetSimpleRepositoryInfo();
@@ -40,7 +41,7 @@ namespace CodeCake
                 } );
 
             Task( "Clean" )
-                .IsDependentOn( "Check-Repoitory" )
+                .IsDependentOn( "Check-Repository" )
                 .Does( () =>
                 {
                     Cake.CleanDirectories( "**/bin/" + configuration, d => !d.Path.Segments.Contains( "CodeCakeBuilder" ) );
@@ -57,7 +58,7 @@ namespace CodeCake
             Task( "Build" )
                 .IsDependentOn( "Clean" )
                 .IsDependentOn( "Restore-NuGet-Packages" )
-                .IsDependentOn( "Check-Repoitory" )
+                .IsDependentOn( "Check-Repository" )
                 .Does( () =>
                 {
                     using( var tempSln = Cake.CreateTemporarySolutionFile( "SGV-Net.sln" ) )
@@ -105,7 +106,28 @@ namespace CodeCake
                     Cake.DeleteFiles( releasesDir.Path + "/*.nuspec" );
                 } );
 
-            Task( "Default" ).IsDependentOn( "Create-NuGet-Packages" );
+            Task( "Push-NuGet-Packages" )
+                .IsDependentOn( "Create-NuGet-Packages" )
+                .WithCriteria( () => gitInfo.IsValidRelease )
+                .Does( () =>
+                {
+                    // Resolve the API key.
+                    var apiKey = Cake.InteractiveEnvironmentVariable( "NUGET_API_KEY" );
+                    if( string.IsNullOrEmpty( apiKey ) ) throw new InvalidOperationException( "Could not resolve NuGet API key." );
+
+                    var settings = new NuGetPushSettings
+                    {
+                        Source = "https://www.myget.org/F/cake/api/v2/package",
+                        ApiKey = apiKey
+                    };
+
+                    foreach( var nupkg in Cake.GetFiles( releasesDir.Path + "/*.nupkg" ) )
+                    {
+                        Cake.NuGetPush( nupkg, settings );
+                    }
+                } );
+
+            Task( "Default" ).IsDependentOn( "Push-NuGet-Packages" );
         }
     }
 }
