@@ -48,8 +48,15 @@ namespace CodeCake
                     Cake.CleanDirectories( nugetOutputDir );
                 } );
 
+            Task( "Restore-NuGet-Packages" )
+                .Does( () =>
+                {
+                    Cake.NuGetRestore( "SGV-Net.sln" );
+                } );
+
             Task( "Build" )
                 .IsDependentOn( "Clean" )
+                .IsDependentOn( "Restore-NuGet-Packages" )
                 .IsDependentOn( "Check-Repoitory" )
                 .Does( () =>
                 {

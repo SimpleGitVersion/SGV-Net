@@ -1,13 +1,25 @@
-# Try download NuGet.exe if do not exist.
-$toolsDir = Join-Path $PSScriptRoot "Tools"
-$nugetExe = Join-Path $toolsDir "nuget.exe"
-if (!(Test-Path $nugetExe)) {
-    New-Item -ItemType Directory $toolsDir
-    Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetExe
-    # Make sure NuGet exists where we expect it.
-    if (!(Test-Path $nugetExe)) {
-        Throw "Could not find NuGet.exe"
-    }
+# This script builds CodeCakeBuilder with the help of nuget.exe (in Tools/, downloaded if missing)
+# and MSBuild.
+#
+# You may move this bootstrap.ps1 to the solution directory or let it in CodeCakeBuilder folder:
+# The $solutionDir and $builderDir are automatically adapted.
+#
+$solutionDir = $PSScriptRoot
+$builderDir = Join-Path $solutionDir "CodeCakeBuilder"
+if (!(Test-Path $builderDir -PathType Container)) {
+    $builderDir = $PSScriptRoot
+    $solutionDir = Join-Path $builderDir ".."
+}
+
+# Ensures that CodeCakeBuilder project exists.
+$builderProj = Join-Path $builderDir "CodeCakeBuilder.csproj"
+if (!(Test-Path $builderProj)) {
+    Throw "Could not find CodeCakeBuilder.csproj"
+}
+# Ensures that packages.config file exists.
+$builderPackageConfig = Join-Path $builderDir "packages.config"
+if (!(Test-Path $builderPackageConfig)) {
+    Throw "Could not find packages.config"
 }
 
 # Find MSBuild 4.0.
@@ -19,19 +31,24 @@ if (!(Test-Path $msbuildExe)) {
     Throw "Could not find msbuild.exe"
 }
 
-# Ensures that CodeCakeBuilder project exists.
-$builderProj = Join-Path $PSScriptRoot "CodeCakeBuilder.csproj"
-if (!(Test-Path $builderProj)) {
-    Throw "Could not find CodeCakeBuilder.csproj"
+
+# Tools directory is for nuget.exe but it may be used to 
+# contain other utilities.
+$toolsDir = Join-Path $builderDir "Tools"
+if (!(Test-Path $toolsDir)) {
+    New-Item -ItemType Directory $toolsDir | Out-Null
 }
 
-$solutionDir = Join-Path $PSScriptRoot  ".."
-Push-Location $solutionDir
-&$nugetExe restore
-if( !($?) ) {
-    Pop-Location
-    Throw "nuget.exe failed."
-} 
-Pop-Location
+# Try download NuGet.exe if do not exist.
+$nugetExe = Join-Path $toolsDir "nuget.exe"
+if (!(Test-Path $nugetExe)) {
+    Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $nugetExe
+    # Make sure NuGet it worked.
+    if (!(Test-Path $nugetExe)) {
+        Throw "Could not find NuGet.exe"
+    }
+}
+
+&$nugetExe restore $builderPackageConfig -SolutionDirectory $solutionDir
 &$msbuildExe $builderProj /p:Configuration=Release
 
