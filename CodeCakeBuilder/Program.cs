@@ -15,7 +15,7 @@ namespace CodeCake
             var app = new CodeCakeApplication();
             app.Run( args );
             // From: http://stackoverflow.com/questions/1188658/how-can-a-c-sharp-windows-console-application-tell-if-it-is-run-interactively
-            if( Console.OpenStandardInput( 1 ) != Stream.Null )
+            if( Console.OpenStandardInput( 1 ) != Stream.Null && Environment.UserInteractive )
             {
                 Console.WriteLine();
                 Console.WriteLine( "Interactive mode detected: hit any key to exit." );
