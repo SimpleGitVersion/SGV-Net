@@ -22,8 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Core.Tests", "Tests\SimpleGitVersion.Core.Tests\SimpleGitVersion.Core.Tests.csproj", "{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersionTask.Tests", "Tests\SimpleGitVersionTask.Tests\SimpleGitVersionTask.Tests.csproj", "{26801ECB-EAD8-4EE9-AE3B-84E35AD7F831}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "Tests\TestProject\TestProject.csproj", "{D97A8EA9-3534-45A3-A3BA-289525A950AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCakeBuilder", "CodeCakeBuilder\CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
@@ -50,10 +48,6 @@ Global
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26801ECB-EAD8-4EE9-AE3B-84E35AD7F831}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26801ECB-EAD8-4EE9-AE3B-84E35AD7F831}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26801ECB-EAD8-4EE9-AE3B-84E35AD7F831}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26801ECB-EAD8-4EE9-AE3B-84E35AD7F831}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D97A8EA9-3534-45A3-A3BA-289525A950AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D97A8EA9-3534-45A3-A3BA-289525A950AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -66,7 +60,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
-		{26801ECB-EAD8-4EE9-AE3B-84E35AD7F831} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
 		{D97A8EA9-3534-45A3-A3BA-289525A950AE} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
 	EndGlobalSection
 EndGlobal
