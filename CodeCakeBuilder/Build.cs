@@ -117,7 +117,7 @@ namespace CodeCake
 
                     var settings = new NuGetPushSettings
                     {
-                        Source = "https://www.myget.org/F/cake/api/v2/package",
+                        Source = "https://www.nuget.org/api/v2/package",
                         ApiKey = apiKey
                     };
 
