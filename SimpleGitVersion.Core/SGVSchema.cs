@@ -14,15 +14,14 @@ namespace SimpleGitVersion
         public static readonly XName StartingVersionForCSemVer = SVGNS + "StartingVersionForCSemVer";
         public static readonly XName IgnoreModifiedFiles = SVGNS + "IgnoreModifiedFiles";
         public static readonly XName Add = SVGNS + "Add";
+        public static readonly XName Debug = SVGNS + "Debug";
         public static readonly XName Branches = SVGNS + "Branches";
         public static readonly XName Branch = SVGNS + "Branch";
-
-        public static readonly XName Name = SVGNS + "Name";
-        public static readonly XName CIVersionMode = SVGNS + "CIVersionMode";
-        public static readonly XName VersionName = SVGNS + "VersionName";
-
-        public static readonly XName NameNoNS = XNamespace.None + "Name";
-        public static readonly XName CIVersionModeNoNS = XNamespace.None + "CIVersionMode";
-        public static readonly XName VersionNameNoNS = XNamespace.None + "VersionName";
+        public static readonly XName RemoteName = SVGNS + "RemoteName";
+        
+        public static readonly XName Name = XNamespace.None + "Name";
+        public static readonly XName CIVersionMode = XNamespace.None + "CIVersionMode";
+        public static readonly XName VersionName = XNamespace.None + "VersionName";
+        public static readonly XName IgnoreDirtyWorkingFolder = XNamespace.None + "IgnoreDirtyWorkingFolder";
     }
 }

@@ -16,6 +16,11 @@ namespace CodeCake
     public static class InteractiveAliases
     {
         /// <summary>
+        /// The "nointeraction" string with no dash before.
+        /// </summary>
+        public static readonly string NoInteractionArgument = "nointeraction";
+
+        /// <summary>
         /// Gets whether the context supports interaction with the user.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -24,7 +29,7 @@ namespace CodeCake
         [CakeMethodAlias]
         public static bool IsInteractiveMode( this ICakeContext context )
         {
-            return !context.HasArgument( "-nointeractive" );
+            return !context.HasArgument( NoInteractionArgument );
         }
 
         /// <summary>
@@ -41,7 +46,7 @@ namespace CodeCake
             string v = context.EnvironmentVariable( variable );
             if( v == null && IsInteractiveMode( context ) )
             {
-                Console.Write( "Environment Variable '{0}' not found. Enter its value: " );
+                Console.Write( "Environment Variable '{0}' not found. Enter its value: ", variable );
                 v = Console.ReadLine();
             }
             return v;

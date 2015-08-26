@@ -134,7 +134,7 @@ namespace SimpleGitVersion
 
             void Propagate( StringBuilder errors, TagCommit tc )
             {
-                Debug.Assert( tc.BestTag != null );
+                Debug.Assert( tc.FinalTag != null );
                 Commit commit = tc.Commit;
                 foreach( Commit p in commit.Parents )
                 {
@@ -148,7 +148,7 @@ namespace SimpleGitVersion
                     bool applicable = commit.Tree.Sha == rParent.Commit.Tree.Sha;
                     if( rParent.AddPropagatedVersionFromChild( errors, tc, applicable ) )
                     {
-                        Debug.Assert( rParent.BestTag != null );
+                        Debug.Assert( rParent.FinalTag != null );
                         Propagate( errors, rParent );
                     }
                 }
@@ -219,9 +219,9 @@ namespace SimpleGitVersion
                             ReleaseTagVersion tag = null;
                             if( tc.Commit.Sha == c.Sha )
                             {
-                                if( _ignorePropagated != null && !_ignorePropagated.Equals( tc.BestTag ) )
+                                if( _ignorePropagated != null && !_ignorePropagated.Equals( tc.FinalTag ) )
                                 {
-                                    tag = tc.BestTag;
+                                    tag = tc.FinalTag;
                                 }
                                 else
                                 {
@@ -243,7 +243,7 @@ namespace SimpleGitVersion
                     TagCommit tcContent;
                     if( _collector.TryGetValue( c.Tree.Sha, out tcContent ) )
                     {
-                        b.ContentTags = tcContent.GetSameContent( true ).Select( tContent => tContent.BestTag ).Where( tag => tag != null ).ToArray();
+                        b.ContentTags = tcContent.GetSameContent( true ).Select( tContent => tContent.FinalTag ).Where( tag => tag != null ).ToArray();
                     }
                     else b.ContentTags = ReleaseTagVersion.EmptyArray;
                     List<CommitVersions> parents = c.Parents.Select( p => GetVersions( p ) ).ToList();

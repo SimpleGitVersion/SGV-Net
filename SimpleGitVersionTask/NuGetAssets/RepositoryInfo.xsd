@@ -23,6 +23,11 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="Debug" minOccurs="0" >
+          <xs:complexType>
+            <xs:attribute name="IgnoreDirtyWorkingFolder" type="xs:boolean" default="false" />
+          </xs:complexType>
+        </xs:element>
         <xs:element name="Branches" minOccurs="0" >
           <xs:complexType>
             <xs:sequence>
@@ -37,6 +42,7 @@
           </xs:complexType>
         </xs:element>
         <xs:element name="StartingVersionForCSemVer" minOccurs="0" type="xs:string" />
+        <xs:element name="RemoteName" minOccurs="0" type="xs:string" />
       </xs:all>
     </xs:complexType>
   </xs:element>

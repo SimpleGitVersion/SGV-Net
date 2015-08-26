@@ -60,6 +60,7 @@ namespace SimpleGitVersion
         /// All commit sha MUST exist in the repository otherwise an error will be added to the error collector.
         /// If the key is "head" (instead of a SHA1) the tags are applied on the current head of the repository.
         /// These tags are applied as if they exist in the repository.
+        /// This property must be used programmatically: it does not appear in the Xml file.
         /// </summary>
         /// <remarks>
         /// A dictionnary of string to list of sting can be directly assigned to this property.
@@ -95,6 +96,12 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
+        /// Gets or sets whether the <see cref="RepositoryInfo.IsDirty"/> is ignored.
+        /// This should be used only for debugging purposes.
+        /// </summary>
+        public bool IgnoreDirtyWorkingFolder { get; set; }
+
+        /// <summary>
         /// Reads <see cref="RepositoryInfoOptions"/> from a xml file.
         /// </summary>
         /// <param name="existingFilePath">Path to a xml file.</param>
@@ -105,6 +112,28 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
+        /// Gets this options as an Xml element.
+        /// </summary>
+        /// <returns>The XElement.</returns>
+        public XElement ToXml()
+        {
+            return new XElement( SGVSchema.RepositoryInfo,
+                                    IgnoreDirtyWorkingFolder 
+                                        ? new XElement( SGVSchema.Debug, new XAttribute( SGVSchema.IgnoreDirtyWorkingFolder, true ) ) 
+                                        : null,
+                                    StartingVersionForCSemVer != null ? new XElement( SGVSchema.StartingVersionForCSemVer, StartingVersionForCSemVer ) : null,
+                                    RemoteName != "origin" ? new XElement( SGVSchema.RemoteName, RemoteName ) : null,
+                                    IgnoreModifiedFiles.Count > 0
+                                        ? new XElement( SGVSchema.IgnoreModifiedFiles,
+                                                            IgnoreModifiedFiles.Where( f=> !string.IsNullOrWhiteSpace(f) ).Select( f => new XElement( SGVSchema.Add, f ) ) )
+                                        : null,
+                                    Branches != null
+                                        ? new XElement( SGVSchema.Branches,
+                                                            Branches.Where( b => b != null ).Select( b => b.ToXml() ) )
+                                        : null );
+        }
+
+        /// <summary>
         /// Reads <see cref="RepositoryInfoOptions"/> from a xml element.
         /// </summary>
         /// <param name="e">Xml element.</param>
@@ -112,8 +141,20 @@ namespace SimpleGitVersion
         public static RepositoryInfoOptions Read( XElement e )
         {
             var info = new RepositoryInfoOptions();
+
+            var eD = e.Element( SGVSchema.Debug );
+            if( eD != null )
+            {
+                var attrIgnoreDirty = eD.Attribute( SGVSchema.IgnoreDirtyWorkingFolder );
+                info.IgnoreDirtyWorkingFolder = attrIgnoreDirty != null ? attrIgnoreDirty.Value == "true" || attrIgnoreDirty.Value == "1" : false;
+            }
+
             var eS = e.Element( SGVSchema.StartingVersionForCSemVer );
             if( eS != null ) info.StartingVersionForCSemVer = eS.Value;
+
+            var eR = e.Element( SGVSchema.RemoteName );
+            if( eR != null ) info.RemoteName = eR.Value;
+
             info.Branches = e.Elements( SGVSchema.Branches )
                                     .Elements( SGVSchema.Branch )
                                     .Select( b => new RepositoryInfoOptionsBranch( b ) ).ToList();

@@ -15,7 +15,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// This is _thisTag or a better propagated tag from child with same content.
         /// </summary>
-        ReleaseTagVersion _bestTag;
+        ReleaseTagVersion _finalTag;
         ReleaseTagVersion _thisTag;
         List<ReleaseTagVersion> _extraCollectedTags;
         TagCommit _nextSameTree;
@@ -23,15 +23,16 @@ namespace SimpleGitVersion
 
         public readonly Commit Commit;
 
-        //// Live data, bound to a repository.
-        //// To implement caching once...
-        //class Transient
-        //{
-        //    public Repository Repo;
-        //    public Commit Commit;
-        //    public List<ReleaseTagVersion> ExtraTags;
-        //}
-        //Transient _runtime;
+        // Live data, bound to a Repository instance.
+        // To implement caching once...
+        //
+        // class Transient
+        // {
+        //     public Repository Repo;
+        //     public Commit Commit;
+        //     public List<ReleaseTagVersion> ExtraTags;
+        // }
+        // Transient _runtime;
 
         public TagCommit( Commit c, ReleaseTagVersion first )
         {
@@ -53,14 +54,14 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets <see cref="ThisTag"/> or the propagated tag if any.
         /// </summary>
-        public ReleaseTagVersion BestTag
+        public ReleaseTagVersion FinalTag
         {
-            get { return _bestTag; }
+            get { return _finalTag; }
         }
 
-        public bool IsBestTagPropagated
+        public bool IsFinalTagPropagated
         {
-            get { return _thisTag != _bestTag; }
+            get { return _thisTag != _finalTag; }
         }
 
         public IEnumerable<TagCommit> GetSameContent( bool withThis )
@@ -142,7 +143,7 @@ namespace SimpleGitVersion
         public void CloseCollect( StringBuilder errors )
         {
             var t = DoCloseCollect( errors );
-            if( t != null && t.IsValid ) _bestTag = _thisTag = t;
+            if( t != null && t.IsValid ) _finalTag = _thisTag = t;
         }
 
         ReleaseTagVersion DoCloseCollect( StringBuilder errors )
@@ -167,18 +168,18 @@ namespace SimpleGitVersion
         public bool AddPropagatedVersionFromChild( StringBuilder errors, TagCommit child, bool applicable )
         {
             Debug.Assert( child != null );
-            ReleaseTagVersion tagChild = child.BestTag;
+            ReleaseTagVersion tagChild = child.FinalTag;
             Debug.Assert( tagChild != null && tagChild.IsValid );
-            if( _bestTag != null )
+            if( _finalTag != null )
             {
-                int cmp = tagChild.CompareTo( _bestTag );
+                int cmp = tagChild.CompareTo( _finalTag );
                 if( cmp == 0 )
                 {
                     // Same version from child. This is valid only if applicable is true.
                     if( !applicable )
                     {
                         errors.AppendLine( string.Format( "Invalid repository: version '{0}' on {1} is also on {2} but the content is not the same! Fix the repository by deleting one of the tag (or create a '+invalid' one if it is already pushed).",
-                                                            _bestTag.ToString(), CommitSha, child.CommitSha ) );
+                                                            _finalTag.ToString(), CommitSha, child.CommitSha ) );
                     }
                     return false;
                 }
@@ -191,10 +192,10 @@ namespace SimpleGitVersion
                 //   In both case, we do not propagate anything. 
                 if( cmp < 0 )
                 {
-                    if( _bestTag == _thisTag )
+                    if( _finalTag == _thisTag )
                     {
                         errors.AppendLine( string.Format( "Invalid repository: version '{0}' on '{1}' is greater than version '{2}' on '{3}'. Fix the repository by deleting one of the tag (or create a '+invalid' one if it is already pushed).",
-                                                        _bestTag.ToString(), CommitSha, tagChild.ToString(), child.CommitSha ) );
+                                                        _finalTag.ToString(), CommitSha, tagChild.ToString(), child.CommitSha ) );
                     }
                     return false;
                 }
@@ -203,7 +204,7 @@ namespace SimpleGitVersion
             }
             if( applicable )
             {
-                _bestTag = tagChild;
+                _finalTag = tagChild;
                 return true;
             }
             return false;
@@ -218,32 +219,32 @@ namespace SimpleGitVersion
         public bool Equals( TagCommit other )
         {
             if( other == null ) return false;
-            if( _bestTag == null ) return other._bestTag == null;
-            return _bestTag.Equals( other._bestTag );
+            if( _finalTag == null ) return other._finalTag == null;
+            return _finalTag.Equals( other._finalTag );
         }
 
         public bool Equals( ReleaseTagVersion other )
         {
-            if( _bestTag == null ) return other == null;
-            return _bestTag.Equals( other );
+            if( _finalTag == null ) return other == null;
+            return _finalTag.Equals( other );
         }
 
         public override int GetHashCode()
         {
-            return _bestTag != null ? _bestTag.GetHashCode() : 0;
+            return _finalTag != null ? _finalTag.GetHashCode() : 0;
         }
 
         public int CompareTo( TagCommit other )
         {
             if( other == null ) return 1;
-            if( _bestTag == null ) return other._bestTag == null ? 0 : -1;
-            return _bestTag.CompareTo( other._bestTag );
+            if( _finalTag == null ) return other._finalTag == null ? 0 : -1;
+            return _finalTag.CompareTo( other._finalTag );
         }
 
         public int CompareTo( ReleaseTagVersion t )
         {
-            if( _bestTag == null ) return t == null ? 0 : -1;
-            return _bestTag.CompareTo( t );
+            if( _finalTag == null ) return t == null ? 0 : -1;
+            return _finalTag.CompareTo( t );
         }
 
 

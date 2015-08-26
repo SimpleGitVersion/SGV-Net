@@ -56,6 +56,7 @@ namespace SimpleGitVersion
         /// It is also null if there is actually no release tag on the current commit.
         /// </summary>
         public readonly ReleaseTagVersion ValidReleaseTag;
+
         /// <summary>
         /// Gets whether the error is the fact that the release tag on the current commit point
         /// is not one of the <see cref="PossibleVersions"/>. An error that describes this appears 
@@ -134,6 +135,11 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
+        /// Gets the <see cref="RepositoryInfoOptions"/> that has been used.
+        /// </summary>
+        public readonly RepositoryInfoOptions Options;
+
+        /// <summary>
         /// The UTC date and time of the commit.
         /// </summary>
         public readonly DateTime CommitDateUtc;
@@ -158,12 +164,13 @@ namespace SimpleGitVersion
         RepositoryInfo( Repository r, RepositoryInfoOptions options, string gitSolutionDir )
             : this()
         {
+            if( options == null ) options = new RepositoryInfoOptions();
+            Options = options;
             if( r == null ) RepositoryError = "No Git repository.";
             else
             {
                 Debug.Assert( gitSolutionDir != null );
                 GitSolutionDirectory = gitSolutionDir;
-                if( options == null ) options = new RepositoryInfoOptions();
                 Commit commit;
                 CIBranchVersionMode ciVersionMode;
                 string ciVersionName;
@@ -175,7 +182,7 @@ namespace SimpleGitVersion
                     CommitDateUtc = commit.Author.When.ToUniversalTime().DateTime;
                     RepositoryStatus repositoryStatus = r.RetrieveStatus();
                     IsDirty = ComputeIsDirty( repositoryStatus, options );
-                    if( !IsDirty )
+                    if( !IsDirty || options.IgnoreDirtyWorkingFolder )
                     {
                         StringBuilder errors = new StringBuilder();
                         TagCollector collector = new TagCollector(  errors, 
@@ -327,23 +334,36 @@ namespace SimpleGitVersion
             // Find current commit (the head) if none is provided.
             if( string.IsNullOrWhiteSpace( commitSha ) )
             {
-                string branchName;
+                IEnumerable<string> branchNames;
                 if( string.IsNullOrWhiteSpace( options.StartingBranchName ) )
                 {
-                    commit = r.Head.Tip;
-                    if( commit == null ) return "Unitialized Git repository.";
-                    branchName = r.Head.Name;
+                    // locCommit is here because one cannot use an out parameter inside a lambda.
+                    var locCommit = commit = r.Head.Tip;
+                    if( locCommit == null ) return "Unitialized Git repository.";
+                    // Save the branches!
+                    // By doing this, when we are in 'Detached Head' state (the head of the repository is on a commit and not on a branch: git checkout <sha>),
+                    // we can detect that it is the head of a branch and hence apply possible options (mainly CI) for it.
+                    // We take into account only the branches from options.RemoteName remote here.
+                    string branchName = r.Head.Name;
+                    if( branchName == "(no branch)" )
+                    {
+                        string remotePrefix = options.RemoteName + '/';
+                        branchNames = r.Branches
+                                        .Where( b => b.Tip == locCommit && (!b.IsRemote || b.Name.StartsWith( remotePrefix )) )
+                                        .Select( b => b.IsRemote ? b.Name.Substring( remotePrefix.Length ) : b.Name );
+                    }
+                    else branchNames = new[] { branchName };
                 }
                 else
                 {
                     Branch br = r.Branches[options.StartingBranchName] ?? r.Branches[ options.RemoteName + '/' + options.StartingBranchName];
                     if( br == null ) return string.Format( "Unknown StartingBranchName: '{0}' (also tested on remote '{1}/{0}').", options.StartingBranchName, options.RemoteName );
                     commit = br.Tip;
-                    branchName = options.StartingBranchName;
+                    branchNames = new[] { options.StartingBranchName };
                 }
                 RepositoryInfoOptionsBranch bOpt;
                 if( options.Branches != null
-                    && (bOpt = options.Branches.FirstOrDefault( b => b.Name == branchName )) != null
+                    && (bOpt = options.Branches.FirstOrDefault( b => branchNames.Contains( b.Name ) )) != null
                     && bOpt.CIVersionMode != CIBranchVersionMode.None )
                 {
                     ciVersionMode = bOpt.CIVersionMode;

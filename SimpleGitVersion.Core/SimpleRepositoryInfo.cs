@@ -6,7 +6,7 @@ namespace SimpleGitVersion
 {
     /// <summary>
     /// Immutable object that exposes simplified information by wrapping a more complex <see cref="RepositoryInfo"/>.
-    /// The <see cref="LoadFromPath(ILogger, string)"/> also handles the read of the RepositoryInfo.xml that may exist 
+    /// The <see cref="LoadFromPath"/> also handles the read of the RepositoryInfo.xml that may exist 
     /// at the root of the solution directory (the Repository.xml file creates a <see cref="RepositoryInfoOptions"/> that 
     /// configures the analysis).
     /// </summary>
@@ -140,13 +140,21 @@ namespace SimpleGitVersion
         /// </summary>
         /// <param name="path">The path to lookup.</param>
         /// <param name="logger">Logger that will be used.</param>
+        /// <param name="optionsChecker">
+        /// Optional action that accepts the logger, a boolean that is true if a RepositoryInfo.xml has been 
+        /// found, and the <see cref="RepositoryInfoOptions"/> that will be used.
+        /// </param>
         /// <returns>An immutable SimpleRepositoryInfo instance.</returns>
-        static public SimpleRepositoryInfo LoadFromPath( ILogger logger, string path )
+        static public SimpleRepositoryInfo LoadFromPath( ILogger logger, string path, Action<ILogger,bool,RepositoryInfoOptions> optionsChecker = null )
         {
+            if( logger == null ) throw new ArgumentNullException( nameof( logger ) ); 
             RepositoryInfo info = RepositoryInfo.LoadFromPath( path, gitPath =>
             {
                 string optionFile = Path.Combine( gitPath, "RepositoryInfo.xml" );
-                return File.Exists( optionFile ) ? RepositoryInfoOptions.Read( optionFile ) : new RepositoryInfoOptions();
+                bool fileExists = File.Exists( optionFile );
+                var options = fileExists ? RepositoryInfoOptions.Read( optionFile ) : new RepositoryInfoOptions();
+                if( optionsChecker != null ) optionsChecker( logger, fileExists, options );
+                return options;
             } );
             return new SimpleRepositoryInfo( logger, info );
         }
@@ -172,13 +180,17 @@ namespace SimpleGitVersion
             {
                 logger.Warn( "Non standard pre release name '{0}' is mapped to '{1}'.", t.PreReleaseNameFromTag, t.PreReleaseName );
             }
-            if( info.IsDirty )
+            if( info.IsDirty && !info.Options.IgnoreDirtyWorkingFolder )
             {
                 SetInvalidValuesAndLog( logger, "Working folder has non committed changes.", false );
             }
             else
             {
                 Debug.Assert( info.PossibleVersions != null && info.PossibleVersionsFromContent != null && info.AllPossibleVersions != null );
+                if( info.IsDirty )
+                {
+                    logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
+                }
                 if( info.PreviousRelease != null )
                 {
                     logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease, info.PreviousReleaseCommitSha );
