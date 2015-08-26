@@ -135,11 +135,7 @@ namespace SimpleGitVersion
         {
             try
             {
-                var i = SimpleRepositoryInfo.LoadFromPath( new Logger( this ), BuildEngine.ProjectFileOfTaskNode, (log,hasOptionFile,options) =>
-                {
-                    if( !hasOptionFile ) log.Info( "Using default options to read repository information." );
-                    else log.Info( "Using RepositoryInfo.xml: " + options.ToXml().ToString() );
-                } );
+                var i = SimpleRepositoryInfo.LoadFromPath( new Logger( this ), BuildEngine.ProjectFileOfTaskNode );
                 GitSolutionDirectory = i.Info.GitSolutionDirectory;
                 IsValidRelease = i.IsValidRelease;
                 IsValidCIBuild = i.IsValidCIBuild;
