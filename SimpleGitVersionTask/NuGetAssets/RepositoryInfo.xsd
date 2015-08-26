@@ -38,6 +38,7 @@
         </xs:element>
         <xs:element name="StartingVersionForCSemVer" minOccurs="0" type="xs:string" />
       </xs:all>
+      <xs:attribute name="IgnoreDirtyWorkingFolder" type="xs:boolean" default="true" />
     </xs:complexType>
   </xs:element>
 </xs:schema>

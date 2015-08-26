@@ -95,6 +95,12 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
+        /// Gets or sets whether the <see cref="RepositoryInfo.IsDirty"/> is ignored.
+        /// This should be used only for debugging purposes.
+        /// </summary>
+        public bool IgnoreDirtyWorkingFolder { get; set; }
+
+        /// <summary>
         /// Reads <see cref="RepositoryInfoOptions"/> from a xml file.
         /// </summary>
         /// <param name="existingFilePath">Path to a xml file.</param>
@@ -112,6 +118,8 @@ namespace SimpleGitVersion
         public static RepositoryInfoOptions Read( XElement e )
         {
             var info = new RepositoryInfoOptions();
+            var attrIgnoreDirty = e.Attribute( SGVSchema.IgnoreDirtyWorkingFolder ) ?? e.Attribute( SGVSchema.IgnoreDirtyWorkingFolderNoNS );
+            info.IgnoreDirtyWorkingFolder = attrIgnoreDirty != null ? attrIgnoreDirty.Value == "true" || attrIgnoreDirty.Value == "1" : false;
             var eS = e.Element( SGVSchema.StartingVersionForCSemVer );
             if( eS != null ) info.StartingVersionForCSemVer = eS.Value;
             info.Branches = e.Elements( SGVSchema.Branches )

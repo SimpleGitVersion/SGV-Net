@@ -20,9 +20,13 @@ namespace SimpleGitVersion
         public static readonly XName Name = SVGNS + "Name";
         public static readonly XName CIVersionMode = SVGNS + "CIVersionMode";
         public static readonly XName VersionName = SVGNS + "VersionName";
+        public static readonly XName IgnoreDirtyWorkingFolder = SVGNS + "IgnoreDirtyWorkingFolder";
 
         public static readonly XName NameNoNS = XNamespace.None + "Name";
         public static readonly XName CIVersionModeNoNS = XNamespace.None + "CIVersionMode";
         public static readonly XName VersionNameNoNS = XNamespace.None + "VersionName";
+        public static readonly XName IgnoreDirtyWorkingFolderNoNS = XNamespace.None + "IgnoreDirtyWorkingFolder";
+
+
     }
 }

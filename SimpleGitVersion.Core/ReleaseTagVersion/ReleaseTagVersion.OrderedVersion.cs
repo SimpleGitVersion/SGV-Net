@@ -226,7 +226,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Relies only on <see cref="OrderedVersion"/>.
         /// </summary>
-        /// <param name="other">Other release tag.</param>
+        /// <param name="other">Other release tag (can be null).</param>
         /// <returns>A signed number indicating the relative values of this instance and <paramref name="other"/>.</returns>
         public int CompareTo( ReleaseTagVersion other )
         {
