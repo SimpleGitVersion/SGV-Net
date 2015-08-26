@@ -41,7 +41,7 @@ namespace CodeCake
             string v = context.EnvironmentVariable( variable );
             if( v == null && IsInteractiveMode( context ) )
             {
-                Console.Write( "Environment Variable '{0}' not found. Enter its value: " );
+                Console.Write( "Environment Variable '{0}' not found. Enter its value: ", variable );
                 v = Console.ReadLine();
             }
             return v;
