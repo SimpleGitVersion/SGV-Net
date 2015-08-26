@@ -25,15 +25,29 @@ namespace SimpleGitVersion
         /// <param name="e">The xml element.</param>
         public RepositoryInfoOptionsBranch( XElement e )
         {
-            Name = (string)(e.Attribute( SGVSchema.Name ) ?? e.Attribute( SGVSchema.NameNoNS )); 
-            VersionName = (string)(e.Attribute( SGVSchema.VersionName ) ?? e.Attribute( SGVSchema.VersionNameNoNS )); 
-            var a = e.Attribute( SGVSchema.CIVersionMode ) ?? e.Attribute( SGVSchema.CIVersionModeNoNS );
+            Name = (string)e.Attribute( SGVSchema.Name ); 
+            VersionName = (string)e.Attribute( SGVSchema.VersionName ); 
+            var a = e.Attribute( SGVSchema.CIVersionMode );
             CIBranchVersionMode mode;
             if( a != null && Enum.TryParse<CIBranchVersionMode>( a.Value, true, out mode ) ) 
             {
                 CIVersionMode = mode;
             }
         }
+
+        /// <summary>
+        /// Gets this branch as an Xml element.
+        /// </summary>
+        /// <returns>The XElement.</returns>
+        public XElement ToXml()
+        {
+            return new XElement( SGVSchema.Branch,
+                                    new XAttribute( SGVSchema.Name, Name ),
+                                    VersionName != null ? new XAttribute( SGVSchema.VersionName, VersionName ) : null,
+                                    new XAttribute( SGVSchema.CIVersionMode, CIVersionMode.ToString() )
+                               );
+        }
+
 
         /// <summary>
         /// Gets or sets the name of the branch.

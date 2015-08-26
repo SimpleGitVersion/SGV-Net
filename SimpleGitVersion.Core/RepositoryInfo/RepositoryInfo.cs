@@ -56,6 +56,7 @@ namespace SimpleGitVersion
         /// It is also null if there is actually no release tag on the current commit.
         /// </summary>
         public readonly ReleaseTagVersion ValidReleaseTag;
+
         /// <summary>
         /// Gets whether the error is the fact that the release tag on the current commit point
         /// is not one of the <see cref="PossibleVersions"/>. An error that describes this appears 
@@ -134,6 +135,11 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
+        /// Gets the <see cref="RepositoryInfoOptions"/> that has been used.
+        /// </summary>
+        public readonly RepositoryInfoOptions Options;
+
+        /// <summary>
         /// The UTC date and time of the commit.
         /// </summary>
         public readonly DateTime CommitDateUtc;
@@ -158,12 +164,13 @@ namespace SimpleGitVersion
         RepositoryInfo( Repository r, RepositoryInfoOptions options, string gitSolutionDir )
             : this()
         {
+            if( options == null ) options = new RepositoryInfoOptions();
+            Options = options;
             if( r == null ) RepositoryError = "No Git repository.";
             else
             {
                 Debug.Assert( gitSolutionDir != null );
                 GitSolutionDirectory = gitSolutionDir;
-                if( options == null ) options = new RepositoryInfoOptions();
                 Commit commit;
                 CIBranchVersionMode ciVersionMode;
                 string ciVersionName;
@@ -175,7 +182,7 @@ namespace SimpleGitVersion
                     CommitDateUtc = commit.Author.When.ToUniversalTime().DateTime;
                     RepositoryStatus repositoryStatus = r.RetrieveStatus();
                     IsDirty = ComputeIsDirty( repositoryStatus, options );
-                    if( !IsDirty )
+                    if( !IsDirty || options.IgnoreDirtyWorkingFolder )
                     {
                         StringBuilder errors = new StringBuilder();
                         TagCollector collector = new TagCollector(  errors, 

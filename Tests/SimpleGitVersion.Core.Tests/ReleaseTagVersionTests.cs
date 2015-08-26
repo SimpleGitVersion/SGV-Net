@@ -371,8 +371,8 @@ namespace SimpleGitVersion.Core.Tests
             }
 
 
-            [TestCase( 1, 10, 1000 )]
-            [TestCase( -1, 10, 1000 ), Description( "Random seed version." )]
+            [TestCase( 1, 2, 1000 )]
+            [TestCase( -1, 2, 1000 ), Description( "Random seed version." )]
             public void randomized_checking_of_ordered_versions_mapping_and_extended_successors_and_predecessors( int seed, int count, int span )
             {
                 Random r = seed >= 0 ? new Random( seed ) : new Random();

@@ -25,11 +25,9 @@ namespace SimpleGitVersion.Core.Tests
         <Add>SharedKey.snk</Add>
     </IgnoreModifiedFiles>
 </RepositoryInfo>";
-            XmlSchema schema = XmlSchema.Read( File.OpenRead( TestHelper.RepositoryXSDPath ), ( o, e ) => { throw new Exception( "Invalid xsd." ); } );
-            XmlSchemaSet set = new XmlSchemaSet();
-            set.Add( schema );
             XDocument d = XDocument.Parse( s );
-            d.Validate( set, ( o, e ) => { throw new Exception( "Invalid xsd." ); } );
+            ValidateAgainstSchema( d );
+
             RepositoryInfoOptions opt = RepositoryInfoOptions.Read( d.Root );
 
             Assert.That( opt.Branches, Is.Empty );
@@ -45,16 +43,12 @@ namespace SimpleGitVersion.Core.Tests
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <RepositoryInfo xmlns=""http://csemver.org/schemas/2015"">
     <Branches>
-        <Branch  xmlns=""http://csemver.org/schemas/2015"" Name=""develop"" CIVersionMode=""LastReleaseBased"" />
-        <Branch  xmlns=""http://csemver.org/schemas/2015"" Name=""exploratory"" CIVersionMode=""ZeroTimed"" VersionName=""Preview"" />
+        <Branch Name=""develop"" CIVersionMode=""LastReleaseBased"" />
+        <Branch Name=""exploratory"" CIVersionMode=""ZeroTimed"" VersionName=""Preview"" />
     </Branches>
 </RepositoryInfo>";
             XDocument d = XDocument.Parse( s );
-
-            XmlSchema schema = XmlSchema.Read( File.OpenRead( TestHelper.RepositoryXSDPath ), ( o, e ) => { throw new Exception( "Invalid xsd." ); } );
-            XmlSchemaSet set = new XmlSchemaSet();
-            set.Add( schema );
-            d.Validate( set, ( o, e ) => { throw new Exception( "Invalid xsd." ); } );
+            ValidateAgainstSchema( d );
 
             RepositoryInfoOptions opt = RepositoryInfoOptions.Read( d.Root );
 
@@ -71,5 +65,50 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( opt.Branches[1].VersionName, Is.EqualTo( "Preview" ) );
         }
 
+        [Test]
+        public void full_repository_info_to_xml_is_valid_according_to_schema()
+        {
+            string s =
+@"<?xml version=""1.0"" encoding=""utf-8""?>
+<RepositoryInfo xmlns=""http://csemver.org/schemas/2015"">
+    <Debug IgnoreDirtyWorkingFolder=""true"" />
+    <Branches>
+        <Branch Name=""develop"" CIVersionMode=""LastReleaseBased"" />
+        <Branch Name=""exploratory"" CIVersionMode=""ZeroTimed"" VersionName=""Preview"" />
+        <Branch Name=""other"" CIVersionMode=""None"" />
+    </Branches>
+	<StartingVersionForCSemVer>v4.2.0</StartingVersionForCSemVer>
+    <IgnoreModifiedFiles>
+        <Add>SharedKey.snk</Add>
+    </IgnoreModifiedFiles>
+	<RemoteName>not-the-origin</RemoteName>
+</RepositoryInfo>";
+            XDocument d = XDocument.Parse( s );
+            ValidateAgainstSchema( d );
+
+            RepositoryInfoOptions opt = RepositoryInfoOptions.Read( d.Root );
+
+            XDocument d2 = new XDocument( opt.ToXml() );
+            ValidateAgainstSchema( d2 );
+            RepositoryInfoOptions opt2 = RepositoryInfoOptions.Read( d2.Root );
+
+            Assert.That( opt.IgnoreDirtyWorkingFolder, Is.EqualTo( opt2.IgnoreDirtyWorkingFolder ) );
+            Assert.That( opt.RemoteName, Is.EqualTo( opt2.RemoteName ) );
+            Assert.That( opt.StartingVersionForCSemVer, Is.EqualTo( opt2.StartingVersionForCSemVer ) );
+            Assert.That( opt.Branches.Count, Is.EqualTo( opt2.Branches.Count ) );
+            Assert.That( opt.IgnoreModifiedFiles.Count, Is.EqualTo( opt2.IgnoreModifiedFiles.Count ) );
+        }
+
+        private static void ValidateAgainstSchema( XDocument d )
+        {
+            XmlSchema schema = XmlSchema.Read( File.OpenRead( TestHelper.RepositoryXSDPath ), ( o, e ) => { throw new Exception( "Invalid xsd." ); } );
+            XmlSchemaSet set = new XmlSchemaSet();
+            set.Add( schema );
+            d.Validate( set, ( o, e ) => 
+            {
+                throw new Exception( "Invalid document:" + e.Message );
+            } );
+        }
+
     }
-}
+    }
