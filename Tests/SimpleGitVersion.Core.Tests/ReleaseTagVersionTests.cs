@@ -67,79 +67,18 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( t.ToString( ReleaseTagFormat.NuGetPackage ), Is.EqualTo( tag ) );
             }
 
-            [TestCase( "0.0.0-alpha", "0.0.0-alpha" )]
-            [TestCase( "3.0.1-beta.12", "3.0.1-beta-12" )]
-            [TestCase( "3.0.1-delta.1", "3.0.1-delta-01" )]
-            [TestCase( "3.0.1-epsilon.18", "3.0.1-epsilon-18" )]
-            [TestCase( "3.0.1-gamma.19", "3.0.1-gamma-19" )]
-            [TestCase( "3.0.1-iota.20", "3.0.1-iota-20" )]
-            [TestCase( "3.0.1-kappa.21", "3.0.1-kappa-21" )]
-            [TestCase( "3.0.1-lambda.22", "3.0.1-lambda-22" )]
-            [TestCase( "3.0.1-mu.23", "3.0.1-mu-23" )]
-            [TestCase( "3.0.1-omicron.24", "3.0.1-omicron-24" )]
-            [TestCase( "3.0.1-pi.25", "3.0.1-pi-25" )]
-            [TestCase( "99999.99999.9999-rc.99", "99999.99999.9999-rc-99" )]
-            public void pre_release_with_standard_names_nugetV2_mappings( string tag, string nuget )
-            {
-                ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
-                Assert.That( t.IsValid );
-                Assert.That( t.IsPreRelease );
-                Assert.That( t.IsPreReleaseNameStandard );
-                Assert.That( t.IsPreReleaseFix, Is.False );
-                Assert.That( t.ToString( ReleaseTagFormat.SemVer ), Is.EqualTo( tag ) );
-                Assert.That( t.ToString( ReleaseTagFormat.NuGetPackage ), Is.EqualTo( nuget ) );
-            }
-
-            [TestCase( "0.0.0-alpha.0.1", "0.0.0-alpha-00-01" )]
-            [TestCase( "3.0.1-beta.12.8", "3.0.1-beta-12-08" )]
-            [TestCase( "3.0.1-delta.1.99", "3.0.1-delta-01-99" )]
-            [TestCase( "3.0.1-epsilon.18.2", "3.0.1-epsilon-18-02" )]
-            [TestCase( "3.0.1-gamma.19.4", "3.0.1-gamma-19-04" )]
-            [TestCase( "3.0.1-iota.1.1", "3.0.1-iota-01-01" )]
-            [TestCase( "3.0.1-kappa.1.5", "3.0.1-kappa-01-05" )]
-            [TestCase( "3.0.1-lambda.10.10", "3.0.1-lambda-10-10" )]
-            [TestCase( "3.0.1-mu.23.23", "3.0.1-mu-23-23" )]
-            [TestCase( "3.0.1-omicron.0.1", "3.0.1-omicron-00-01" )]
-            [TestCase( "3.0.1-pi.0.1", "3.0.1-pi-00-01" )]
-            [TestCase( "99999.99999.9999-rc.99.99", "99999.99999.9999-rc-99-99" )]
-            public void pre_release_with_standard_names_and_fix_number_nugetV2_mappings( string tag, string nuget )
-            {
-                ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
-                Assert.That( t.IsValid );
-                Assert.That( t.IsPreRelease );
-                Assert.That( t.IsPreReleaseNameStandard );
-                Assert.That( t.IsPreReleaseFix );
-                Assert.That( t.PreReleaseFix, Is.GreaterThan( 0 ) );
-                Assert.That( t.ToString( ReleaseTagFormat.SemVer ), Is.EqualTo( tag ) );
-                Assert.That( t.ToString( ReleaseTagFormat.NuGetPackage ), Is.EqualTo( nuget ) );
-            }
-
-            [TestCase( "3.0.1-ready.0.1", "3.0.1-ready-00-01" )]
-            [TestCase( "99999.99999.9999-nonstandard.99.99", "99999.99999.9999-nonstandard-99-99" )]
-            public void parsing_valid_pre_release_with_nonstandard_names( string tag, string nuget )
-            {
-                ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
-                Assert.That( t.IsValid );
-                Assert.That( t.IsPreRelease );
-                Assert.That( !t.IsPreReleaseNameStandard );
-                Assert.That( t.IsPreReleaseFix );
-                Assert.That( t.PreReleaseFix, Is.GreaterThan( 0 ) );
-                Assert.That( t.ToString( ReleaseTagFormat.SemVer, null, true ), Is.EqualTo( tag ) );
-                Assert.That( t.ToString( ReleaseTagFormat.NuGetPackage, null, true ), Is.EqualTo( nuget ) );
-            }
-
             [TestCase( "", -1 )]
             [TestCase( "alpha", 0 )]
             [TestCase( "beta", 1 )]
-            [TestCase( "delta", 2 )]
-            [TestCase( "epsilon", 3 )]
-            [TestCase( "gamma", 4 )]
-            [TestCase( "iota", 5 )]
-            [TestCase( "kappa", 6 )]
-            [TestCase( "lambda", 7 )]
-            [TestCase( "mu", 8 )]
-            [TestCase( "omicron", 9 )]
-            [TestCase( "pi", 10 )]
+            [TestCase( "chi", 2 )]
+            [TestCase( "delta", 3 )]
+            [TestCase( "epsilon", 4 )]
+            [TestCase( "gamma", 5 )]
+            [TestCase( "iota", 6 )]
+            [TestCase( "kappa", 7 )]
+            [TestCase( "lambda", 8 )]
+            [TestCase( "mu", 9 )]
+            [TestCase( "omicron", 10 )]
             [TestCase( "A", 11 )]
             [TestCase( "Alpha", 11 )]
             [TestCase( "c", 11 )]
@@ -151,7 +90,22 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( ReleaseTagVersion.GetPreReleaseNameIdx( n ), Is.EqualTo( idx ), n );
             }
 
-            [TestCase( "v0.0.0-alpha", 0, 0, 0, 1 )]
+        [TestCase( "3.0.1-ready.0.1" )]
+        [TestCase( "99999.99999.9999-nonstandard.99.99" )]
+        public void to_string_pre_release_with_nonstandard_names_works_for_SemVer_but_throws_for_NuGetV2( string tag )
+        {
+            ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
+            Assert.That( t.IsValid );
+            Assert.That( t.IsPreRelease );
+            Assert.That( !t.IsPreReleaseNameStandard );
+            Assert.That( t.IsPreReleaseFix );
+            Assert.That( t.PreReleaseFix, Is.GreaterThan( 0 ) );
+            Assert.That( t.ToString( ReleaseTagFormat.SemVer, null, true ), Is.EqualTo( tag ) );
+            Assert.Throws<ArgumentException>( () => t.ToString( ReleaseTagFormat.NugetPackageV2, null, true ) );
+        }
+
+
+        [TestCase( "v0.0.0-alpha", 0, 0, 0, 1 )]
             [TestCase( "v0.0.0-alpha.0.1", 0, 0, 0, 2 )]
             [TestCase( "v0.0.0-alpha.0.2", 0, 0, 0, 3 )]
             [TestCase( "v0.0.0-alpha.1", 0, 0, 0, 101 )]
@@ -212,7 +166,8 @@ namespace SimpleGitVersion.Core.Tests
             [TestCase( "0.0.0-alpha.0.2", false, 2 )]
             [TestCase( "0.0.0-alpha.99.99", false, 100 * 99 + 100 - 1 )]
             [TestCase( "0.0.0-beta", false, 100 * 99 + 100 )]
-            [TestCase( "0.0.0-delta", false, 2 * (100 * 99 + 100) )]
+            [TestCase( "0.0.0-chi", false, 2 * (100 * 99 + 100) )]
+            [TestCase( "0.0.0-delta", false, 3 * (100 * 99 + 100) )]
             [TestCase( "0.0.0-rc", false, 12 * (100 * 99 + 100) )]
             [TestCase( "0.0.0-rc.99.99", false, 12 * (100 * 99 + 100) + 100*99 + 99 )]
             [TestCase( "0.0.0", false, 13 * 100 * 100 )]
@@ -222,7 +177,9 @@ namespace SimpleGitVersion.Core.Tests
             [TestCase( "0.0.1-alpha.0.2", false, ((13 * 100 * 100) + 1) + 2 )]
             [TestCase( "0.0.1-alpha.99.99", false, ((13 * 100 * 100) + 1) + 100 * 99 + 100 - 1 )]
             [TestCase( "0.0.1-beta", false, ((13 * 100 * 100) + 1) + 100 * 99 + 100 )]
-            [TestCase( "0.0.1-delta", false, ((13 * 100 * 100) + 1) + 2 * (100 * 99 + 100) )]
+            [TestCase( "0.0.1-chi", false, ((13 * 100 * 100) + 1) + 2 * (100 * 99 + 100) )]
+            [TestCase( "0.0.1-delta", false, ((13 * 100 * 100) + 1) + 3 * (100 * 99 + 100) )]
+            [TestCase( "0.0.1-epsilon", false, ((13 * 100 * 100) + 1) + 4 * (100 * 99 + 100) )]
             [TestCase( "0.0.1-rc", false, ((13 * 100 * 100) + 1) + 12 * (100 * 99 + 100) )]
             [TestCase( "0.0.1-rc.99.99", false, ((13 * 100 * 100) + 1) + 12 * (100 * 99 + 100) + 100 * 99 + 99 )]
             [TestCase( "0.0.1", false, ((13 * 100 * 100) + 1) + 13 * 100 * 100 )]
@@ -449,11 +406,11 @@ namespace SimpleGitVersion.Core.Tests
             public void check_first_possible_versions()
             {
                 string firstPossibleVersions = @"
-                        v0.0.0-alpha, v0.0.0-beta, v0.0.0-delta, v0.0.0-epsilon, v0.0.0-gamma, v0.0.0-iota, v0.0.0-kappa, v0.0.0-lambda, v0.0.0-mu, v0.0.0-omicron, v0.0.0-pi, v0.0.0-prerelease, v0.0.0-rc, 
+                        v0.0.0-alpha, v0.0.0-beta, v0.0.0-chi, v0.0.0-delta, v0.0.0-epsilon, v0.0.0-gamma, v0.0.0-iota, v0.0.0-kappa, v0.0.0-lambda, v0.0.0-mu, v0.0.0-omicron, v0.0.0-prerelease, v0.0.0-rc, 
                         v0.0.0, 
-                        v0.1.0-alpha, v0.1.0-beta, v0.1.0-delta, v0.1.0-epsilon, v0.1.0-gamma, v0.1.0-iota, v0.1.0-kappa, v0.1.0-lambda, v0.1.0-mu, v0.1.0-omicron, v0.1.0-pi, v0.1.0-prerelease, v0.1.0-rc, 
+                        v0.1.0-alpha, v0.1.0-beta, v0.1.0-chi, v0.1.0-delta, v0.1.0-epsilon, v0.1.0-gamma, v0.1.0-iota, v0.1.0-kappa, v0.1.0-lambda, v0.1.0-mu, v0.1.0-omicron, v0.1.0-prerelease, v0.1.0-rc, 
                         v0.1.0, 
-                        v1.0.0-alpha, v1.0.0-beta, v1.0.0-delta, v1.0.0-epsilon, v1.0.0-gamma, v1.0.0-iota, v1.0.0-kappa, v1.0.0-lambda, v1.0.0-mu, v1.0.0-omicron, v1.0.0-pi, v1.0.0-prerelease, v1.0.0-rc, 
+                        v1.0.0-alpha, v1.0.0-beta, v1.0.0-chi, v1.0.0-delta, v1.0.0-epsilon, v1.0.0-gamma, v1.0.0-iota, v1.0.0-kappa, v1.0.0-lambda, v1.0.0-mu, v1.0.0-omicron, v1.0.0-prerelease, v1.0.0-rc, 
                         v1.0.0";
                 var next = firstPossibleVersions.Split( ',' )
                                         .Select( v => v.Trim() )

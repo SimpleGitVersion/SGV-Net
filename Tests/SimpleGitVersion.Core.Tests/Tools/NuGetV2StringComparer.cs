@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Semver;
+using NUnit.Framework;
 
 namespace SimpleGitVersion
 {
@@ -16,6 +17,8 @@ namespace SimpleGitVersion
         {
             var vX = SemVersion.Parse( x, true );
             var vY = SemVersion.Parse( y, true );
+            Assert.That( vX.Prerelease.Length <= 20, "{0} => PreRelease must not contain more than 20 characters (lenght is {1}).", x, x.Length );
+            Assert.That( vY.Prerelease.Length <= 20, "{0} => PreRelease must not contain more than 20 characters (lenght is {1}).", y, y.Length );
             int cmp = vX.Major - vY.Major;
             if( cmp != 0 ) return cmp;
             cmp = vX.Minor - vY.Minor;

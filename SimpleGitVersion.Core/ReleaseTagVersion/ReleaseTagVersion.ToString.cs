@@ -30,22 +30,28 @@ namespace SimpleGitVersion
         public string ToString( ReleaseTagFormat f, CIBuildDescriptor buildInfo = null, bool usePreReleaseNameFromTag = false )
         {
             if( ParseErrorMessage != null ) return ParseErrorMessage;
-
+            if( buildInfo != null && !buildInfo.IsValid ) throw new ArgumentException( "buildInfo must be valid." );
             if( f == ReleaseTagFormat.DottedOrderedVersion )
             {
                 return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}.{3}", OrderedVersionMajor, OrderedVersionMinor, OrderedVersionBuild, OrderedVersionRevision );
             }
+
 
             string prName = usePreReleaseNameFromTag ? PreReleaseNameFromTag : PreReleaseName;
             switch( f )
             {
                 case ReleaseTagFormat.NugetPackageV2:
                     {
+                        // For NuGetV2, we are obliged to use the initial otherwise the special part for a pre release fix is too long for CI-Build LastReleasedBased.
+                        if( usePreReleaseNameFromTag ) throw new ArgumentException( "ReleaseTagFormat.NugetPackageV2 can not use PreReleaseNameFromTag." );
+                        prName = PreReleaseNameIdx >= 0 ? _standardNames[PreReleaseNameIdx][0].ToString() : String.Empty;
+
                         string suffix = IsMarkedInvalid ? Marker : null;
-                        bool isCIBuild = buildInfo != null && buildInfo.IsApplicable;
+                        bool isCIBuild = buildInfo != null;
+                        if( isCIBuild && !buildInfo.IsValidForNuGetV2 ) throw new ArgumentException( "buildInfo must be valid for NuGetV2 format." );
                         if( isCIBuild )
                         {
-                            suffix = buildInfo.ToStringPadded( '-' ) + suffix;
+                            suffix = buildInfo.ToStringForNuGetV2() + suffix;
                         }
                         if( IsPreRelease )
                         {
@@ -53,21 +59,21 @@ namespace SimpleGitVersion
                             {
                                 if( isCIBuild )
                                 {
-                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                                 }
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                             }
                             if( PreReleaseNumber > 0 )
                             {
                                 if( isCIBuild )
                                 {
-                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-00-{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-00-{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                                 }
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                             }
                             if( isCIBuild )
                             {
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-00-00-{4}", Major, Minor, Patch, prName, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}00-00-{4}", Major, Minor, Patch, prName, suffix );
                             }
                             return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, suffix );
                         }
@@ -81,7 +87,7 @@ namespace SimpleGitVersion
                 case ReleaseTagFormat.SemVerWithMarker:
                     {
                         string suffix = f == ReleaseTagFormat.SemVerWithMarker ? Marker : string.Empty;
-                        bool isCIBuild = buildInfo != null && buildInfo.IsApplicable;
+                        bool isCIBuild = buildInfo != null;
                         if( isCIBuild )
                         {
                             suffix = buildInfo.ToString() + suffix;
