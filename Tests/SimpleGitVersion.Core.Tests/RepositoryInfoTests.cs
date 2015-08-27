@@ -343,12 +343,12 @@ namespace SimpleGitVersion.Core.Tests
 
         }
 
-        [TestCase( "v1.0.0", "alpha", "1.0.1--ci-alpha.1", "1.0.1--ci-alpha-000001" )]
-        [TestCase( "v1.0.0", "beta", "1.0.1--ci-beta.1", "1.0.1--ci-beta-000001" )]
-        [TestCase( "v1.0.0", "gamma", "1.0.1--ci-gamma.2", "1.0.1--ci-gamma-000002" )]
-        [TestCase( "v1.0.0", "parallel-world", "1.0.1--ci-parallel-world.3", "1.0.1--ci-parallel-world-000003" )]
-        [TestCase( "v0.1.0-beta", "alpha", "0.1.0-beta.0.0.ci-alpha.1", "0.1.0-beta-00-00-ci-alpha-000001" )]
-        [TestCase( "v0.0.0-rc", "beta", "0.0.0-rc.0.0.ci-beta.1", "0.0.0-rc-00-00-ci-beta-000001" )]
+        [TestCase( "v1.0.0", "alpha", "1.0.1--ci-alpha.1", "1.0.1--alpha0001" )]
+        [TestCase( "v1.0.0", "beta", "1.0.1--ci-beta.1", "1.0.1--beta0001" )]
+        [TestCase( "v1.0.0", "gamma", "1.0.1--ci-gamma.2", "1.0.1--gamma0002" )]
+        [TestCase( "v1.0.0", "parallel-world", "1.0.1--ci-parallel-world.3", "1.0.1--parallel-world0003" )]
+        [TestCase( "v0.1.0-beta", "alpha", "0.1.0-beta.0.0.ci-alpha.1", "0.1.0-beta-00-00-alpha0001" )]
+        [TestCase( "v0.0.0-rc", "beta", "0.0.0-rc.0.0.ci-beta.1", "0.0.0-rc-00-00-beta0001" )]
         public void CIBuildVersion_from_RealDevInAlpha_commits_ahead_tests( string vRealDevInAlpha, string branchName, string ciBuildVersion, string ciBuildVersionNuGet )
         {
             var repoTest = TestHelper.TestGitRepository;
@@ -370,21 +370,21 @@ namespace SimpleGitVersion.Core.Tests
             }
         }
 
-        [TestCase( "v0.0.0-alpha.1.1", "alpha", "0.0.0-alpha.1.1.ci-alpha.3", "0.0.0-alpha-01-01-ci-alpha-000003" )]
-        [TestCase( "v0.0.0-alpha.2", "alpha", "0.0.0-alpha.2.0.ci-alpha.3", "0.0.0-alpha-02-00-ci-alpha-000003" )]
-        [TestCase( "v0.0.0-beta", "alpha", "0.0.0-beta.0.0.ci-alpha.3", "0.0.0-beta-00-00-ci-alpha-000003" )]
+        [TestCase( "v0.0.0-alpha.1.1", "alpha", "0.0.0-alpha.1.1.ci-alpha.3", "0.0.0-alpha-01-01-alpha0003" )]
+        [TestCase( "v0.0.0-alpha.2", "alpha", "0.0.0-alpha.2.0.ci-alpha.3", "0.0.0-alpha-02-00-alpha0003" )]
+        [TestCase( "v0.0.0-beta", "alpha", "0.0.0-beta.0.0.ci-alpha.3", "0.0.0-beta-00-00-alpha0003" )]
 
-        [TestCase( "v0.0.0-alpha.1.1", "beta", "0.0.0-alpha.1.1.ci-beta.2", "0.0.0-alpha-01-01-ci-beta-000002" )]
-        [TestCase( "v0.0.0-alpha.2", "beta", "0.0.0-alpha.2.0.ci-beta.2", "0.0.0-alpha-02-00-ci-beta-000002" )]
-        [TestCase( "v0.0.0-beta", "beta", "0.0.0-beta.0.0.ci-beta.2", "0.0.0-beta-00-00-ci-beta-000002" )]
+        [TestCase( "v0.0.0-alpha.1.1", "beta", "0.0.0-alpha.1.1.ci-beta.2", "0.0.0-alpha-01-01-beta0002" )]
+        [TestCase( "v0.0.0-alpha.2", "beta", "0.0.0-alpha.2.0.ci-beta.2", "0.0.0-alpha-02-00-beta0002" )]
+        [TestCase( "v0.0.0-beta", "beta", "0.0.0-beta.0.0.ci-beta.2", "0.0.0-beta-00-00-beta0002" )]
 
-        [TestCase( "v0.0.0-alpha.1.1", "parallel-world", "0.0.0-alpha.1.1.ci-parallel-world.4", "0.0.0-alpha-01-01-ci-parallel-world-000004" )]
-        [TestCase( "v0.0.0-alpha.2", "parallel-world", "0.0.0-alpha.2.0.ci-parallel-world.4", "0.0.0-alpha-02-00-ci-parallel-world-000004" )]
-        [TestCase( "v0.0.0-beta", "parallel-world", "0.0.0-beta.0.0.ci-parallel-world.4", "0.0.0-beta-00-00-ci-parallel-world-000004" )]
+        [TestCase( "v0.0.0-alpha.1.1", "parallel-world", "0.0.0-alpha.1.1.ci-parallel-world.4", "0.0.0-alpha-01-01-parallel-world0004" )]
+        [TestCase( "v0.0.0-alpha.2", "parallel-world", "0.0.0-alpha.2.0.ci-parallel-world.4", "0.0.0-alpha-02-00-parallel-world0004" )]
+        [TestCase( "v0.0.0-beta", "parallel-world", "0.0.0-beta.0.0.ci-parallel-world.4", "0.0.0-beta-00-00-parallel-world0004" )]
 
-        [TestCase( "v0.0.0-nimp", "f-beta-nothing", "0.0.0-alpha.1.0.ci-f-beta-nothing.4", "0.0.0-alpha-01-00-ci-f-beta-nothing-000004" )]
-        [TestCase( "v0.0.0-dont-care", "f-beta-nothing", "0.0.0-alpha.1.0.ci-f-beta-nothing.4", "0.0.0-alpha-01-00-ci-f-beta-nothing-000004" )]
-        [TestCase( "v0.0.0-onDevInAlpha", "f-beta-nothing", "0.0.0-alpha.1.0.ci-f-beta-nothing.4", "0.0.0-alpha-01-00-ci-f-beta-nothing-000004" )]
+        [TestCase( "v0.0.0-nimp", "f-beta-nothing", "0.0.0-alpha.1.0.ci-f-beta-nothing.4", "0.0.0-alpha-01-00-f-beta-nothing0004" )]
+        [TestCase( "v0.0.0-dont-care", "f-beta-nothing", "0.0.0-alpha.1.0.ci-f-beta-nothing.4", "0.0.0-alpha-01-00-f-beta-nothing0004" )]
+        [TestCase( "v0.0.0-onDevInAlpha", "f-beta-nothing", "0.0.0-alpha.1.0.ci-f-beta-nothing.4", "0.0.0-alpha-01-00-f-beta-nothing0004" )]
         public void CIBuildVersion_from_DevInAlpha_commits_ahead_tests( string vDevInAlpha, string branchName, string ciBuildVersion, string ciBuildVersionNuGet )
         {
             var repoTest = TestHelper.TestGitRepository;

@@ -53,7 +53,7 @@ namespace SimpleGitVersion
         /// The maximum number of fixes to a pre-release.
         /// </summary>
         public const int MaxPreReleaseFix = 99;
-        static readonly string[] _standardNames = new[]{ "alpha", "beta", "delta", "epsilon", "gamma", "iota", "kappa", "lambda", "mu", "omicron", "pi", "prerelease", "rc" };
+        static readonly string[] _standardNames = new[]{ "alpha", "beta", "chi", "delta", "epsilon", "gamma", "iota", "kappa", "lambda", "mu", "omicron", "prerelease", "rc" };
 
         const UInt64 MulNum = MaxPreReleaseFix + 1;
         const UInt64 MulName = MulNum * (MaxPreReleaseNumber + 1);

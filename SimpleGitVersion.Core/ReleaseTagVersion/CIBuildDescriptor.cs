@@ -17,20 +17,20 @@ namespace SimpleGitVersion
         /// Defines the maximal build index.
         /// This is required to be able to pad it with a constant number of '0'.
         /// </summary>
-        public const int MaxBuildIndex = 999999;
+        public const int MaxNuGetV2BuildIndex = 9999;
 
         int _buildIndex;
 
         /// <summary>
-        /// Gets or sets the build index. Must be between 0 and <see cref="MaxBuildIndex"/> otherwise an <see cref="ArgumentException"/> is thrown.
-        /// When 0, this descriptor is not applicable.
+        /// Gets or sets the build index. Must be between greater or equal to 0.
+       /// To be valid for NuGetV2, it must not exceed <see cref="MaxNuGetV2BuildIndex"/>.
         /// </summary>
         public int BuildIndex 
         {
             get { return _buildIndex; } 
             set
             {
-                if( _buildIndex < 0 || _buildIndex > MaxBuildIndex ) throw new ArgumentException();
+                if( _buildIndex < 0 ) throw new ArgumentException();
                 _buildIndex = value;
             }
         }
@@ -44,30 +44,38 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets whether this descriptor can be applied.
         /// </summary>
-        public bool IsApplicable
+        public bool IsValid
         {
-            get { return BuildIndex > 0 && !string.IsNullOrWhiteSpace( BranchName ); }
+            get { return _buildIndex > 0 && !string.IsNullOrWhiteSpace( BranchName ); }
         }
 
         /// <summary>
-        /// Overridden to return "ci-<see cref="BranchName"/>.<see cref="BuildIndex"/>" when <see cref="IsApplicable"/> is true,
+        /// Gets whether this descriptor can be applied for NuGetV2 special name case.
+        /// </summary>
+        public bool IsValidForNuGetV2
+        {
+            get { return IsValid && _buildIndex <= MaxNuGetV2BuildIndex; }
+        }
+
+        /// <summary>
+        /// Overridden to return "ci-<see cref="BranchName"/>.<see cref="BuildIndex"/>" when <see cref="IsValid"/> is true,
         /// the empty string otherwise.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return IsApplicable ? string.Format( "ci-{0}.{1}", BranchName, BuildIndex ) : string.Empty;
+            return IsValid ? string.Format( "ci-{0}.{1}", BranchName, BuildIndex ) : string.Empty;
         }
 
         /// <summary>
-        /// When <see cref="IsApplicable"/> is true, returns "ci-<see cref="BranchName"/><param name="nameNumberSeparator">(separator)</param><see cref="BuildIndex"/>" where 
+        /// When <see cref="IsValidForNuGetV2"/> is true, returns "<see cref="BranchName"/><see cref="BuildIndex"/>" where 
         /// the index is padded with 0, the empty string otherwise.
         /// </summary>
         /// <returns></returns>
-        public string ToStringPadded( char nameNumberSeparator )
+        public string ToStringForNuGetV2()
         {
-            Debug.Assert( MaxBuildIndex.ToString().Length == 6 );
-            return IsApplicable ? string.Format( "ci-{0}{1}{2:000000}", BranchName, nameNumberSeparator, BuildIndex ) : string.Empty;
+            Debug.Assert( MaxNuGetV2BuildIndex.ToString().Length == 4 );
+            return IsValid ? string.Format( "{0}{1:0000}", BranchName, BuildIndex ) : string.Empty;
         }
 
     }
