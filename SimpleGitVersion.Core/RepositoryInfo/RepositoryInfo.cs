@@ -252,8 +252,18 @@ namespace SimpleGitVersion
                                             {
                                                 Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && PreviousRelease != null );
                                                 CIBuildDescriptor ci = new CIBuildDescriptor{ BranchName = ciVersionName, BuildIndex = cv.DepthFromParent };
-                                                CIBuildVersion = PreviousRelease.ToString( ReleaseTagFormat.SemVer, ci );
-                                                CIBuildVersionNuGet = PreviousRelease.ToString( ReleaseTagFormat.NuGetPackage, ci );
+                                                if( !ci.IsValidForNuGetV2 )
+                                                {
+                                                    errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
+                                                    errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
+                                                            .AppendFormat( @"<Branch Name=""{0}"" VersionName=""{1}"" ... />.", ci.BranchName, ci.BranchName.Substring( 0, 8 ) )
+                                                            .AppendLine();
+                                                }
+                                                else
+                                                {
+                                                    CIBuildVersion = PreviousRelease.ToString( ReleaseTagFormat.SemVer, ci );
+                                                    CIBuildVersionNuGet = PreviousRelease.ToString( ReleaseTagFormat.NuGetPackage, ci );
+                                                }
                                             }
                                         }
                                     }
