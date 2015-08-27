@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-Net/master/SimpleGitVersion.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>
-      Cake extension that enables Cake scripts to obtain the SimpleGitVersion.RepositoryInfo.
+      Cake extension that enables Cake scripts to obtain the SimpleGitVersion.RepositoryInfo ({{CSemVer}}).
     </summary>
     <description>
       Simple relay to SimpleGitVersion.Core.RepositoryInfo.

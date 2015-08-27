@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-Net/master/SimpleGitVersion.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>
-      Core implementation of 'Constrained Semantic Version' on Git.
+      Core implementation of 'Constrained Semantic Version' on Git ({{CSemVer}}).
     </summary>
     <description>
       Extracts RepositoryInfo from a git repository that describes possible CSemVer and/or actual CSemVer version to use based on repository tags and topology.

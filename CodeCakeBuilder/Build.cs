@@ -100,7 +100,10 @@ namespace CodeCake
                     Cake.CopyFiles( "CodeCakeBuilder/NuSpec/*.nuspec", releasesDir );
                     foreach( var nuspec in Cake.GetFiles( releasesDir.Path + "/*.nuspec" ) )
                     {
-                        Cake.TransformTextFile( nuspec, "{{", "}}" ).WithToken( "configuration", configuration ).Save( nuspec );
+                        Cake.TransformTextFile( nuspec, "{{", "}}" )
+                                .WithToken( "configuration", configuration )
+                                .WithToken( "CSemVer", gitInfo.SemVer )
+                                .Save( nuspec );
                         Cake.NuGetPack( nuspec, settings );
                     }
                     Cake.DeleteFiles( releasesDir.Path + "/*.nuspec" );

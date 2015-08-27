@@ -54,7 +54,7 @@ namespace SimpleGitVersion
         /// </summary>
         public bool IsValidForNuGetV2
         {
-            get { return IsValid && _buildIndex <= MaxNuGetV2BuildIndex; }
+            get { return IsValid && _buildIndex <= MaxNuGetV2BuildIndex && BranchName.Length <= 8; }
         }
 
         /// <summary>
@@ -68,14 +68,14 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// When <see cref="IsValidForNuGetV2"/> is true, returns "<see cref="BranchName"/><see cref="BuildIndex"/>" where 
+        /// When <see cref="IsValidForNuGetV2"/> is true, returns "<see cref="BranchName"/>-<see cref="BuildIndex"/>" where 
         /// the index is padded with 0, the empty string otherwise.
         /// </summary>
         /// <returns></returns>
         public string ToStringForNuGetV2()
         {
             Debug.Assert( MaxNuGetV2BuildIndex.ToString().Length == 4 );
-            return IsValid ? string.Format( "{0}{1:0000}", BranchName, BuildIndex ) : string.Empty;
+            return IsValid ? string.Format( "{0}-{1:0000}", BranchName, BuildIndex ) : string.Empty;
         }
 
     }

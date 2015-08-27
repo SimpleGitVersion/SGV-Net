@@ -42,10 +42,9 @@ namespace SimpleGitVersion
             {
                 case ReleaseTagFormat.NugetPackageV2:
                     {
-                        // For NuGetV2, 'prerelease' is mapped to 'pre', otherwise the special part for a pre release fix is tool long (22 instaed of 20 characters).
+                        // For NuGetV2, we are obliged to use the initial otherwise the special part for a pre release fix is too long for CI-Build LastReleasedBased.
                         if( usePreReleaseNameFromTag ) throw new ArgumentException( "ReleaseTagFormat.NugetPackageV2 can not use PreReleaseNameFromTag." );
-                        Debug.Assert( _standardNames[11] == "prerelease" );
-                        if( PreReleaseNameIdx == 11 ) prName = "pre";
+                        prName = PreReleaseNameIdx >= 0 ? _standardNames[PreReleaseNameIdx][0].ToString() : String.Empty;
 
                         string suffix = IsMarkedInvalid ? Marker : null;
                         bool isCIBuild = buildInfo != null;
@@ -60,21 +59,21 @@ namespace SimpleGitVersion
                             {
                                 if( isCIBuild )
                                 {
-                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                                 }
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
                             }
                             if( PreReleaseNumber > 0 )
                             {
                                 if( isCIBuild )
                                 {
-                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}-00-{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-00-{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                                 }
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-{4:00}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}{5}", Major, Minor, Patch, prName, PreReleaseNumber, suffix );
                             }
                             if( isCIBuild )
                             {
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}-00-00-{4}", Major, Minor, Patch, prName, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}00-00-{4}", Major, Minor, Patch, prName, suffix );
                             }
                             return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4}", Major, Minor, Patch, prName, suffix );
                         }
