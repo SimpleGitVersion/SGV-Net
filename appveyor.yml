@@ -10,5 +10,5 @@ environment:
 install:
 - ps: CodeCakeBuilder\Bootstrap.ps1
 build_script:
-- CodeCakeBuilder\bin\Release\CodeCakeBuilder.exe --nointeraction
+- CodeCakeBuilder\bin\Release\CodeCakeBuilder.exe -nointeraction
 test: off
