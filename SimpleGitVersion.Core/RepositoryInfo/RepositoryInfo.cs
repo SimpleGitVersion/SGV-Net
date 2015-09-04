@@ -241,7 +241,7 @@ namespace SimpleGitVersion
                                         if( ciVersionName != null )
                                         {
                                             CIBaseTag = PreviousRelease ?? ReleaseTagVersion.VeryFirstVersion;
-                                            // If there is no previous release, we fall back to ZeroTimed mode.
+                                            // If there is no previous release, we fall back to ZeroTimedBased mode.
                                             if( ciVersionMode == CIBranchVersionMode.ZeroTimed || PreviousRelease == null )
                                             {
                                                 var name = string.Format( "0.0.0--ci-{0}-{1:u}", ciVersionName, commit.Committer.When );

@@ -11,7 +11,7 @@ namespace SimpleGitVersion.Core.Tests
     [TestFixture]
     public class NuGetV2NameTests
     {
-
+        [Explicit]
         [TestCase( "0.0.0-alpha" )]
         [TestCase( "0.0.0-alpha.1" )]
         [TestCase( "0.0.0-alpha.2" )]
@@ -36,6 +36,7 @@ namespace SimpleGitVersion.Core.Tests
             Console.WriteLine( "      " + string.Join( ", ", succ.Select( s => s.ToString() ) ) );
         }
 
+        [Explicit]
         [TestCase( "0.0.0-alpha, 0.0.0-alpha.1, 0.0.0-alpha.2, 1.0.0-prerelease, 0.0.0-prerelease.99.99, 5.0.0", 10 )]
         [TestCase( "99999.99999.9999-rc.99.99, 99999.99999.9999", 10 )]
         public void display_name_for_CI_build_and_check_20_characters_limit( string versions, int range )
