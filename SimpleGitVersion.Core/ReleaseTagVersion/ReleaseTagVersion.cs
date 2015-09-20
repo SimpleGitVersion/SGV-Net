@@ -66,8 +66,8 @@ namespace SimpleGitVersion
         /// </summary>
         public bool IsPreReleaseFix { get { return PreReleaseFix > 0; } }
         /// <summary>
-        /// Gets the marker if ("+valid", "+published" or "+invalid").
-        /// Normalized in lowercase and <see cref="string.Empty"/> when <see cref="IsMarked"/> is false.
+        /// Gets the "+invalid" marker.
+        /// Normalized in lowercase and <see cref="string.Empty"/> when <see cref="IsMarkedInvalid"/> is false.
         /// </summary>
         public readonly string Marker;
         /// <summary>
@@ -76,18 +76,6 @@ namespace SimpleGitVersion
         /// </summary>
         public bool IsValid { get { return PreReleaseNameFromTag != null; } }
         /// <summary>
-        /// Gets whether this <see cref="ReleaseTagVersion"/> is marked with +valid, +publish or +invalid.
-        /// </summary>
-        public bool IsMarked { get { return Kind.IsMarked(); } }
-        /// <summary>
-        /// Gets whether this <see cref="ReleaseTagVersion"/> is marked with +valid.
-        /// </summary>
-        public bool IsMarkedValid { get { return Kind.IsMarkedValid(); } }
-        /// <summary>
-        /// Gets whether this <see cref="ReleaseTagVersion"/> is marked with +publish.
-        /// </summary>
-        public bool IsMarkedPublished { get { return Kind.IsMarkedPublished(); } }
-        /// <summary>
         /// Gets whether this <see cref="ReleaseTagVersion"/> is marked with +invalid.
         /// This is the strongest form of tag.
         /// </summary>
@@ -95,7 +83,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the strength of this tag: an invalid tag has a strength of 0. For valid tags, the same release tag in 
         /// terms of <see cref="OrderedVersion"/> can be expressed with: a <see cref="IsPreReleaseNameStandard"/> (stronger than a non standard 'prerelease' one), 
-        /// a <see cref="IsMarkedPublished"/> is better and, ultimately, a <see cref="IsMarkedInvalid"/> wins.
+        /// and ultimately, a <see cref="IsMarkedInvalid"/> wins.
         /// </summary>
         public readonly int DefinitionStrength;
         /// <summary>
@@ -166,33 +154,22 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// Creates a clone of this tag, except that it is marked with "+valid".
-        /// This tag must be valid (<see cref="IsValid"/> is true), otherwise an <see cref="InvalidOperationException"/> is thrown.
-        /// </summary>
-        /// <returns>The "+valid" tag.</returns>
-        public ReleaseTagVersion MarkValid()
-        {
-            if( !IsValid ) throw new InvalidOperationException();
-            return IsMarkedValid ? this : new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, PreReleaseNumber, PreReleaseFix, Kind.ClearMarker() | ReleaseTagKind.MarkedValid );
-        }
-
-        /// <summary>
         /// Creates a clone of this tag, except that it is marked with "+invalid".
         /// This tag must be valid (<see cref="IsValid"/> is true), otherwise an <see cref="InvalidOperationException"/> is thrown.
         /// </summary>
         /// <returns>The "+valid" tag.</returns>
         public ReleaseTagVersion MarkInvalid()
         {
-            return IsMarkedInvalid ? this : new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, PreReleaseNumber, PreReleaseFix, Kind.ClearMarker() | ReleaseTagKind.MarkedInvalid );
+            return IsMarkedInvalid ? this : new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, PreReleaseNumber, PreReleaseFix, Kind | ReleaseTagKind.MarkedInvalid );
         }
 
         /// <summary>
         /// Computes the next possible ordered versions, from the closest one to the biggest possible bump.
         /// If <see cref="IsValid"/> is false, the list is empty.
         /// </summary>
-        /// <param name="closest">True to limit the jump (0 to 8 closest successors) otherwise generates the full list of valid successors (up to 43 successors).</param>
+        /// <param name="fixesOnly">True to obtain only fixes to this version. False to generate the full list of valid successors (up to 43 successors).</param>
         /// <returns>Next possible versions.</returns>
-        public IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool closest = false )
+        public IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool fixesOnly = false )
         {
             Debug.Assert( _standardNames[0] == "alpha" );
             if( IsValid )
@@ -204,24 +181,24 @@ namespace SimpleGitVersion
                     {
                         yield return new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, PreReleaseNumber, nextFix, ReleaseTagKind.PreRelease );
                     }
-                    int nextPrereleaseNumber = PreReleaseNumber + 1;
-                    if( nextPrereleaseNumber <= ReleaseTagVersion.MaxPreReleaseNumber )
+                    if( !fixesOnly )
                     {
-                        yield return new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, nextPrereleaseNumber, 0, ReleaseTagKind.PreRelease );
-                    }
-                    int nextPrereleaseNameIdx = PreReleaseNameIdx + 1;
-                    if( nextPrereleaseNameIdx <= ReleaseTagVersion.MaxPreReleaseNameIdx )
-                    {
-                        yield return new ReleaseTagVersion( null, Major, Minor, Patch, _standardNames[nextPrereleaseNameIdx], nextPrereleaseNameIdx, 0, 0, ReleaseTagKind.PreRelease );
-                        if( !closest )
+                        int nextPrereleaseNumber = PreReleaseNumber + 1;
+                        if( nextPrereleaseNumber <= ReleaseTagVersion.MaxPreReleaseNumber )
                         {
+                            yield return new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, nextPrereleaseNumber, 0, ReleaseTagKind.PreRelease );
+                        }
+                        int nextPrereleaseNameIdx = PreReleaseNameIdx + 1;
+                        if( nextPrereleaseNameIdx <= ReleaseTagVersion.MaxPreReleaseNameIdx )
+                        {
+                            yield return new ReleaseTagVersion( null, Major, Minor, Patch, _standardNames[nextPrereleaseNameIdx], nextPrereleaseNameIdx, 0, 0, ReleaseTagKind.PreRelease );
                             while( ++nextPrereleaseNameIdx <= ReleaseTagVersion.MaxPreReleaseNameIdx )
                             {
                                 yield return new ReleaseTagVersion( null, Major, Minor, Patch, _standardNames[nextPrereleaseNameIdx], nextPrereleaseNameIdx, 0, 0, ReleaseTagKind.PreRelease );
                             }
                         }
+                        yield return new ReleaseTagVersion( null, Major, Minor, Patch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                     }
-                    yield return new ReleaseTagVersion( null, Major, Minor, Patch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                 }
                 else
                 {
@@ -229,42 +206,41 @@ namespace SimpleGitVersion
                     int nextPatch = Patch + 1;
                     if( nextPatch <= MaxPatch )
                     {
-                        yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, "alpha", 0, 0, 0, ReleaseTagKind.PreRelease );
-                        if( !closest )
+                        for( int i = 0; i <= MaxPreReleaseNameIdx; ++i )
                         {
-                            for( int i = 1; i <= MaxPreReleaseNameIdx; ++i )
-                            {
-                                yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
-                            }
+                            yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
                         }
                         yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                     }
                 }
-                int nextMinor = Minor + 1;
-                if( nextMinor <= MaxMinor )
+                if( !fixesOnly )
                 {
-                    yield return new ReleaseTagVersion( null, Major, nextMinor, 0, "alpha", 0, 0, 0, ReleaseTagKind.PreRelease );
-                    if( !closest )
+                    int nextMinor = Minor + 1;
+                    if( nextMinor <= MaxMinor )
                     {
-                        for( int i = 1; i <= MaxPreReleaseNameIdx; ++i )
+                        yield return new ReleaseTagVersion( null, Major, nextMinor, 0, "alpha", 0, 0, 0, ReleaseTagKind.PreRelease );
+                        if( !fixesOnly )
                         {
-                            yield return new ReleaseTagVersion( null, Major, nextMinor, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
+                            for( int i = 1; i <= MaxPreReleaseNameIdx; ++i )
+                            {
+                                yield return new ReleaseTagVersion( null, Major, nextMinor, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
+                            }
                         }
+                        yield return new ReleaseTagVersion( null, Major, nextMinor, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                     }
-                    yield return new ReleaseTagVersion( null, Major, nextMinor, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
-                }
-                int nextMajor = Major + 1;
-                if( nextMajor <= MaxMajor )
-                {
-                    yield return new ReleaseTagVersion( null, nextMajor, 0, 0, "alpha", 0, 0, 0, ReleaseTagKind.PreRelease );
-                    if( !closest )
+                    int nextMajor = Major + 1;
+                    if( nextMajor <= MaxMajor )
                     {
-                        for( int i = 1; i <= MaxPreReleaseNameIdx; ++i )
+                        yield return new ReleaseTagVersion( null, nextMajor, 0, 0, "alpha", 0, 0, 0, ReleaseTagKind.PreRelease );
+                        if( !fixesOnly )
                         {
-                            yield return new ReleaseTagVersion( null, nextMajor, 0, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
+                            for( int i = 1; i <= MaxPreReleaseNameIdx; ++i )
+                            {
+                                yield return new ReleaseTagVersion( null, nextMajor, 0, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
+                            }
                         }
+                        yield return new ReleaseTagVersion( null, nextMajor, 0, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                     }
-                    yield return new ReleaseTagVersion( null, nextMajor, 0, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
                 }
             }
         }
@@ -336,19 +312,19 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// This static version handles null <paramref name="version"/> (the next versions are always '0.0.0-alpha', '0.0.0', '1.0.0-alpha', '1.0.0').
+        /// This static version handles null <paramref name="version"/> (the next versions are always <see cref="FirstPossibleVersions"/>).
         /// If the version is not valid or it it is <see cref="VeryLastVersion"/>, the list is empty.
         /// </summary>
         /// <param name="version">Any version (can be null).</param>
-        /// <param name="closest">True to limit the jump (0 to 8 closest successors). False to generate the full list of valid successors (up to 43 successors).</param>
+        /// <param name="fixesOnly">True to obtain only fixes to this version. False to generate the full list of valid successors (up to 43 successors).</param>
         /// <returns>The direct successors.</returns>
-        public static IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool closest, ReleaseTagVersion version = null )
+        public static IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool fixesOnly, ReleaseTagVersion version = null )
         {
             if( version == null )
             {
                 return FirstPossibleVersions;
             }
-            return version.GetDirectSuccessors( closest );
+            return version.GetDirectSuccessors( fixesOnly );
         }
     }
 }

@@ -51,6 +51,7 @@ namespace SimpleGitVersion
         /// Gets whether there are non committed files in the working directory.
         /// </summary>
         public readonly bool IsDirty;
+
         /// <summary>
         /// Gets the release tag. If there is error, this is null.
         /// It is also null if there is actually no release tag on the current commit.
@@ -67,43 +68,30 @@ namespace SimpleGitVersion
         /// <summary>
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
-        /// Can also be null if there is simply no previous release: the <see cref="PossibleVersions"/> are then <see cref="ReleaseTagVersion.FirstPossibleVersions"/>.
+        /// Can also be null if there is simply no previous release: the <see cref="PossibleVersions"/> are then based on <see cref="ReleaseTagVersion.FirstPossibleVersions"/>.
         /// </summary>
-        public readonly ReleaseTagVersion PreviousRelease;
-
-        /// <summary>
-        /// If there is a <see cref="PreviousRelease"/>, this is the Sha of the corresponding commit.
-        /// </summary>
-        public readonly string PreviousReleaseCommitSha;
+        public readonly ITagCommit PreviousRelease;
 
         /// <summary>
         /// Gets the existing versions in the repository in ascending order.
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
         /// </summary>
-        public readonly IReadOnlyList<ReleaseTagVersion> ExistingVersions;
+        public readonly IReadOnlyList<ITagCommit> ExistingVersions;
 
         /// <summary>
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
-        /// When empty, this means that there can not be a valid release tag on the current commit point based on the <see cref="PreviousRelease"/>.
-        /// However, <see cref="PossibleVersionsFromContent"/> may be non empty.
+        /// When empty, this means that there can not be a valid release tag on the current commit point.
         /// </summary>
         public readonly IReadOnlyList<ReleaseTagVersion> PossibleVersions;
 
         /// <summary>
-        /// Possible versions computed from the commit content.
+        /// Among possible versions this gives the versions that are valid regarding the whole repository.
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
         /// </summary>
-        public readonly IReadOnlyList<ReleaseTagVersion> PossibleVersionsFromContent;
-
-        /// <summary>
-        /// All possible versions is given by the union of <see cref="PossibleVersions"/> and <see cref="PossibleVersionsFromContent"/>.
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
-        /// prevented its computation.
-        /// </summary>
-        public readonly IReadOnlyList<ReleaseTagVersion> AllPossibleVersions;
+        public readonly IReadOnlyList<ReleaseTagVersion> ValidVersions;
 
         /// <summary>
         /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either because it is the current branch 
@@ -185,116 +173,68 @@ namespace SimpleGitVersion
                     if( !IsDirty || options.IgnoreDirtyWorkingFolder )
                     {
                         StringBuilder errors = new StringBuilder();
-                        TagCollector collector = new TagCollector(  errors, 
-                                                                    r, 
-                                                                    options.StartingVersionForCSemVer, 
-                                                                    c => c.Sha == CommitSha ? ReleaseTagParsingMode.RaiseErrorOnMalformedTag : ReleaseTagParsingMode.IgnoreMalformedTag, 
+                        TagCollector collector = new TagCollector( errors,
+                                                                    r,
+                                                                    options.StartingVersionForCSemVer,
+                                                                    c => c.Sha == CommitSha ? ReleaseTagParsingMode.RaiseErrorOnMalformedTag : ReleaseTagParsingMode.IgnoreMalformedTag,
                                                                     options.OverridenTags );
                         if( errors.Length == 0 )
                         {
-                            CommitVersions cv = collector.GetVersions( commit );
-                            PreviousRelease = cv.BaseVersions.ParentTag;
-                            PreviousReleaseCommitSha = cv.BaseVersions.ParentTagSha;
-                            ExistingVersions = collector.ExistingVersions.ToArray();
-                            if( errors.Length == 0 )
+                            CommitVersionInfo info = collector.GetVersionInfo( commit );
+                            ExistingVersions = collector.ExistingVersions.TagCommits;
+                            PossibleVersions = info.PossibleVersions.ToArray();
+                            ValidVersions = info.ValidVersions;
+                            if( info.PreviousTag != null ) PreviousRelease = info.PreviousCommit.ThisCommit;
+                            if( info.ThisCommit != null )
                             {
-                                #region Computes PossibleVersions and ValidReleaseTag
-                                // Special case: we are on the StartingVersionForCSemVer.
-                                if( collector.StartingVersionForCSemVer != null && collector.StartingVersionForCSemVer.Equals( cv.Tag ) )
+                                if( ValidVersions.Contains( info.ThisCommit.ThisTag ) )
                                 {
-                                    Debug.Assert( PreviousRelease == null );
-                                    AllPossibleVersions = PossibleVersions = new ReleaseTagVersion[] { ValidReleaseTag = cv.Tag };
-                                    PossibleVersionsFromContent = ReleaseTagVersion.EmptyArray;
+                                    ValidReleaseTag = info.ThisCommit.ThisTag;
                                 }
                                 else
                                 {
-                                    // Gets the successors of the previous release.
-                                    IEnumerable<ReleaseTagVersion> successors = PreviousRelease != null ? PreviousRelease.GetDirectSuccessors( false ) : ReleaseTagVersion.FirstPossibleVersions;
-                                    // Possible versions are the successors computed above from which we must remove all versions greater than 
-                                    // the smallest existing version greater than the PreviousRelease (or this tag if we are on a tag).
-                                    // If there is no ExistingVersions, we have nothing to remove.
-                                    // And if there is no PreviousRelease, it is simply the smallest existing version.
-                                    if( ExistingVersions.Count > 0 )
+                                    ReleaseTagIsNotPossibleError = true;
+                                    errors.Append( "Release tag '" )
+                                           .Append( info.ThisCommit.ThisTag.OriginalTagText )
+                                           .Append( "' is not valid here. Valid tags are: " )
+                                           .Append( string.Join( ", ", ValidVersions ) )
+                                           .AppendLine();
+                                }
+                            }
+                            else
+                            {
+                                if( ciVersionName != null )
+                                {
+                                    CIBaseTag = info.PreviousTag ?? ReleaseTagVersion.VeryFirstVersion;
+                                    // If there is no previous tag, we fall back to ZeroTimedBased mode.
+                                    if( ciVersionMode == CIBranchVersionMode.ZeroTimed || PreviousRelease == null )
                                     {
-                                        int idx = 0;
-                                        if( PreviousRelease != null )
-                                        {
-                                            idx = ExistingVersions.BinarySearch( cv.TagOrParentTag );
-                                            Debug.Assert( idx >= 0 );
-                                            ++idx;
-                                        }
-                                        else if( cv.Tag != null && ExistingVersions[idx].Equals( cv.Tag ) ) idx = 1;
-                                        if( idx < ExistingVersions.Count ) successors = successors.Where( s => s.CompareTo( ExistingVersions[idx] ) < 0 );
-                                    }
-                                    // Always removes proposals that are lower than the StartingVersionForCSemVer if it exists.
-                                    if( collector.StartingVersionForCSemVer != null )
-                                    {
-                                        successors = successors.Where( s => s.CompareTo( collector.StartingVersionForCSemVer ) >= 0 );
-                                    }
-                                    PossibleVersions = successors.ToArray();
-                                    // Now... "Save the Cherry Pick" operation!
-                                    PossibleVersionsFromContent = ComputePossibleVersionsFromContent( cv, collector.StartingVersionForCSemVer );
-                                    AllPossibleVersions = PossibleVersions.Concat( PossibleVersionsFromContent ).OrderBy( t => t ).ToArray();
-                                    if( cv.Tag == null )
-                                    {
-                                        // There is no release tag on the current commit.
-                                        if( ciVersionName != null )
-                                        {
-                                            CIBaseTag = PreviousRelease ?? ReleaseTagVersion.VeryFirstVersion;
-                                            // If there is no previous release, we fall back to ZeroTimedBased mode.
-                                            if( ciVersionMode == CIBranchVersionMode.ZeroTimed || PreviousRelease == null )
-                                            {
-                                                var name = string.Format( "0.0.0--ci-{0}-{1:u}", ciVersionName, commit.Committer.When );
-                                                string suffix = PreviousRelease != null ? '+' + PreviousRelease.ToString() : null;
-                                                CIBuildVersionNuGet = CIBuildVersion = ciVersionName + suffix;
-                                            }
-                                            else
-                                            {
-                                                Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && PreviousRelease != null );
-                                                CIBuildDescriptor ci = new CIBuildDescriptor{ BranchName = ciVersionName, BuildIndex = cv.DepthFromParent };
-                                                if( !ci.IsValidForNuGetV2 )
-                                                {
-                                                    errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
-                                                    errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
-                                                            .AppendFormat( @"<Branch Name=""{0}"" VersionName=""{1}"" ... />.", ci.BranchName, ci.BranchName.Substring( 0, 8 ) )
-                                                            .AppendLine();
-                                                }
-                                                else
-                                                {
-                                                    CIBuildVersion = PreviousRelease.ToString( ReleaseTagFormat.SemVer, ci );
-                                                    CIBuildVersionNuGet = PreviousRelease.ToString( ReleaseTagFormat.NuGetPackage, ci );
-                                                }
-                                            }
-                                        }
+                                        var name = string.Format( "0.0.0--ci-{0}-{1:u}", ciVersionName, commit.Committer.When );
+                                        string suffix = PreviousRelease != null ? '+' + PreviousRelease.ToString() : null;
+                                        CIBuildVersionNuGet = CIBuildVersion = ciVersionName + suffix;
                                     }
                                     else
                                     {
-                                        // There is a release tag on the current commit.
-                                        if( AllPossibleVersions.Contains( cv.Tag ) )
+                                        Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && PreviousRelease != null );
+                                        CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciVersionName, BuildIndex = info.PreviousDepth };
+                                        if( !ci.IsValidForNuGetV2 )
                                         {
-                                            ValidReleaseTag = cv.Tag;
+                                            errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
+                                            errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
+                                                    .AppendFormat( @"<Branch Name=""{0}"" VersionName=""{1}"" ... />.", ci.BranchName, ci.BranchName.Substring( 0, 8 ) )
+                                                    .AppendLine();
                                         }
                                         else
                                         {
-                                            ReleaseTagIsNotPossibleError = true;
-                                            errors.Append( "Release tag '" )
-                                                    .Append( cv.Tag.OriginalTagText )
-                                                    .Append( "' is not valid here. Possible tags are: " )
-                                                    .Append( string.Join( ", ", PossibleVersions ) );
-                                            if( PossibleVersionsFromContent.Count > 0 )
-                                            {
-                                                errors.Append( " or (from content): '" )
-                                                    .Append( string.Join( ", ", PossibleVersionsFromContent ) );
-                                            }
-                                            errors.AppendLine();
+                                            CIBuildVersion = PreviousRelease.ThisTag.ToString( ReleaseTagFormat.SemVer, ci );
+                                            CIBuildVersionNuGet = PreviousRelease.ThisTag.ToString( ReleaseTagFormat.NuGetPackage, ci );
                                         }
                                     }
                                 }
-                                #endregion Computes PossibleVersions and ValidReleaseTag
                             }
                         }
                         if( errors.Length > 0 ) SetError( errors, out ReleaseTagErrorLines, out ReleaseTagErrorText );
-                    } 
+                    }
                 }
             }
         }
@@ -310,28 +250,6 @@ namespace SimpleGitVersion
                 if( !options.IgnoreModifiedFiles.Contains( m.FilePath  ) ) return true;
             }
             return false;
-        }
-
-        IReadOnlyList<ReleaseTagVersion> ComputePossibleVersionsFromContent( CommitVersions cv, ReleaseTagVersion startingVersionForCSemVer )
-        {
-            HashSet<ReleaseTagVersion> result = new HashSet<ReleaseTagVersion>();
-            foreach( var t in cv.BaseVersions.ContentTags.Concat( cv.BaseVersions.ParentContentTags ) )
-            {
-                if( t.Equals( cv.TagOrParentTag ) ) continue;
-                var succ = t.GetDirectSuccessors( false );
-                int idx = ExistingVersions.BinarySearch( t );
-                Debug.Assert( idx >= 0 );
-                ++idx;
-                if( idx < ExistingVersions.Count ) succ = succ.Where( s => s.CompareTo( ExistingVersions[idx] ) < 0 );
-                result.UnionWith( succ );
-            }
-            result.ExceptWith( PossibleVersions );
-            // Always removes proposals that are lower than the StartingVersionForCSemVer if it exists.
-            if( startingVersionForCSemVer != null )
-            {
-                result.RemoveWhere( s => s.CompareTo( startingVersionForCSemVer ) < 0 );
-            }
-            return result.OrderBy( t => t ).ToArray();
         }
 
         string TryFindCommit( RepositoryInfoOptions options, Repository r, out Commit commit, out CIBranchVersionMode ciVersionMode, out string branchNameForCIVersion )

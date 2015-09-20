@@ -35,7 +35,7 @@ namespace SimpleGitVersion
         }
 
         const string _noTagParseErrorMessage = "Not a release tag.";
-        static Regex _regexStrict = new Regex( @"^v?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)\.(?<3>0|[1-9][0-9]*)(-(?<4>[a-z]+)(\.(?<5>0|[1-9][0-9]?)(\.(?<6>[1-9][0-9]?))?)?)?(\+(?<7>Valid|Invalid|Published)?)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase );
+        static Regex _regexStrict = new Regex( @"^v?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)\.(?<3>0|[1-9][0-9]*)(-(?<4>[a-z]+)(\.(?<5>0|[1-9][0-9]?)(\.(?<6>[1-9][0-9]?))?)?)?(\+(?<7>Invalid)?)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase );
         static Regex _regexApprox = new Regex( @"^(v|V)?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)(\.(?<3>0|[1-9][0-9]*))?(?<4>.*)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
 
         /// <summary>
@@ -90,12 +90,7 @@ namespace SimpleGitVersion
                 if( prFix == 0 && prNum == 0 && sPRNum.Length > 0 ) return new ReleaseTagVersion( s, true, string.Format( "Incorrect '.0' Release Number version. 0 can appear only to fix the first pre release (ie. '.0.F' where F is between 1 and {0}).", MaxPreReleaseFix ) );
             }
             ReleaseTagKind kind = prNameIdx >= 0 ? ReleaseTagKind.PreRelease : ReleaseTagKind.Release;
-            if( sBuldMetaData.Length > 0 )
-            {
-                if( sBuldMetaData[0] == 'i' || sBuldMetaData[0] == 'I' ) kind |= ReleaseTagKind.MarkedInvalid;
-                else if( sBuldMetaData[0] == 'v' || sBuldMetaData[0] == 'V' ) kind |= ReleaseTagKind.MarkedValid;
-                else kind |= ReleaseTagKind.MarkedPublished;
-            }
+            if( sBuldMetaData.Length > 0 ) kind |= ReleaseTagKind.MarkedInvalid;
             return new ReleaseTagVersion( s, major, minor, patch, sPRName, prNameIdx, prNum, prFix, kind );
         }
 
@@ -132,15 +127,13 @@ namespace SimpleGitVersion
                 }
                 if( fragment.Length > 0 )
                 {
-                    if( !StringComparer.InvariantCultureIgnoreCase.Equals( fragment, "invalid" )
-                        && !StringComparer.InvariantCultureIgnoreCase.Equals( fragment, "valid" )
-                        && !StringComparer.InvariantCultureIgnoreCase.Equals( fragment, "published" ) )
+                    if( !StringComparer.InvariantCultureIgnoreCase.Equals( fragment, "invalid" ) )
                     {
-                        return "Invalid build meta data: can only be '+valid' or '+published', '+invalid'.";
+                        return "Invalid build meta data: can only be '+invalid'.";
                     }
                 }
             }
-            return "Invalid tag. Valid examples are: '1.0.0', '1.0.0-beta', '1.0.0-beta.5', '1.0.0-rc.5.12', '3.0.12+invalid' or 7.2.3-gamma+published";
+            return "Invalid tag. Valid examples are: '1.0.0', '1.0.0-beta', '1.0.0-beta.5', '1.0.0-rc.5.12', '3.0.12+invalid'";
         }
 
         /// <summary>

@@ -29,22 +29,6 @@ namespace SimpleGitVersion
             return _userName != null ? new Signature( _userName, _userEmail, DateTimeOffset.Now ) : _repo.Config.BuildSignature( DateTimeOffset.Now );
         }
 
-        public bool ValidReleaseTag( string exactTagName )
-        {
-            if( exactTagName == null ) throw new ArgumentNullException();
-            Tag cTag = _repo.Tags[ exactTagName ];
-            if( cTag == null ) return false;
-            Commit c = cTag.ResolveTarget() as Commit;
-            if( c == null ) return false;
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( exactTagName );
-            if( !t.IsValid ) return false;
-            if( t.IsMarkedValid && t.IsPreReleaseNameStandard ) return true;
-            var tV = t.MarkValid();
-            _repo.Tags.Add( tV.ToString( ReleaseTagFormat.Normalized ), c, true );
-            _repo.Tags.Remove( exactTagName );
-            return true;
-        }
-
         public static RepositoryWriter LoadFromPath( string path )
         {
             using( var repo = GitHelper.LoadFromPath( path ) )

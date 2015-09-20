@@ -43,7 +43,7 @@ namespace SimpleGitVersion.Core.Tests
             Console.WriteLine( "      " + string.Join( ", ", succ.Select( s => s.ToString() ) ) );
 
             var closest = t.GetDirectSuccessors( true ).Select( s => s.ToString() ).ToList();
-            Console.WriteLine( "    - {0} closest successors:", closest.Count, t );
+            Console.WriteLine( "    - {0} next fixes:", closest.Count, t );
             Console.WriteLine( "      " + string.Join( ", ", closest ) );
         }
 
@@ -152,12 +152,8 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "0.0.0-nonstandard", 2, "Non standard prerelease name = 2." )]
         [TestCase( "0.0.0", 3, "Normal = 3" )]
         [TestCase( "0.0.0-gamma", 3, "Normal = 3" )]
-        [TestCase( "0.0.0-nonstandard+Valid", 4, "Marked Valid non standard = 4" )]
-        [TestCase( "0.0.0-gamma+Valid", 5, "Marked Valid = 5" )]
-        [TestCase( "0.0.0-nonstandard+Published", 6, "Marked Published non standard = 6" )]
-        [TestCase( "0.0.0-gamma+Published", 7, "Marked Published = 7" )]
-        [TestCase( "88.88.88-nonstandard+Invalid", 8, "Invalid non standard = 8" )]
-        [TestCase( "88.88.88+Invalid", 9, "Marked Invalid = 9" )]
+        [TestCase( "88.88.88-nonstandard+Invalid", 4, "Invalid non standard = 4" )]
+        [TestCase( "88.88.88+Invalid", 5, "Marked Invalid = 5" )]
         public void equal_release_tags_can_have_different_definition_strengths( string tag, int level, string message )
         {
             var t = ReleaseTagVersion.TryParse( tag, true );
@@ -299,19 +295,12 @@ namespace SimpleGitVersion.Core.Tests
         }
 
 
-        [TestCase( "v0.0.0-alpha", "v0.0.0-alpha.0.1, v0.0.0-alpha.1, v0.0.0-beta, v0.0.0, v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.0.0-alpha.0.1", "v0.0.0-alpha.0.2, v0.0.0-alpha.1, v0.0.0-beta, v0.0.0, v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.0.0-alpha.1", "v0.0.0-alpha.1.1, v0.0.0-alpha.2, v0.0.0-beta, v0.0.0, v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.0.0-alpha.99", "v0.0.0-alpha.99.1, v0.0.0-beta, v0.0.0, v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.0.0-rc.99", "v0.0.0-rc.99.1, v0.0.0, v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.0.0-rc.99.99", "v0.0.0, v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.0.0", "v0.0.1-alpha, v0.0.1, v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.0.9999", "v0.1.0-alpha, v0.1.0, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v0.99999.0", "v0.99999.1-alpha, v0.99999.1, v1.0.0-alpha, v1.0.0" )]
-        [TestCase( "v99999.0.0", "v99999.0.1-alpha, v99999.0.1, v99999.1.0-alpha, v99999.1.0" )]
-        [TestCase( "v99999.99999.0", "v99999.99999.1-alpha, v99999.99999.1" )]
-        [TestCase( "v99999.99999.9999", "" )]
-        public void checking_closest_direct_successors_and_predecessors( string start, string nextVersions )
+        [TestCase( "v0.0.0-alpha", "v0.0.0-alpha.0.1" )]
+        [TestCase( "v0.0.0-alpha.0.1", "v0.0.0-alpha.0.2" )]
+        [TestCase( "v0.0.0-rc.99", "v0.0.0-rc.99.1" )]
+        [TestCase( "v0.0.0-rc.1.99", "" )]
+        [TestCase( "v0.0.0", "v0.0.1-alpha, v0.0.1-beta, v0.0.1-chi, v0.0.1-delta, v0.0.1-epsilon, v0.0.1-gamma, v0.0.1-iota, v0.0.1-kappa,  v0.0.1-lambda, v0.0.1-mu, v0.0.1-omicron, v0.0.1-prerelease, v0.0.1-rc, v0.0.1" )]
+        public void checking_next_fixes_and_predecessors( string start, string nextVersions )
         {
             var next = nextVersions.Split( ',' )
                                     .Select( v => v.Trim() )
@@ -346,13 +335,13 @@ namespace SimpleGitVersion.Core.Tests
                 {
                     rCurrent = CheckMapping( start + i );
                     if( rCurrent == null ) break;
-                    Assert.That( rStart.CompareTo( rCurrent ) < 0 );
+                    Assert.That( rStart < rCurrent );
                 }
                 for( int i = 1; i < span; ++i )
                 {
                     rCurrent = CheckMapping( start - i );
                     if( rCurrent == null ) break;
-                    Assert.That( rStart.CompareTo( rCurrent ) > 0 );
+                    Assert.That( rStart > rCurrent );
                 }
             }
             //Console.WriteLine( "Greatest successors count = {0}.", _greatersuccessorCount );
@@ -380,7 +369,7 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( tNormalized.Equals( (object)t ) );
             Assert.That( tSemVer.Equals( (object)t ) );
             Assert.That( tNormalized.CompareTo( t ) == 0 );
-            Assert.That( tSemVer.CompareTo( t ) == 0 );
+            Assert.That( tSemVer == t );
             Assert.That( tSemVer.ToString(), Is.EqualTo( t.ToString() ) );
             Assert.That( tNormalized.ToString(), Is.EqualTo( t.ToString() ) );
             // Successors/Predecessors check.

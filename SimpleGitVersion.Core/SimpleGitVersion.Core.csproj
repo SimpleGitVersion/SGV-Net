@@ -66,7 +66,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TagCollector\ITagCommit.cs" />
     <Compile Include="ILogger.cs" />
+    <Compile Include="TagCollector\IFullTagCommit.cs" />
+    <Compile Include="TagCollector\CommitVersionInfo.cs" />
+    <Compile Include="TagCollector\RepositoryVersions.cs" />
+    <Compile Include="TagCollector\TagCollector.VersionReader.cs" />
     <Compile Include="SimpleRepositoryInfo.cs" />
     <Compile Include="ReleaseTagVersion\CIBuildDescriptor.cs" />
     <Compile Include="ReleaseTagVersion\ReleaseTagFormat.cs" />
@@ -78,16 +83,14 @@
     <Compile Include="ReleaseTagVersion\ReleaseTagVersion.OrderedVersion.cs" />
     <Compile Include="ReleaseTagVersion\ReleaseTagVersion.Parse.cs" />
     <Compile Include="ReleaseTagVersion\ReleaseTagVersion.ToString.cs" />
-    <Compile Include="RepositoryInfo\CommitBaseVersions.cs" />
-    <Compile Include="RepositoryInfo\CommitVersion.cs" />
     <Compile Include="RepositoryInfo\Options\RepositoryInfoOptionsBranch.cs" />
     <Compile Include="RepositoryInfo\ReleaseTagParsingMode.cs" />
-    <Compile Include="RepositoryInfo\RepositoryInfo.TagCollector.cs" />
+    <Compile Include="TagCollector\TagCollector.cs" />
     <Compile Include="RepositoryInfo\RepositoryInfo.cs" />
     <Compile Include="ReleaseTagVersion\ReleaseTagVersion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepositoryInfo\Options\RepositoryInfoOptions.cs" />
-    <Compile Include="RepositoryInfo\TagCommit.cs" />
+    <Compile Include="TagCollector\TagCommit.cs" />
     <Compile Include="RepositoryWriter\RepositoryWriter.cs" />
     <Compile Include="SGVSchema.cs" />
   </ItemGroup>
@@ -106,7 +109,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LibGit2Sharp.0.21.0.176\build\net40\LibGit2Sharp.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.0.21.0.176\build\net40\LibGit2Sharp.props'))" />
-    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.5.0-r\build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.5.0-r\build\SimpleGitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.5.0\build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.5.0\build\SimpleGitVersionTask.targets'))" />
   </Target>
   <Target Name="SignUnsignedReferences" BeforeTargets="BeforeBuild">
     <Exec Command="&quot;$(SolutionDir)packages\Brutal.Dev.StrongNameSigner.1.5.1\tools\StrongNameSigner.Console.exe&quot; -a &quot;$(SolutionDir)packages\LibGit2Sharp.0.21.0.176\lib\net40\LibGit2Sharp.dll&quot; -k &quot;$(SolutionDir)SharedKey.snk&quot;" />
@@ -116,5 +119,5 @@
     <MakeDir Directories="$(TargetDir)ILMerged\" />
     <Exec Command="&quot;$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILmerge.exe&quot;  /allowDup /keyfile:&quot;$(SolutionDir)SharedKey.snk&quot; /out:&quot;$(TargetDir)ILMerged\$(TargetFileName)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)LibGit2Sharp.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot; /internalize " />
   </Target>
-  <Import Project="..\packages\SimpleGitVersionTask.0.5.0-r\build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.5.0-r\build\SimpleGitVersionTask.targets')" />
+  <Import Project="..\packages\SimpleGitVersionTask.0.5.0\build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.5.0\build\SimpleGitVersionTask.targets')" />
 </Project>
