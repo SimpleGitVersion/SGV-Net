@@ -29,17 +29,9 @@ namespace SimpleGitVersion
         /// </summary>
         PreRelease = 4,
         /// <summary>
-        /// This release tag is +Valid.
-        /// </summary>
-        MarkedValid = 8,
-        /// <summary>
-        /// This release tag is +Published.
-        /// </summary>
-        MarkedPublished = 16,
-        /// <summary>
         /// This release tag is +Invalid.
         /// </summary>
-        MarkedInvalid = 32
+        MarkedInvalid = 8
     }
 
     /// <summary>
@@ -47,36 +39,6 @@ namespace SimpleGitVersion
     /// </summary>
     public static class ReleaseTagKindExtensions
     {
-        /// <summary>
-        /// Returns true if this tag is marked with <see cref="ReleaseTagKind.MarkedValid"/> or <see cref="ReleaseTagKind.MarkedPublished"/> or <see cref="ReleaseTagKind.MarkedInvalid"/>.
-        /// </summary>
-        /// <param name="this">This <see cref="ReleaseTagKind"/>.</param>
-        /// <returns>True if MarkedValid or MarkedPublished or MarkedInvalid.</returns>
-        public static bool IsMarked( this ReleaseTagKind @this )
-        {
-            return (@this & (ReleaseTagKind.MarkedValid | ReleaseTagKind.MarkedPublished | ReleaseTagKind.MarkedInvalid)) != 0;
-        }
-
-        /// <summary>
-        /// Returns true if this tag is marked with <see cref="ReleaseTagKind.MarkedValid"/>.
-        /// </summary>
-        /// <param name="this"></param>
-        /// <returns>True if MarkedValid.</returns>
-        public static bool IsMarkedValid( this ReleaseTagKind @this )
-        {
-            return (@this & ReleaseTagKind.MarkedValid) != 0;
-        }
-
-        /// <summary>
-        /// Returns true if this tag is marked with <see cref="ReleaseTagKind.MarkedPublished"/>.
-        /// </summary>
-        /// <param name="this"></param>
-        /// <returns>True if MarkedPublished.</returns>
-        public static bool IsMarkedPublished( this ReleaseTagKind @this )
-        {
-            return (@this & ReleaseTagKind.MarkedPublished) != 0;
-        }
-
         /// <summary>
         /// Returns true if this tag is marked with <see cref="ReleaseTagKind.MarkedInvalid"/>.
         /// </summary>
@@ -88,16 +50,6 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// Returns a <see cref="ReleaseTagKind"/> without markers.
-        /// </summary>
-        /// <param name="this">This <see cref="ReleaseTagKind"/>.</param>
-        /// <returns>Unmarked ReleaseTagKind.</returns>
-        public static ReleaseTagKind ClearMarker( this ReleaseTagKind @this )
-        {
-            return @this & ~(ReleaseTagKind.MarkedValid | ReleaseTagKind.MarkedPublished | ReleaseTagKind.MarkedInvalid);
-        }
-
-        /// <summary>
         /// Obtains the marker as a string. <see cref="string.Empty"/> if this is nor marked.
         /// </summary>
         /// <param name="this">This <see cref="ReleaseTagKind"/>.</param>
@@ -105,11 +57,9 @@ namespace SimpleGitVersion
         /// <returns>A string with the marker if any.</returns>
         public static string ToStringMarker( this ReleaseTagKind @this, bool prefixPlus = true )
         {
-            switch( @this & (ReleaseTagKind.MarkedValid | ReleaseTagKind.MarkedPublished | ReleaseTagKind.MarkedInvalid) ) 
+            if( (@this & ReleaseTagKind.MarkedInvalid) != 0 ) 
             {
-                case ReleaseTagKind.MarkedValid: return prefixPlus ? "+valid" : "valid";
-                case ReleaseTagKind.MarkedPublished: return prefixPlus ? "+published" : "published";
-                case ReleaseTagKind.MarkedInvalid: return prefixPlus ? "+invalid" : "invalid";
+                return prefixPlus ? "+invalid" : "invalid";
             }
             return string.Empty;
         }

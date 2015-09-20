@@ -13,6 +13,34 @@ namespace SimpleGitVersion.Core.Tests
     [TestFixture]
     public class CIBuildNameTests
     {
+
+        [Explicit]
+        [TestCase( "v0.4.1-rc.2.1", "0.4.1-rc.2.2, 0.4.1-rc.3, 0.4.2" )]
+        [TestCase( "v3.2.1-rc.1", "3.2.1-rc.1.1, 3.2.1-rc.2, 3.2.2" )]
+        [TestCase( "v3.2.1-beta", "3.2.1-beta.1, 3.2.1-beta.0.1, 3.2.1-chi, 3.2.1-beta.5, 3.2.2" )]
+        [TestCase( "v1.2.3", "1.2.4-alpha, 1.2.4-alpha.0.1, 1.2.4" )]
+        public void display_versions_and_CI_version( string version, string after )
+        {
+            var buildInfo = new CIBuildDescriptor() { BranchName = "develop", BuildIndex = 15 };
+            ReleaseTagVersion v = ReleaseTagVersion.TryParse( version );
+            string vCI = v.ToString( ReleaseTagFormat.SemVer, buildInfo );
+            ReleaseTagVersion vNext = new ReleaseTagVersion( v.OrderedVersion + 1 );
+
+            Console.WriteLine( "Version = {0}, CI = {1}, Next = {2}", v, vCI, vNext );
+
+            var vSemVer = SemVersion.Parse( v.ToString( ReleaseTagFormat.SemVer ) );
+            var vCISemVer = SemVersion.Parse( vCI );
+            var vNextSemVer = SemVersion.Parse( vNext.ToString( ReleaseTagFormat.SemVer ) );
+            Assert.That( vSemVer < vCISemVer, "{0} < {1}", vSemVer, vCISemVer );
+            Assert.That( vCISemVer < vNextSemVer, "{0} < {1}", vCISemVer, vNextSemVer );
+
+            foreach( var vAfter in after.Split( ',' ).Select( s => SemVersion.Parse( s.Trim() )) ) 
+            {
+                Assert.That( vAfter.CompareTo( vCISemVer ) > 0, "{0} > {1}", vAfter, vCISemVer );
+            }
+        }
+
+
         [TestCase( "1.0.0" )]
         [TestCase( "1.0.0-alpha" )]
         [TestCase( "1.0.0-alpha.0.1" )]

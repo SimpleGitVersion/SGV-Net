@@ -186,14 +186,14 @@ namespace SimpleGitVersion
             }
             else
             {
-                Debug.Assert( info.PossibleVersions != null && info.PossibleVersionsFromContent != null && info.AllPossibleVersions != null );
+                Debug.Assert( info.ValidVersions != null );
                 if( info.IsDirty )
                 {
                     logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
                 }
                 if( info.PreviousRelease != null )
                 {
-                    logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease, info.PreviousReleaseCommitSha );
+                    logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease.ThisTag, info.PreviousRelease.CommitSha );
                 }
                 if( info.CIBaseTag != null )
                 {
@@ -202,14 +202,14 @@ namespace SimpleGitVersion
                     NuGetVersion = info.CIBuildVersionNuGet;
                     SemVer = info.CIBuildVersion;
                     logger.Info( "CI release: '{0}'.", SemVer );
-                    LogPossibleVersions( logger, info );
+                    LogValidVersions( logger, info );
                 }
                 else
                 {
                     if( t == null )
                     {
                         SetInvalidValuesAndLog( logger, "No valid release tag.", false );
-                        LogPossibleVersions( logger, info );
+                        LogValidVersions( logger, info );
                     }
                     else
                     {
@@ -225,19 +225,19 @@ namespace SimpleGitVersion
             MajorMinorPatch = string.Format( "{0}.{1}", MajorMinor, Patch );
         }
 
-        void LogPossibleVersions( ILogger logger, RepositoryInfo info )
+        void LogValidVersions( ILogger logger, RepositoryInfo info )
         {
-            if( info.AllPossibleVersions.Count == 0 )
+            if( info.ValidVersions.Count == 0 )
             {
                 logger.Info( "Not a releaseable commit." );
             }
-            else if( info.AllPossibleVersions.Count == 1 )
+            else if( info.ValidVersions.Count == 1 )
             {
-                logger.Info( "This can be released with '{0}' tag.", info.AllPossibleVersions[0] );
+                logger.Info( "This can be released with '{0}' tag.", info.ValidVersions[0] );
             }
             else
             {
-                logger.Info( "Possible release tags are: {0}", string.Join( ", ", info.AllPossibleVersions ) );
+                logger.Info( "Valid release tags are: {0}", string.Join( ", ", info.ValidVersions ) );
             }
         }
 

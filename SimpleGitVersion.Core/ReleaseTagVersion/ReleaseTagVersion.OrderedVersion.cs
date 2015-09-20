@@ -183,9 +183,7 @@ namespace SimpleGitVersion
             Debug.Assert( IsValid && !IsMalformed );
             int d = 3;
             if( IsPreRelease && !IsPreReleaseNameStandard ) d -= 1;
-            if( IsMarked ) d += 2;
-            if( IsMarkedPublished ) d += 2;
-            if( IsMarkedInvalid ) d += 4;
+            if( IsMarkedInvalid ) d += 2;
             return d;
         }
 
@@ -213,7 +211,7 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
-        /// No other memebers are used for equality and comparison.
+        /// No other members are used for equality and comparison.
         /// </summary>
         /// <param name="other">Other release tag.</param>
         /// <returns>True if they have the same OrderedVersion.</returns>
@@ -234,11 +232,57 @@ namespace SimpleGitVersion
             return _orderedVersion.Number.CompareTo( other._orderedVersion.Number );
         }
 
+        static public bool operator ==( ReleaseTagVersion x, ReleaseTagVersion y )
+        {
+            if( ReferenceEquals( x, y ) ) return true;
+            if( !ReferenceEquals( x, null ) && !ReferenceEquals( y, null ) )
+            {
+                return x._orderedVersion.Number == y._orderedVersion.Number;
+            }
+            return false;
+        }
+
+        static public bool operator !=( ReleaseTagVersion x, ReleaseTagVersion y )
+        {
+            return !(x == y);
+        }
+
+        static public bool operator >( ReleaseTagVersion x, ReleaseTagVersion y )
+        {
+            if( ReferenceEquals( x, y ) ) return false;
+            if( !ReferenceEquals( x, null ) && !ReferenceEquals( y, null ) )
+            {
+                return x._orderedVersion.Number > y._orderedVersion.Number;
+            }
+            return x != null;
+        }
+
+        static public bool operator <( ReleaseTagVersion x, ReleaseTagVersion y )
+        {
+            if( ReferenceEquals( x, y ) ) return false;
+            if( !ReferenceEquals( x, null ) && !ReferenceEquals( y, null ) )
+            {
+                return x._orderedVersion.Number < y._orderedVersion.Number;
+            }
+            return y != null;
+        }
+
+        static public bool operator <=( ReleaseTagVersion x, ReleaseTagVersion y )
+        {
+            return !(x > y);
+        }
+
+        static public bool operator >=( ReleaseTagVersion x, ReleaseTagVersion y )
+        {
+            return !(x < y);
+        }
+
         /// <summary>
-        /// 
+        /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
+        /// No other members are used for equality and comparison.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="other">Other release tag.</param>
+        /// <returns>True if they have the same OrderedVersion.</returns>
         public override bool Equals( object obj )
         {
             if( obj == null ) return false;
@@ -249,7 +293,7 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
-        /// No other memebers are used for equality and comparison.
+        /// No other members are used for equality and comparison.
         /// </summary>
         /// <returns>True if they have the same OrderedVersion.</returns>
         public override int GetHashCode()
