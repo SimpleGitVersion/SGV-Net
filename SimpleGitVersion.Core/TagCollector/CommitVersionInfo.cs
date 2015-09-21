@@ -14,9 +14,9 @@ namespace SimpleGitVersion
         readonly IFullTagCommit _thisCommit;
         readonly IFullTagCommit _contentCommit;
         readonly CommitVersionInfo _prevCommit;
-        readonly CommitVersionInfo _baseCommit;
-        readonly CommitVersionInfo _ciBaseCommit;
-        readonly int _ciBaseDepth;
+        readonly CommitVersionInfo _prevMaxCommit;
+        readonly IFullTagCommit _maxCommit;
+        readonly int _maxCommitDepth;
         IReadOnlyList<ReleaseTagVersion> _possibleVersions;
 
         internal CommitVersionInfo( 
@@ -25,8 +25,7 @@ namespace SimpleGitVersion
             IFullTagCommit thisCommit, 
             IFullTagCommit contentCommit, 
             CommitVersionInfo prevCommitParent, 
-            CommitVersionInfo baseCommitParent,
-            CommitVersionInfo ciBaseCommitParent )
+            CommitVersionInfo prevMaxCommitParent )
         {
             Debug.Assert( thisCommit == null || thisCommit.ThisTag != null );
             Debug.Assert( thisCommit == null || contentCommit == thisCommit, "this commit exists => content commit is this commit" );
@@ -34,16 +33,32 @@ namespace SimpleGitVersion
             _commitSha = commitSha;
             _thisCommit = thisCommit;
             _contentCommit = contentCommit;
-            _baseCommit = baseCommitParent;
+
             if( prevCommitParent != null )
             {
                 _prevCommit = prevCommitParent._thisCommit != null ? prevCommitParent : prevCommitParent._prevCommit;
             }
-            if( ciBaseCommitParent != null && (_contentCommit == null || _contentCommit.BestCommit.ThisTag <= ciBaseCommitParent.CIBaseTag) )
+
+            if( prevMaxCommitParent != null )
             {
-                _ciBaseCommit = ciBaseCommitParent;
-                _ciBaseDepth = ciBaseCommitParent._ciBaseDepth + 1;
+                Debug.Assert( prevMaxCommitParent.PreviousMaxTag == null || prevMaxCommitParent._prevMaxCommit != null );
+                if( prevMaxCommitParent._prevMaxCommit == null || prevMaxCommitParent.BestContentTag > prevMaxCommitParent.PreviousMaxTag )
+                {
+                    Debug.Assert( prevMaxCommitParent.MaxTag == prevMaxCommitParent.BestContentTag );
+                    _prevMaxCommit = prevMaxCommitParent;
+                    _maxCommitDepth = 1;
+                }
+                else
+                {
+                    Debug.Assert( prevMaxCommitParent.MaxTag == prevMaxCommitParent.PreviousMaxTag );
+                    _prevMaxCommit = prevMaxCommitParent._prevMaxCommit;
+                    _maxCommitDepth = prevMaxCommitParent._maxCommitDepth + 1;
+                }
+                Debug.Assert( _prevMaxCommit != null );
             }
+            _maxCommit = BestContentTag >= PreviousMaxTag 
+                            ? (_contentCommit != null ? _contentCommit.BestCommit : null) 
+                            : (_prevMaxCommit._contentCommit != null ? _prevMaxCommit._contentCommit.BestCommit : null);
         }
 
         public string CommitSha { get { return _commitSha; } }
@@ -52,33 +67,21 @@ namespace SimpleGitVersion
 
         public ITagCommit ThisCommit { get { return _thisCommit; } }
 
-        internal IReadOnlyList<ReleaseTagVersion> GetBaseTags( ReleaseTagVersion exclude )
-        {
-            var prev = PreviousTag;
-            if( _contentCommit != null )
-            {
-                var contents = _contentCommit.GetContentTagCommits( true )
-                                                .Select( c => c.ThisTag )
-                                                .Where( v => v != exclude && v >= prev )
-                                                .ToList();
-                if( contents.Count > 0 ) return contents;
-            }
-            return new ReleaseTagVersion[] { prev };
-        }
-
-        public ReleaseTagVersion BestTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : PreviousTag; } }
-
-        public IEnumerable<ITagCommit> ContentCommits { get { return _contentCommit != null ? _contentCommit.GetContentTagCommits( true ) : Enumerable.Empty<ITagCommit>(); } }
-
-        public ITagCommit ContentBestCommit { get { return _contentCommit != null ? _contentCommit.BestCommit : null; } }
+        public ReleaseTagVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }
 
         public ReleaseTagVersion PreviousTag { get { return _prevCommit != null ? _prevCommit.ThisTag : null; } }
 
-        public ReleaseTagVersion CIBaseTag { get { return _ciBaseCommit != null ? _ciBaseCommit.CIBaseTag : (_contentCommit != null ? _contentCommit.BestCommit.ThisTag : null); } }
+        public ReleaseTagVersion MaxTag { get { return _maxCommit != null ? _maxCommit.ThisTag : null; } }
 
-        public int CIBaseDepth { get { return _ciBaseDepth; } }
+        public ReleaseTagVersion PreviousMaxTag { get { return _prevMaxCommit != null ? _prevMaxCommit.MaxTag : null; } }
+
+        public int PreviousMaxTagDepth { get { return _maxCommitDepth; } }
+
 
         public CommitVersionInfo PreviousCommit { get { return _prevCommit; } }
+
+        public CommitVersionInfo PreviousMaxCommit { get { return _prevMaxCommit; } }
+
 
         /// <summary>
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
@@ -101,10 +104,9 @@ namespace SimpleGitVersion
                     else
                     {
                         var versions = allVersions.Where( c => c != _thisCommit );
-                        IReadOnlyList<ReleaseTagVersion> baseTags = _baseCommit != null ? _baseCommit.GetBaseTags( exclude: ThisTag ) : new ReleaseTagVersion[] { null };
 
                         List<ReleaseTagVersion> result = new List<ReleaseTagVersion>();
-                        foreach( var b in baseTags )
+                        foreach( var b in GetBaseTags() )
                         {
                             var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
                             var successors = ReleaseTagVersion.GetDirectSuccessors( nextReleased != null, b );
@@ -118,6 +120,18 @@ namespace SimpleGitVersion
                 }
                 return _possibleVersions;
             }
+        }
+
+        IReadOnlyList<ReleaseTagVersion> GetBaseTags()
+        {
+            var tP = PreviousTag;
+            var tM = PreviousMaxTag;
+            if( tP != null && tP != tM )
+            {
+                if( tM != null ) return new[] { tP, tM };
+                return new[] { tP };
+            }
+            return new[] { tM };
         }
 
         /// <summary>
@@ -145,12 +159,12 @@ namespace SimpleGitVersion
                     .Append( ']' );
             }
 
-            if( _prevCommit == null || _prevCommit.ThisTag == null ) b.Append( " No Previous" );
-            else b.Append( " Previous=" ).Append( _prevCommit.ThisTag );
-            b.Append( " Depth=" ).Append( _ciBaseDepth );
+            if( PreviousTag == null ) b.Append( " No PreviousTag" );
+            else b.Append( " Previous=" ).Append( PreviousTag );
 
-            if( _baseCommit == null ) b.Append( " No Base" );
-            else b.Append( " Base=" ).Append( _baseCommit.BestTag ).Append( '(' ).Append( _baseCommit.CommitSha ).Append( ')' );
+            if( PreviousMaxTag != null ) b.Append( " No PreviousMaxtag" );
+            else b.Append( " PreviousMaxTag=" ).Append( PreviousMaxTag );
+            b.Append( " Depth=" ).Append( _maxCommitDepth );
 
             return b.ToString();
         }

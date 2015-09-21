@@ -21,44 +21,20 @@ namespace SimpleGitVersion
             }
             IFullTagCommit thisCommit = GetCommit( commitSha );
             IFullTagCommit contentCommit = thisCommit ?? GetCommit( c.Tree.Sha );
-            CommitVersionInfo prevCommitParent, baseCommitParent, ciBaseCommitParent;
-            ReadParentInfo( c, out prevCommitParent, out baseCommitParent, out ciBaseCommitParent );
-            info = new CommitVersionInfo( this, commitSha, thisCommit, contentCommit, prevCommitParent, baseCommitParent, ciBaseCommitParent );
+            CommitVersionInfo prevCommitParent, prevMaxCommitParent;
+            ReadParentInfo( c, out prevCommitParent, out prevMaxCommitParent );
+            info = new CommitVersionInfo( this, commitSha, thisCommit, contentCommit, prevCommitParent, prevMaxCommitParent );
             _versionsCache.Add( commitSha, info );
             return info;
         }
 
-        void ReadParentInfo( Commit c, out CommitVersionInfo prevCommitParent, out CommitVersionInfo bestBaseParent, out CommitVersionInfo ciBaseCommitParent )
+        void ReadParentInfo( Commit c, out CommitVersionInfo prevCommitParent, out CommitVersionInfo prevMaxCommitParent )
         {
             Debug.Assert( !_versionsCache.ContainsKey( c.Sha ) );
-            prevCommitParent = bestBaseParent = ciBaseCommitParent = null;
+            prevCommitParent = prevMaxCommitParent = null;
             foreach( var p in c.Parents )
             {
-                Debug.Assert( bestBaseParent == null || bestBaseParent.BestTag != null );
-
                 var pV = GetVersionInfo( p );
-
-                if( ciBaseCommitParent == null ) ciBaseCommitParent = pV;
-                else
-                {
-                    var ciBaseTag = ciBaseCommitParent.CIBaseTag;
-                    var maxTag = pV.CIBaseTag;
-                    if( ciBaseTag == null )
-                    {
-                        if( maxTag != null || ciBaseCommitParent.CIBaseDepth < pV.CIBaseDepth )
-                        {
-                            ciBaseCommitParent = pV;
-                        }
-                    }
-                    else 
-                    {
-                        int cmp = ciBaseTag.CompareTo( maxTag );
-                        if( cmp < 0 || (cmp == 0 && ciBaseCommitParent.CIBaseDepth < pV.CIBaseDepth) )
-                        {
-                            ciBaseCommitParent = pV;
-                        }
-                    }
-                }
 
                 var prevTag = pV.ThisTag ?? pV.PreviousTag;
                 if( prevTag != null )
@@ -69,12 +45,25 @@ namespace SimpleGitVersion
                     }
                 }
 
-                var bestTag = pV.BestTag;
-                if( bestTag != null )
+                if( prevMaxCommitParent == null ) prevMaxCommitParent = pV;
+                else
                 {
-                    if( bestBaseParent == null || bestBaseParent.BestTag < bestTag )
+                    var prevMaxTag = prevMaxCommitParent.MaxTag;
+                    var maxTag = pV.MaxTag;
+                    if( prevMaxTag == null )
                     {
-                        bestBaseParent = pV;
+                        if( maxTag != null || prevMaxCommitParent.PreviousMaxTagDepth < pV.PreviousMaxTagDepth )
+                        {
+                            prevMaxCommitParent = pV;
+                        }
+                    }
+                    else 
+                    {
+                        int cmp = prevMaxTag.CompareTo( maxTag );
+                        if( cmp < 0 || (cmp == 0 && prevMaxCommitParent.PreviousMaxTagDepth < pV.PreviousMaxTagDepth) )
+                        {
+                            prevMaxCommitParent = pV;
+                        }
                     }
                 }
             }

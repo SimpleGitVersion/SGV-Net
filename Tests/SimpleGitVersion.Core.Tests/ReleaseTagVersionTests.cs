@@ -347,7 +347,7 @@ namespace SimpleGitVersion.Core.Tests
             //Console.WriteLine( "Greatest successors count = {0}.", _greatersuccessorCount );
         }
 
-        static int _greatersuccessorCount = 0;
+        //static int _greatersuccessorCount = 0;
 
         ReleaseTagVersion CheckMapping( decimal v )
         {
@@ -411,6 +411,42 @@ namespace SimpleGitVersion.Core.Tests
             CollectionAssert.AreEqual( next, ReleaseTagVersion.FirstPossibleVersions.Select( v => v.ToString() ).ToArray() );
         }
 
+        [Test]
+        public void operators_overloads()
+        {
+            // Two variables to avoid Compiler Warning (level 3) CS1718
+            ReleaseTagVersion null2 = null;
+            ReleaseTagVersion null1 = null;
+
+            Assert.That( null1 == null2 );
+            Assert.That( null1 >= null2 );
+            Assert.That( null1 <= null2 );
+
+            Assert.That( null1 != null2, Is.False );
+            Assert.That( null1 > null2, Is.False );
+            Assert.That( null1 < null2, Is.False );
+
+            NullIsAlwaysSmaller( ReleaseTagVersion.VeryFirstVersion );
+            NullIsAlwaysSmaller( ReleaseTagVersion.TryParse( "1.0.0" ) );
+            NullIsAlwaysSmaller( ReleaseTagVersion.TryParse( "bug" ) );
+        }
+
+        private static void NullIsAlwaysSmaller( ReleaseTagVersion v )
+        {
+            Assert.That( null != v );
+            Assert.That( null == v, Is.False );
+            Assert.That( null >= v, Is.False );
+            Assert.That( null <= v );
+            Assert.That( null > v, Is.False );
+            Assert.That( null < v );
+
+            Assert.That( v != null );
+            Assert.That( v == null, Is.False );
+            Assert.That( v >= null );
+            Assert.That( v <= null, Is.False );
+            Assert.That( v > null );
+            Assert.That( v < null, Is.False );
+        }
     }
 }
 
