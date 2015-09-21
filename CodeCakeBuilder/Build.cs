@@ -114,19 +114,36 @@ namespace CodeCake
                 .WithCriteria( () => gitInfo.IsValidRelease )
                 .Does( () =>
                 {
-                    // Resolve the API key.
+                    if( Cake.IsInteractiveMode() )
+                    {
+                        var localFeed = Cake.FindDirectoryAbove( "LocalFeed" );
+                        if( localFeed != null )
+                        {
+                            Cake.Information( "LocalFeed directory found: {0}", localFeed );
+                            if( Cake.ReadInteractiveOption( "Do you want to publish to LocalFeed?", 'y', 'n' ) == 'y' )
+                            {
+                                Cake.CopyFiles( releasesDir.Path + "/*.nupkg", localFeed );
+                            }
+                        }
+                    }
+                    // Resolves nuget.com API key.
                     var apiKey = Cake.InteractiveEnvironmentVariable( "NUGET_API_KEY" );
-                    if( string.IsNullOrEmpty( apiKey ) ) throw new InvalidOperationException( "Could not resolve NuGet API key." );
-
-                    var settings = new NuGetPushSettings
+                    if( string.IsNullOrEmpty( apiKey ) )
                     {
-                        Source = "https://www.nuget.org/api/v2/package",
-                        ApiKey = apiKey
-                    };
-
-                    foreach( var nupkg in Cake.GetFiles( releasesDir.Path + "/*.nupkg" ) )
+                        Cake.Information( "Could not resolve NuGet API key. Push to NuGet is skipped." );
+                    }
+                    else
                     {
-                        Cake.NuGetPush( nupkg, settings );
+                        var settings = new NuGetPushSettings
+                        {
+                            Source = "https://www.nuget.org/api/v2/package",
+                            ApiKey = apiKey
+                        };
+
+                        foreach( var nupkg in Cake.GetFiles( releasesDir.Path + "/*.nupkg" ) )
+                        {
+                            Cake.NuGetPush( nupkg, settings );
+                        }
                     }
                 } );
 

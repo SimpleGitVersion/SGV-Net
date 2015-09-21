@@ -79,7 +79,7 @@ namespace SimpleGitVersion
                         }
                         if( isCIBuild )
                         {
-                            return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}--{3}", Major, Minor, Patch+1, suffix );
+                            return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-C{3}", Major, Minor, Patch+1, suffix );
                         }
                         return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}{3}", Major, Minor, Patch, suffix );
                     }

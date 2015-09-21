@@ -68,9 +68,16 @@ namespace SimpleGitVersion
         /// <summary>
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
-        /// Can also be null if there is simply no previous release: the <see cref="PossibleVersions"/> are then based on <see cref="ReleaseTagVersion.FirstPossibleVersions"/>.
+        /// Can also be null if there is simply no previous release.
         /// </summary>
         public readonly ITagCommit PreviousRelease;
+
+        /// <summary>
+        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
+        /// prevented its computation.
+        /// Can also be null if there is simply no previous release: the <see cref="PossibleVersions"/> are then based on <see cref="ReleaseTagVersion.FirstPossibleVersions"/>.
+        /// </summary>
+        public readonly ITagCommit PreviousMaxRelease;
 
         /// <summary>
         /// Gets the existing versions in the repository in ascending order.
@@ -172,6 +179,7 @@ namespace SimpleGitVersion
                             PossibleVersions = info.PossibleVersions.ToArray();
                             ValidVersions = info.ValidVersions;
                             if( info.PreviousTag != null ) PreviousRelease = info.PreviousCommit.ThisCommit;
+                            if( info.PreviousMaxTag != null ) PreviousMaxRelease = info.PreviousMaxCommit.ThisCommit;
                             if( info.ThisCommit != null )
                             {
                                 if( ValidVersions.Contains( info.ThisCommit.ThisTag ) )

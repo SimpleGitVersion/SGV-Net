@@ -195,6 +195,10 @@ namespace SimpleGitVersion
                 {
                     logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease.ThisTag, info.PreviousRelease.CommitSha );
                 }
+                if( info.PreviousMaxRelease != null && info.PreviousMaxRelease != info.PreviousRelease )
+                {
+                    logger.Trace( "Previous max release found '{0}' on commit '{1}'.", info.PreviousMaxRelease.ThisTag, info.PreviousMaxRelease.CommitSha );
+                }
                 if( info.CIRelease != null )
                 {
                     IsValidCIBuild = true;
@@ -218,6 +222,7 @@ namespace SimpleGitVersion
                         SetNumericalVersionValues( t );
                         NuGetVersion = t.ToString( ReleaseTagFormat.NuGetPackage );
                         SemVer = t.ToString( ReleaseTagFormat.SemVerWithMarker );
+                        logger.Info( "Release: '{0}'.", SemVer );
                     }
                 }
             }
