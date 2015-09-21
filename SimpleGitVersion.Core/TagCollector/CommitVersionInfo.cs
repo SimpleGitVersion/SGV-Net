@@ -15,10 +15,18 @@ namespace SimpleGitVersion
         readonly IFullTagCommit _contentCommit;
         readonly CommitVersionInfo _prevCommit;
         readonly CommitVersionInfo _baseCommit;
-        readonly int _previousDepth;
-        IReadOnlyList<ReleaseTagVersion> _validVersions;
+        readonly CommitVersionInfo _ciBaseCommit;
+        readonly int _ciBaseDepth;
+        IReadOnlyList<ReleaseTagVersion> _possibleVersions;
 
-        internal CommitVersionInfo( TagCollector tagCollector, string commitSha, IFullTagCommit thisCommit, IFullTagCommit contentCommit, CommitVersionInfo prevCommitParent, CommitVersionInfo baseCommit )
+        internal CommitVersionInfo( 
+            TagCollector tagCollector, 
+            string commitSha, 
+            IFullTagCommit thisCommit, 
+            IFullTagCommit contentCommit, 
+            CommitVersionInfo prevCommitParent, 
+            CommitVersionInfo baseCommitParent,
+            CommitVersionInfo ciBaseCommitParent )
         {
             Debug.Assert( thisCommit == null || thisCommit.ThisTag != null );
             Debug.Assert( thisCommit == null || contentCommit == thisCommit, "this commit exists => content commit is this commit" );
@@ -26,42 +34,23 @@ namespace SimpleGitVersion
             _commitSha = commitSha;
             _thisCommit = thisCommit;
             _contentCommit = contentCommit;
-            _baseCommit = baseCommit;
+            _baseCommit = baseCommitParent;
             if( prevCommitParent != null )
             {
-                if( prevCommitParent._thisCommit != null )
-                {
-                    _prevCommit = prevCommitParent;
-                }
-                else
-                {
-                    _prevCommit = prevCommitParent._prevCommit;
-                }
-                if( _thisCommit == null ) _previousDepth = prevCommitParent._previousDepth + 1;
+                _prevCommit = prevCommitParent._thisCommit != null ? prevCommitParent : prevCommitParent._prevCommit;
+            }
+            if( ciBaseCommitParent != null && (_contentCommit == null || _contentCommit.BestCommit.ThisTag <= ciBaseCommitParent.CIBaseTag) )
+            {
+                _ciBaseCommit = ciBaseCommitParent;
+                _ciBaseDepth = ciBaseCommitParent._ciBaseDepth + 1;
             }
         }
-
 
         public string CommitSha { get { return _commitSha; } }
 
         public ReleaseTagVersion ThisTag { get { return _thisCommit != null ? _thisCommit.ThisTag : null; } }
 
         public ITagCommit ThisCommit { get { return _thisCommit; } }
-
-        internal ReleaseTagVersion GetBaseTag( ReleaseTagVersion exclude )
-        {
-            var t = ThisTag;
-            if( t != null && t != exclude ) return t;
-            if( _contentCommit != null )
-            {
-                t = _contentCommit.BestCommit.ThisTag;
-                Debug.Assert( t != null );
-                if( t != exclude ) return t;
-            }
-            t = PreviousTag;
-            if( t != exclude ) return t;
-            return null;
-        }
 
         internal IReadOnlyList<ReleaseTagVersion> GetBaseTags( ReleaseTagVersion exclude )
         {
@@ -85,11 +74,11 @@ namespace SimpleGitVersion
 
         public ReleaseTagVersion PreviousTag { get { return _prevCommit != null ? _prevCommit.ThisTag : null; } }
 
-        public int PreviousDepth { get { return _previousDepth; } }
+        public ReleaseTagVersion CIBaseTag { get { return _ciBaseCommit != null ? _ciBaseCommit.CIBaseTag : (_contentCommit != null ? _contentCommit.BestCommit.ThisTag : null); } }
+
+        public int CIBaseDepth { get { return _ciBaseDepth; } }
 
         public CommitVersionInfo PreviousCommit { get { return _prevCommit; } }
-
-        public CommitVersionInfo BaseCommit { get { return _baseCommit; } }
 
         /// <summary>
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
@@ -99,28 +88,35 @@ namespace SimpleGitVersion
         {
             get
             {
-                var allVersions = _tagCollector.ExistingVersions.Versions;
-
-                // Special case: there is no existing versions (other than this that is skippped it it exists) but
-                // there is a startingVersionForCSemVer, every commit may be the first one. 
-                if( _tagCollector.StartingVersionForCSemVer != null && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
+                if( _possibleVersions == null )
                 {
-                    return new[] { _tagCollector.StartingVersionForCSemVer };
-                }
-                var versions = allVersions.Where( c => c != _thisCommit );
-                IReadOnlyList<ReleaseTagVersion> baseTags = _baseCommit != null ? _baseCommit.GetBaseTags( exclude: ThisTag ) : new ReleaseTagVersion[] { null };
+                    var allVersions = _tagCollector.ExistingVersions.Versions;
 
-                List<ReleaseTagVersion> result = new List<ReleaseTagVersion>();
-                foreach( var b in baseTags )
-                {
-                    var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
-                    var successors = ReleaseTagVersion.GetDirectSuccessors( nextReleased != null, b );
-                    foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer && (nextReleased == null || v < nextReleased.ThisTag) ))
+                    // Special case: there is no existing versions (other than this that is skippped it it exists) but
+                    // there is a startingVersionForCSemVer, every commit may be the first one. 
+                    if( _tagCollector.StartingVersionForCSemVer != null && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
                     {
-                        if( !result.Contains( v ) ) result.Add( v );
+                        _possibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
+                    }
+                    else
+                    {
+                        var versions = allVersions.Where( c => c != _thisCommit );
+                        IReadOnlyList<ReleaseTagVersion> baseTags = _baseCommit != null ? _baseCommit.GetBaseTags( exclude: ThisTag ) : new ReleaseTagVersion[] { null };
+
+                        List<ReleaseTagVersion> result = new List<ReleaseTagVersion>();
+                        foreach( var b in baseTags )
+                        {
+                            var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
+                            var successors = ReleaseTagVersion.GetDirectSuccessors( nextReleased != null, b );
+                            foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer && (nextReleased == null || v < nextReleased.ThisTag) ) )
+                            {
+                                if( !result.Contains( v ) ) result.Add( v );
+                            }
+                        }
+                        _possibleVersions = result;
                     }
                 }
-                return result;
+                return _possibleVersions;
             }
         }
 
@@ -131,7 +127,7 @@ namespace SimpleGitVersion
         /// </summary>
         public IReadOnlyList<ReleaseTagVersion> ValidVersions
         {
-            get { return _validVersions ?? (_validVersions = PossibleVersions.ToArray()); }
+            get { return PossibleVersions; }
         }
 
         public override string ToString()
@@ -151,7 +147,7 @@ namespace SimpleGitVersion
 
             if( _prevCommit == null || _prevCommit.ThisTag == null ) b.Append( " No Previous" );
             else b.Append( " Previous=" ).Append( _prevCommit.ThisTag );
-            b.Append( " Depth=" ).Append( _previousDepth );
+            b.Append( " Depth=" ).Append( _ciBaseDepth );
 
             if( _baseCommit == null ) b.Append( " No Base" );
             else b.Append( " Base=" ).Append( _baseCommit.BestTag ).Append( '(' ).Append( _baseCommit.CommitSha ).Append( ')' );

@@ -22,8 +22,8 @@ namespace SimpleGitVersion
         int _buildIndex;
 
         /// <summary>
-        /// Gets or sets the build index. Must be between greater or equal to 0.
-       /// To be valid for NuGetV2, it must not exceed <see cref="MaxNuGetV2BuildIndex"/>.
+        /// Gets or sets the build index. Must be greater or equal to 0.
+        /// To be valid for NuGetV2, it must not exceed <see cref="MaxNuGetV2BuildIndex"/>.
         /// </summary>
         public int BuildIndex 
         {
@@ -46,7 +46,7 @@ namespace SimpleGitVersion
         /// </summary>
         public bool IsValid
         {
-            get { return _buildIndex > 0 && !string.IsNullOrWhiteSpace( BranchName ); }
+            get { return _buildIndex >= 0 && !string.IsNullOrWhiteSpace( BranchName ); }
         }
 
         /// <summary>

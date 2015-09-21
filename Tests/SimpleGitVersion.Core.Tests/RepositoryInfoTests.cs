@@ -109,7 +109,10 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.ReleaseTagErrorText, Is.Not.Null );
             }
             {
-                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions { StartingCommitSha = cOK.Sha, OverridenTags = overrides.Overrides, StartingVersionForCSemVer = "4.0.3-beta" } );
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions {
+                    StartingCommitSha = cOK.Sha,
+                    OverridenTags = overrides.Overrides,
+                    StartingVersionForCSemVer = "4.0.3-beta" } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag.ToString(), Is.EqualTo( "v4.0.3-beta" ) );
                 Assert.That( i.PreviousRelease, Is.Null );
@@ -393,7 +396,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIBuildVersion, Is.EqualTo( "2.0.1--ci-gamma.7" ) );
+                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "2.0.1--ci-gamma.7" ) );
             }
             // On "alpha" branch, the head is 6 commits ahead of the v2.0.0 tag (always the take the longest path). 
             {
@@ -407,7 +410,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIBuildVersion, Is.EqualTo( "2.0.1--ci-ALPHAAAA.6" ) );
+                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "2.0.1--ci-ALPHAAAA.6" ) );
             }
             // On "beta" branch, the head is 6 commits ahead of the v2.0.0 tag. 
             {
@@ -421,7 +424,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIBuildVersion, Is.EqualTo( "2.0.1--ci-BBBBBB.6" ) );
+                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "2.0.1--ci-BBBBBB.6" ) );
             }
 
         }
@@ -435,7 +438,7 @@ namespace SimpleGitVersion.Core.Tests
         public void CIBuildVersion_from_RealDevInAlpha_commits_ahead_tests( string vRealDevInAlpha, string branchName, string ciBuildVersion, string branchVersionName, string ciBuildVersionNuGet )
         {
             var repoTest = TestHelper.TestGitRepository;
-            var cRealDevInAlpha = repoTest.Commits.First( sc => sc.Message.StartsWith( "Real Dev in Alpha." ) );
+            var cRealDevInAlpha = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Real Dev in Alpha." ) );
             var overrides = new TagsOverride().MutableAdd( cRealDevInAlpha.Sha, vRealDevInAlpha );
             {
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
@@ -448,8 +451,8 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIBuildVersion, Is.EqualTo( ciBuildVersion ) );
-                Assert.That( i.CIBuildVersionNuGet, Is.EqualTo( ciBuildVersionNuGet ) );
+                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( ciBuildVersion ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet, Is.EqualTo( ciBuildVersionNuGet ) );
             }
         }
 
@@ -490,8 +493,8 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIBuildVersion, Is.EqualTo( ciBuildVersion ) );
-                Assert.That( i.CIBuildVersionNuGet, Is.EqualTo( ciBuildVersionNuGet ) );
+                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( ciBuildVersion ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet, Is.EqualTo( ciBuildVersionNuGet ) );
             }
         }
 

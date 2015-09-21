@@ -21,42 +21,51 @@ namespace SimpleGitVersion
             }
             IFullTagCommit thisCommit = GetCommit( commitSha );
             IFullTagCommit contentCommit = thisCommit ?? GetCommit( c.Tree.Sha );
-            CommitVersionInfo prevCommitParent;
-            CommitVersionInfo baseCommitParent;
-            ReadParentInfo( c, out prevCommitParent, out baseCommitParent );
-            info = new CommitVersionInfo( this, commitSha, thisCommit, contentCommit, prevCommitParent, baseCommitParent );
+            CommitVersionInfo prevCommitParent, baseCommitParent, ciBaseCommitParent;
+            ReadParentInfo( c, out prevCommitParent, out baseCommitParent, out ciBaseCommitParent );
+            info = new CommitVersionInfo( this, commitSha, thisCommit, contentCommit, prevCommitParent, baseCommitParent, ciBaseCommitParent );
             _versionsCache.Add( commitSha, info );
             return info;
         }
 
-        void ReadParentInfo( Commit c, out CommitVersionInfo prevCommitParent, out CommitVersionInfo bestBaseParent )
+        void ReadParentInfo( Commit c, out CommitVersionInfo prevCommitParent, out CommitVersionInfo bestBaseParent, out CommitVersionInfo ciBaseCommitParent )
         {
             Debug.Assert( !_versionsCache.ContainsKey( c.Sha ) );
-            prevCommitParent = bestBaseParent = null;
+            prevCommitParent = bestBaseParent = ciBaseCommitParent = null;
             foreach( var p in c.Parents )
             {
                 Debug.Assert( bestBaseParent == null || bestBaseParent.BestTag != null );
 
                 var pV = GetVersionInfo( p );
-                if( prevCommitParent == null ) prevCommitParent = pV;
+
+                if( ciBaseCommitParent == null ) ciBaseCommitParent = pV;
                 else
                 {
-                    var prevCommitTag = prevCommitParent.ThisTag ?? prevCommitParent.PreviousTag;
-                    var prevTag = pV.ThisTag ?? pV.PreviousTag;
-                    if( prevCommitTag == null )
+                    var ciBaseTag = ciBaseCommitParent.CIBaseTag;
+                    var maxTag = pV.CIBaseTag;
+                    if( ciBaseTag == null )
                     {
-                        if( prevTag != null || prevCommitParent.PreviousDepth < pV.PreviousDepth )
+                        if( maxTag != null || ciBaseCommitParent.CIBaseDepth < pV.CIBaseDepth )
                         {
-                            prevCommitParent = pV;
+                            ciBaseCommitParent = pV;
                         }
                     }
                     else 
                     {
-                        int cmp = prevCommitTag.CompareTo( prevTag );
-                        if( cmp < 0 || (cmp == 0 && prevCommitParent.PreviousDepth < pV.PreviousDepth) )
+                        int cmp = ciBaseTag.CompareTo( maxTag );
+                        if( cmp < 0 || (cmp == 0 && ciBaseCommitParent.CIBaseDepth < pV.CIBaseDepth) )
                         {
-                            prevCommitParent = pV;
+                            ciBaseCommitParent = pV;
                         }
+                    }
+                }
+
+                var prevTag = pV.ThisTag ?? pV.PreviousTag;
+                if( prevTag != null )
+                {
+                    if( prevCommitParent == null || (prevCommitParent.ThisTag ?? prevCommitParent.PreviousTag) < prevTag )
+                    {
+                        prevCommitParent = pV;
                     }
                 }
 
