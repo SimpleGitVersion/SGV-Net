@@ -195,12 +195,12 @@ namespace SimpleGitVersion
                 {
                     logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease.ThisTag, info.PreviousRelease.CommitSha );
                 }
-                if( info.CIBaseTag != null )
+                if( info.CIRelease != null )
                 {
                     IsValidCIBuild = true;
-                    SetNumericalVersionValues( info.CIBaseTag );
-                    NuGetVersion = info.CIBuildVersionNuGet;
-                    SemVer = info.CIBuildVersion;
+                    SetNumericalVersionValues( info.CIRelease.BaseTag );
+                    NuGetVersion = info.CIRelease.BuildVersionNuGet;
+                    SemVer = info.CIRelease.BuildVersion;
                     logger.Info( "CI release: '{0}'.", SemVer );
                     LogValidVersions( logger, info );
                 }

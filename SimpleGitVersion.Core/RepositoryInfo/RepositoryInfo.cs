@@ -94,24 +94,11 @@ namespace SimpleGitVersion
         public readonly IReadOnlyList<ReleaseTagVersion> ValidVersions;
 
         /// <summary>
-        /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either because it is the current branch 
-        /// or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it), the <see cref="RepositoryInfoOptions.StartingCommitSha"/> is null or 
-        /// empty and there is no <see cref="ValidReleaseTag"/> on the commit.
-        /// The format is based on <see cref="ReleaseTagFormat.SemVer"/>
-        /// </summary>
-        public readonly string CIBuildVersion;
-
-        /// <summary>
-        /// Same as <see cref="CIBuildVersion"/> instead that the format is based on <see cref="ReleaseTagFormat.NuGetPackage"/>
-        /// </summary>
-        public readonly string CIBuildVersionNuGet;
-
-        /// <summary>
-        /// The base <see cref="ReleaseTagVersion"/> from which <see cref="CIBuildVersion"/> is built.
-        /// It is either <see cref="PreviousRelease"/> or <see cref="ReleaseTagVersion.VeryFirstVersion"/>.
-        /// Null if and only if CIBuildVersion is null.
-        /// </summary>
-        public readonly ReleaseTagVersion CIBaseTag;
+        /// Gets CI informations if a CI release must be done.
+        /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either 
+        /// because it is the current branch or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it), the <see cref="RepositoryInfoOptions.StartingCommitSha"/> 
+        /// is null or empty and there is no <see cref="ValidReleaseTag"/> on the commit.
+        public readonly CIReleaseInfo CIRelease;
 
         /// <summary>
         /// Gets the NuGet version that must be used.
@@ -119,7 +106,7 @@ namespace SimpleGitVersion
         /// </summary>
         public string FinalNuGetVersion
         {
-            get { return CIBuildVersionNuGet ?? (ValidReleaseTag != null ? ValidReleaseTag.ToString( ReleaseTagFormat.NuGetPackage ) : null); }
+            get { return CIRelease != null ? CIRelease.BuildVersionNuGet : (ValidReleaseTag != null ? ValidReleaseTag.ToString( ReleaseTagFormat.NuGetPackage ) : null); }
         }
 
         /// <summary>
@@ -205,31 +192,7 @@ namespace SimpleGitVersion
                             {
                                 if( ciVersionName != null )
                                 {
-                                    CIBaseTag = info.PreviousTag ?? ReleaseTagVersion.VeryFirstVersion;
-                                    // If there is no previous tag, we fall back to ZeroTimedBased mode.
-                                    if( ciVersionMode == CIBranchVersionMode.ZeroTimed || PreviousRelease == null )
-                                    {
-                                        var name = string.Format( "0.0.0--ci-{0}-{1:u}", ciVersionName, commit.Committer.When );
-                                        string suffix = PreviousRelease != null ? '+' + PreviousRelease.ToString() : null;
-                                        CIBuildVersionNuGet = CIBuildVersion = ciVersionName + suffix;
-                                    }
-                                    else
-                                    {
-                                        Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && PreviousRelease != null );
-                                        CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciVersionName, BuildIndex = info.PreviousDepth };
-                                        if( !ci.IsValidForNuGetV2 )
-                                        {
-                                            errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
-                                            errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
-                                                    .AppendFormat( @"<Branch Name=""{0}"" VersionName=""{1}"" ... />.", ci.BranchName, ci.BranchName.Substring( 0, 8 ) )
-                                                    .AppendLine();
-                                        }
-                                        else
-                                        {
-                                            CIBuildVersion = PreviousRelease.ThisTag.ToString( ReleaseTagFormat.SemVer, ci );
-                                            CIBuildVersionNuGet = PreviousRelease.ThisTag.ToString( ReleaseTagFormat.NuGetPackage, ci );
-                                        }
-                                    }
+                                    CIRelease = CIReleaseInfo.Create( commit, ciVersionMode, ciVersionName, errors, info );
                                 }
                             }
                         }

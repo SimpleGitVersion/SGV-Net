@@ -21,51 +21,49 @@ namespace SimpleGitVersion
             }
             IFullTagCommit thisCommit = GetCommit( commitSha );
             IFullTagCommit contentCommit = thisCommit ?? GetCommit( c.Tree.Sha );
-            CommitVersionInfo prevCommitParent;
-            CommitVersionInfo baseCommitParent;
-            ReadParentInfo( c, out prevCommitParent, out baseCommitParent );
-            info = new CommitVersionInfo( this, commitSha, thisCommit, contentCommit, prevCommitParent, baseCommitParent );
+            CommitVersionInfo prevCommitParent, prevMaxCommitParent;
+            ReadParentInfo( c, out prevCommitParent, out prevMaxCommitParent );
+            info = new CommitVersionInfo( this, commitSha, thisCommit, contentCommit, prevCommitParent, prevMaxCommitParent );
             _versionsCache.Add( commitSha, info );
             return info;
         }
 
-        void ReadParentInfo( Commit c, out CommitVersionInfo prevCommitParent, out CommitVersionInfo bestBaseParent )
+        void ReadParentInfo( Commit c, out CommitVersionInfo prevCommitParent, out CommitVersionInfo prevMaxCommitParent )
         {
             Debug.Assert( !_versionsCache.ContainsKey( c.Sha ) );
-            prevCommitParent = bestBaseParent = null;
+            prevCommitParent = prevMaxCommitParent = null;
             foreach( var p in c.Parents )
             {
-                Debug.Assert( bestBaseParent == null || bestBaseParent.BestTag != null );
-
                 var pV = GetVersionInfo( p );
-                if( prevCommitParent == null ) prevCommitParent = pV;
+
+                var prevTag = pV.ThisTag ?? pV.PreviousTag;
+                if( prevTag != null )
+                {
+                    if( prevCommitParent == null || (prevCommitParent.ThisTag ?? prevCommitParent.PreviousTag) < prevTag )
+                    {
+                        prevCommitParent = pV;
+                    }
+                }
+
+                if( prevMaxCommitParent == null ) prevMaxCommitParent = pV;
                 else
                 {
-                    var prevCommitTag = prevCommitParent.ThisTag ?? prevCommitParent.PreviousTag;
-                    var prevTag = pV.ThisTag ?? pV.PreviousTag;
-                    if( prevCommitTag == null )
+                    var prevMaxTag = prevMaxCommitParent.MaxTag;
+                    var maxTag = pV.MaxTag;
+                    if( prevMaxTag == null )
                     {
-                        if( prevTag != null || prevCommitParent.PreviousDepth < pV.PreviousDepth )
+                        if( maxTag != null || prevMaxCommitParent.PreviousMaxTagDepth < pV.PreviousMaxTagDepth )
                         {
-                            prevCommitParent = pV;
+                            prevMaxCommitParent = pV;
                         }
                     }
                     else 
                     {
-                        int cmp = prevCommitTag.CompareTo( prevTag );
-                        if( cmp < 0 || (cmp == 0 && prevCommitParent.PreviousDepth < pV.PreviousDepth) )
+                        int cmp = prevMaxTag.CompareTo( maxTag );
+                        if( cmp < 0 || (cmp == 0 && prevMaxCommitParent.PreviousMaxTagDepth < pV.PreviousMaxTagDepth) )
                         {
-                            prevCommitParent = pV;
+                            prevMaxCommitParent = pV;
                         }
-                    }
-                }
-
-                var bestTag = pV.BestTag;
-                if( bestTag != null )
-                {
-                    if( bestBaseParent == null || bestBaseParent.BestTag < bestTag )
-                    {
-                        bestBaseParent = pV;
                     }
                 }
             }
