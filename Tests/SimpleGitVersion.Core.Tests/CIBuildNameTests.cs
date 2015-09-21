@@ -67,8 +67,8 @@ namespace SimpleGitVersion.Core.Tests
             var sNuGet = t.ToString( formatV2 );
             var sNuGetPrev = tPrev.ToString( formatV2 );
             var sNuGetNext = tNext.ToString( formatV2 );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetPrev, sNuGet ) < 0, "{0} < {1}", sNuGetPrev, sNuGet );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGet, sNuGetNext ) < 0, "{0} < {1}", sNuGet, sNuGetNext );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetPrev, sNuGet ) < 0, "{0} < {1}", sNuGetPrev, sNuGet );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGet, sNuGetNext ) < 0, "{0} < {1}", sNuGet, sNuGetNext );
 
 
             CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = "dev", BuildIndex = 1 };
@@ -79,8 +79,8 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( vCi < vNext, "{0} < {1}", vCi, vNext );
 
             var sNuGetCI = t.ToString( formatV2, ci );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGet, sNuGetCI ) < 0, "{0} < {1}", sNuGet, sNuGetCI );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCI, sNuGetNext ) < 0, "{0} < {1}", sNuGetCI, sNuGetNext );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGet, sNuGetCI ) < 0, "{0} < {1}", sNuGet, sNuGetCI );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCI, sNuGetNext ) < 0, "{0} < {1}", sNuGetCI, sNuGetNext );
             
             string sCiNext = tNext.ToString( ReleaseTagFormat.SemVer, ci );
             SemVersion vCiNext = SemVersion.Parse( sCiNext, true );
@@ -88,8 +88,8 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( vCiNext > vNext, "{0} > {1}", vCiNext, vNext );
 
             var sNuGetCINext = tNext.ToString( formatV2, ci );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCINext, sNuGetCI ) > 0, "{0} > {1}", sNuGetCINext, sNuGetCI );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCINext, sNuGetNext ) > 0, "{0} > {1}", sNuGetCINext, sNuGetNext );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCINext, sNuGetCI ) > 0, "{0} > {1}", sNuGetCINext, sNuGetCI );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCINext, sNuGetNext ) > 0, "{0} > {1}", sNuGetCINext, sNuGetNext );
 
             string sCiPrev = tPrev.ToString( ReleaseTagFormat.SemVer, ci );
             SemVersion vCiPrev = SemVersion.Parse( sCiPrev, true );
@@ -98,9 +98,9 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( vCiPrev < vCiNext, "{0} < {1}", vCiPrev, vCiNext );
 
             var sNuGetCIPrev = tPrev.ToString( formatV2, ci );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCIPrev, sNuGetPrev ) > 0, "{0} > {1}", sNuGetCIPrev, sNuGetPrev );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCIPrev,  sNuGet ) < 0, "{0} < {1}", sNuGetCIPrev, sNuGet );
-            Assert.That( NuGetV2StringComparer.Default.Compare( sNuGetCIPrev, sNuGetCINext ) < 0, "{0} < {1}", sNuGetCIPrev, sNuGetCINext );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCIPrev, sNuGetPrev ) > 0, "{0} > {1}", sNuGetCIPrev, sNuGetPrev );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCIPrev,  sNuGet ) < 0, "{0} < {1}", sNuGetCIPrev, sNuGet );
+            Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCIPrev, sNuGetCINext ) < 0, "{0} < {1}", sNuGetCIPrev, sNuGetCINext );
         }
 
     }

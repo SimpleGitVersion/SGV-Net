@@ -428,10 +428,10 @@ namespace SimpleGitVersion.Core.Tests
 
         }
 
-        [TestCase( "v1.0.0", "alpha", "1.0.1--ci-alpha.1", null, "1.0.1--alpha-0001" )]
-        [TestCase( "v1.0.0", "beta", "1.0.1--ci-beta.1", null, "1.0.1--beta-0001" )]
-        [TestCase( "v1.0.0", "gamma", "1.0.1--ci-gamma.2", null, "1.0.1--gamma-0002" )]
-        [TestCase( "v1.0.0", "parallel-world", "1.0.1--ci-parallel.3", "parallel", "1.0.1--parallel-0003" )]
+        [TestCase( "v1.0.0", "alpha", "1.0.1--ci-alpha.1", null, "1.0.1-Calpha-0001" )]
+        [TestCase( "v1.0.0", "beta", "1.0.1--ci-beta.1", null, "1.0.1-Cbeta-0001" )]
+        [TestCase( "v1.0.0", "gamma", "1.0.1--ci-gamma.2", null, "1.0.1-Cgamma-0002" )]
+        [TestCase( "v1.0.0", "parallel-world", "1.0.1--ci-parallel.3", "parallel", "1.0.1-Cparallel-0003" )]
         [TestCase( "v0.1.0-beta", "alpha", "0.1.0-beta.0.0.ci-alpha.1", null, "0.1.0-b00-00-alpha-0001" )]
         [TestCase( "v0.0.0-rc", "beta", "0.0.0-rc.0.0.ci-beta.1", null, "0.0.0-r00-00-beta-0001" )]
         public void CIBuildVersion_from_RealDevInAlpha_commits_ahead_tests( string vRealDevInAlpha, string branchName, string ciBuildVersion, string branchVersionName, string ciBuildVersionNuGet )
