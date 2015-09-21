@@ -114,7 +114,19 @@ namespace CodeCake
                 .WithCriteria( () => gitInfo.IsValidRelease )
                 .Does( () =>
                 {
-                    // Resolve the API key.
+                    if( Cake.IsInteractiveMode() )
+                    {
+                        var localFeed = Cake.FindDirectoryAbove( "LocalFeed" );
+                        if( localFeed != null )
+                        {
+                            Cake.Information( "LocalFeed directory fonud: {0}", localFeed );
+                            if( Cake.ReadInteractiveOption( "Do you want to publish to LocalFeed?", 'y', 'n' ) == 'y' )
+                            {
+                                Cake.CopyFiles( releasesDir.Path + "/*.nupkg", localFeed );
+                            }
+                        }
+                    }
+                    // Resolves nuget.com API key.
                     var apiKey = Cake.InteractiveEnvironmentVariable( "NUGET_API_KEY" );
                     if( string.IsNullOrEmpty( apiKey ) )
                     {
