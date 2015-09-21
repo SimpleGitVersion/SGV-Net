@@ -116,17 +116,22 @@ namespace CodeCake
                 {
                     // Resolve the API key.
                     var apiKey = Cake.InteractiveEnvironmentVariable( "NUGET_API_KEY" );
-                    if( string.IsNullOrEmpty( apiKey ) ) throw new InvalidOperationException( "Could not resolve NuGet API key." );
-
-                    var settings = new NuGetPushSettings
+                    if( string.IsNullOrEmpty( apiKey ) )
                     {
-                        Source = "https://www.nuget.org/api/v2/package",
-                        ApiKey = apiKey
-                    };
-
-                    foreach( var nupkg in Cake.GetFiles( releasesDir.Path + "/*.nupkg" ) )
+                        Cake.Information( "Could not resolve NuGet API key. Push to NuGet is skipped." );
+                    }
+                    else
                     {
-                        Cake.NuGetPush( nupkg, settings );
+                        var settings = new NuGetPushSettings
+                        {
+                            Source = "https://www.nuget.org/api/v2/package",
+                            ApiKey = apiKey
+                        };
+
+                        foreach( var nupkg in Cake.GetFiles( releasesDir.Path + "/*.nupkg" ) )
+                        {
+                            Cake.NuGetPush( nupkg, settings );
+                        }
                     }
                 } );
 
