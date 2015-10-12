@@ -35,7 +35,15 @@ namespace CodeCake
                 .Does( () =>
                 {
                     gitInfo = Cake.GetSimpleRepositoryInfo();
-                    if( !gitInfo.IsValid ) throw new Exception( "Repository is not ready to be published." );
+                    if( !gitInfo.IsValid )
+                    {
+                        if( Cake.IsInteractiveMode() 
+                            && Cake.ReadInteractiveOption( "Repository is not ready to be published. Processd anyway?", 'Y', 'N' ) == 'Y' )
+                        {
+                            Cake.Warning( "GitInfo is not valid, but you choose to proceed..." );
+                        }
+                        else throw new Exception( "Repository is not ready to be published." );
+                    }
                     configuration = gitInfo.IsValidRelease && gitInfo.PreReleaseName.Length == 0 ? "Release" : "Debug";
                     Cake.Information( "Publishing {0} in {1}.", gitInfo.SemVer, configuration );
                 } );

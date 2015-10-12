@@ -131,6 +131,11 @@ namespace SimpleGitVersion
             }
         }
 
+        /// <summary>
+        /// Reads version information.
+        /// On errors, they are logged but the return of this task is always true to avoid blocking the build process.
+        /// </summary>
+        /// <returns>Always true.</returns>
         public override bool Execute()
         {
             try
@@ -156,12 +161,17 @@ namespace SimpleGitVersion
                 CommitSha = i.CommitSha;
                 CommitDateUtc = i.CommitDateUtc;
 
-                return !i.Info.HasError;
+                if( i.Info.HasError )
+                {
+                    this.LogError( i.Info.RepositoryError ?? i.Info.ReleaseTagErrorText );
+                }
+
+                return true;
             }
             catch( Exception exception )
             {
                 this.LogError( "Error occurred: " + exception );
-                return false;
+                return true;
             }
         }
     }
