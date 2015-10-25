@@ -14,6 +14,7 @@ using System;
 using System.Linq;
 using Cake.Core.Diagnostics;
 using Cake.Common.Tools.NuGet.Push;
+using Cake.Core.IO;
 
 namespace CodeCake
 {
@@ -99,6 +100,12 @@ namespace CodeCake
                 .Does( () =>
                 {
                     Cake.CreateDirectory( releasesDir );
+                    // Preparing SimpleGitVersion.DNXCommands/app folder.
+                    var dnxAppPath = releasesDir.Path + "/SimpleGitVersion.DNXCommands/app";
+                    Cake.CreateDirectory( dnxAppPath );
+                    Cake.CopyFiles( "SimpleGitVersion.DNXCommands/NuGetAssets/app/*", dnxAppPath );
+                    TransformText( dnxAppPath + "/project.json", configuration, gitInfo );
+                    // 
                     var settings = new NuGetPackSettings()
                     {
                         Version = gitInfo.NuGetVersion,
@@ -108,13 +115,11 @@ namespace CodeCake
                     Cake.CopyFiles( "CodeCakeBuilder/NuSpec/*.nuspec", releasesDir );
                     foreach( var nuspec in Cake.GetFiles( releasesDir.Path + "/*.nuspec" ) )
                     {
-                        Cake.TransformTextFile( nuspec, "{{", "}}" )
-                                .WithToken( "configuration", configuration )
-                                .WithToken( "CSemVer", gitInfo.SemVer )
-                                .Save( nuspec );
+                        TransformText( nuspec, configuration, gitInfo );
                         Cake.NuGetPack( nuspec, settings );
                     }
                     Cake.DeleteFiles( releasesDir.Path + "/*.nuspec" );
+                    Cake.DeleteDirectory( dnxAppPath, true );
                 } );
 
             Task( "Push-NuGet-Packages" )
@@ -128,7 +133,7 @@ namespace CodeCake
                         if( localFeed != null )
                         {
                             Cake.Information( "LocalFeed directory found: {0}", localFeed );
-                            if( Cake.ReadInteractiveOption( "Do you want to publish to LocalFeed?", 'y', 'n' ) == 'y' )
+                            if( Cake.ReadInteractiveOption( "Do you want to publish to LocalFeed?", 'Y', 'N' ) == 'Y' )
                             {
                                 Cake.CopyFiles( releasesDir.Path + "/*.nupkg", localFeed );
                             }
@@ -156,6 +161,15 @@ namespace CodeCake
                 } );
 
             Task( "Default" ).IsDependentOn( "Push-NuGet-Packages" );
+        }
+
+        private void TransformText( FilePath textFilePath, string configuration, SimpleRepositoryInfo gitInfo )
+        {
+            Cake.TransformTextFile( textFilePath, "{{", "}}" )
+                    .WithToken( "configuration", configuration )
+                    .WithToken( "NuGetVersion", gitInfo.NuGetVersion )
+                    .WithToken( "CSemVer", gitInfo.SemVer )
+                    .Save( textFilePath );
         }
     }
 }

@@ -197,3 +197,5 @@ FakesAssemblies/
 
 Tests/TestGitRepository
 CodeCakeBuilder/Tools/nuget.exe
+project.lock.json
+*GhostDoc.xml

@@ -10,7 +10,7 @@ namespace SimpleGitVersion
     /// at the root of the solution directory (the Repository.xml file creates a <see cref="RepositoryInfoOptions"/> that 
     /// configures the analysis).
     /// </summary>
-    public class SimpleRepositoryInfo
+    public sealed partial class SimpleRepositoryInfo
     {
         /// <summary>
         /// Gets the <see cref="RepositoryInfo"/> onto which this simplified representation is built.
@@ -79,7 +79,7 @@ namespace SimpleGitVersion
         public int PreReleaseFix { get; private set; }
 
         /// <summary>
-        /// Gets the "<see cref="Major"/>.<see cref="Minor"/>" as a string: this is the component version (the AsssemblyVersion).
+        /// Gets the "<see cref="Major"/>.<see cref="Minor"/>" as a string: this is the component version (the AssemblyVersion).
         /// </summary>
         public string MajorMinor { get; private set; }
 

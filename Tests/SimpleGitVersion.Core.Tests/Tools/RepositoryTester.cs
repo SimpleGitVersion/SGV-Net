@@ -10,14 +10,25 @@ namespace SimpleGitVersion
     class RepositoryTester
     {
         public readonly string Path;
-        public readonly List<SimpleCommit> Commits;
+        readonly List<SimpleCommit> _commits;
 
         public RepositoryTester( string path )
         {
             Path = path;
             using( var r = new Repository( path ) )
             {
-                Commits = r.Commits.QueryBy( new CommitFilter { Since = r.Refs }).Select( c => new SimpleCommit() { Sha = c.Sha, Message = c.Message } ).ToList();
+                _commits = r.Commits.QueryBy( new CommitFilter { Since = r.Refs }).Select( c => new SimpleCommit() { Sha = c.Sha, Message = c.Message } ).ToList();
+            }
+        }
+
+        public IReadOnlyList<SimpleCommit> Commits { get { return _commits; } }
+
+        public void CheckOut( string branchName )
+        {
+            using( var r = new Repository( Path ) )
+            {
+                Branch b = r.Branches[branchName];
+                r.Checkout( b, new CheckoutOptions() { CheckoutModifiers = CheckoutModifiers.Force } );
             }
         }
 
@@ -28,7 +39,7 @@ namespace SimpleGitVersion
         
         public RepositoryInfo GetRepositoryInfo( string commitSha, TagsOverride tags = null )
         {
-            return RepositoryInfo.LoadFromPath( Path, new RepositoryInfoOptions { StartingCommitSha = commitSha, OverridenTags = tags != null ? tags.Overrides : null } );
+            return RepositoryInfo.LoadFromPath( Path, new RepositoryInfoOptions { StartingCommitSha = commitSha, OverriddenTags = tags != null ? tags.Overrides : null } );
         }
     }
 }

@@ -79,7 +79,7 @@ namespace SimpleGitVersion.Core.Tests
             var before3 = repoTest.Commits.First( sc => sc.Message.StartsWith( "On master again" ) );
             checkKO( before3 );
 
-            // Checking possible versions after: all suceessors are allowed.
+            // Checking possible versions after: all successors are allowed.
             var after1 = repoTest.Commits.First( sc => sc.Message.StartsWith( "Second b/b2" ) );
             checkOK( after1 );
             var after2 = repoTest.Commits.First( sc => sc.Message.StartsWith( "Merge branch 'b' into c" ) );
@@ -111,7 +111,7 @@ namespace SimpleGitVersion.Core.Tests
             {
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions {
                     StartingCommitSha = cOK.Sha,
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     StartingVersionForCSemVer = "4.0.3-beta" } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag.ToString(), Is.EqualTo( "v4.0.3-beta" ) );
@@ -123,7 +123,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cAbove.Sha,
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     StartingVersionForCSemVer = "4.0.3-beta"
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
@@ -138,7 +138,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cBelow.Sha,
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     StartingVersionForCSemVer = "4.0.3-beta"
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
@@ -151,7 +151,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cBelow.Sha,
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     StartingVersionForCSemVer = "4.0.3-beta"
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
@@ -182,7 +182,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cReleased.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v1beta ) );
@@ -205,7 +205,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cReleased.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag.ToString(), Is.EqualTo( "v2.0.0" ) );
@@ -216,7 +216,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cAlphaContinue.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 var tagged = ReleaseTagVersion.TryParse( "2.1.0-beta" );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
@@ -272,7 +272,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = commit.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 CollectionAssert.AreEqual( v1.GetDirectSuccessors().Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersions );
             };
@@ -282,7 +282,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = commit.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersions );
             };
@@ -292,7 +292,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = commit.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ).Concat( v2.GetDirectSuccessors() ), i.PossibleVersions );
             };
@@ -302,7 +302,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = commit.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 CollectionAssert.AreEqual( v2.GetDirectSuccessors(), i.PossibleVersions );
             };
@@ -343,7 +343,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cDevInAlpha.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( ReleaseTagVersion.TryParse( "v2.0.0" ) ) );
             }
@@ -361,7 +361,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cDevInBeta.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( ReleaseTagVersion.TryParse( "v1.0.1-beta" ) ) );
             }
@@ -379,7 +379,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = cDevInGamma.Sha,
-                    OverridenTags = overrides.Overrides
+                    OverriddenTags = overrides.Overrides
                 } );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( ReleaseTagVersion.TryParse( "v1.0.1-alpha" ) ) );
             }
@@ -388,7 +388,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingBranchName = "gamma",
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     Branches = new RepositoryInfoOptionsBranch[] 
                     {
                         new RepositoryInfoOptionsBranch() { Name = "gamma", CIVersionMode = CIBranchVersionMode.LastReleaseBased }
@@ -402,7 +402,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingBranchName = "alpha",
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     Branches = new RepositoryInfoOptionsBranch[] 
                     {
                         new RepositoryInfoOptionsBranch() { Name = "alpha", VersionName="ALPHAAAA", CIVersionMode = CIBranchVersionMode.LastReleaseBased }
@@ -416,7 +416,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingBranchName = "beta",
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     Branches = new RepositoryInfoOptionsBranch[] 
                     {
                         new RepositoryInfoOptionsBranch() { Name = "beta", VersionName="BBBBBB", CIVersionMode = CIBranchVersionMode.LastReleaseBased }
@@ -443,7 +443,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingBranchName = branchName,
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     Branches = new RepositoryInfoOptionsBranch[] 
                     {
                         new RepositoryInfoOptionsBranch() { Name = branchName, CIVersionMode = CIBranchVersionMode.LastReleaseBased, VersionName = branchVersionName }
@@ -485,7 +485,7 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingBranchName = branchName,
-                    OverridenTags = overrides.Overrides,
+                    OverriddenTags = overrides.Overrides,
                     Branches = new RepositoryInfoOptionsBranch[] 
                     {
                         new RepositoryInfoOptionsBranch() { Name = branchName, CIVersionMode = CIBranchVersionMode.LastReleaseBased, VersionName = branchNameVersion }
@@ -529,6 +529,61 @@ namespace SimpleGitVersion.Core.Tests
             finally
             {
                 File.WriteAllBytes( fileToChange, original );
+            }
+        }
+
+
+        [Test]
+        public void options_IgnoreModified_files_filter()
+        {
+            var repoTest = TestHelper.TestGitRepository;
+            repoTest.CheckOut( "origin/parallel-world" );
+
+            string devPath = Path.Combine( repoTest.Path, "Dev in Alpha.txt" );
+            string devTxt = File.ReadAllText( devPath );
+            Assume.That( devTxt, Is.EqualTo( "Dev in Aplpha." ) );
+
+            string realDevPath = Path.Combine( repoTest.Path, "Real Dev in Alpha.txt" ); ;
+            string realDevTxt = File.ReadAllText( realDevPath );
+            Assume.That( realDevTxt, Is.EqualTo( "Real Dev in Alpha." ) );
+
+            try
+            {
+                RepositoryInfo info;
+                var options = new RepositoryInfoOptions();
+                info = repoTest.GetRepositoryInfo( options );
+                Assert.That( info.IsDirty, Is.False, "Working folder is clean." );
+
+                File.WriteAllText( devPath, "!MODIFIED!" + devTxt );
+                File.WriteAllText( realDevPath, "!MODIFIED!" + realDevTxt );
+
+                info = repoTest.GetRepositoryInfo( options );
+                Assert.That( info.IsDirty, "Working folder is dirty." );
+
+                options.IgnoreModifiedFiles.Add( "Dev in Alpha.txt" );
+                options.IgnoreModifiedFiles.Add( "Real Dev in Alpha.txt" );
+                info = repoTest.GetRepositoryInfo( options );
+                Assert.That( info.IsDirty, Is.False, "Working folder is dirty but IgnoreModifiedFiles explicitly ignores the 2 files." );
+
+                options.IgnoreModifiedFiles.Clear();
+                options.IgnoreModifiedFilePredicate = m => true;
+                info = repoTest.GetRepositoryInfo( options );
+                Assert.That( info.IsDirty, Is.False, "Working folder is dirty but ModifiedFileFilter explicitly ignores all files." );
+
+                options.IgnoreModifiedFiles.Add( "Dev in Alpha.txt" );
+                options.IgnoreModifiedFilePredicate = m => 
+                {
+                    Assert.That( m.Path, Is.Not.EqualTo( "Dev in Alpha.txt" ), "This has been filtered by IgnoreModifiedFiles set." );
+                    Assert.That( m.CommittedText, Is.EqualTo( "Real Dev in Alpha." ) );
+                    return m.Path == "Real Dev in Alpha.txt";
+                };
+                info = repoTest.GetRepositoryInfo( options );
+                Assert.That( info.IsDirty, Is.False, "Working folder is dirty but IgnoreModifiedFiles ignores one file and ModifiedFileFilter ignores the other one." );
+            }
+            finally
+            {
+                File.WriteAllText( devPath, devTxt );
+                File.WriteAllText( realDevPath, realDevTxt );
             }
         }
     }

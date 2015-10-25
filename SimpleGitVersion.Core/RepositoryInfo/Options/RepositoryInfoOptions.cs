@@ -15,41 +15,23 @@ namespace SimpleGitVersion
     {
         string _remoteName;
 
-        class PathComparer : IEqualityComparer<string>
-        {
-            public bool Equals( string x, string y )
-            {
-                return StringComparer.OrdinalIgnoreCase.Equals( Normalize( x ), Normalize( y ) );
-            }
-
-            public int GetHashCode( string path )
-            {
-                return Normalize( path ).GetHashCode();
-            }
-
-            static string Normalize( string path )
-            {
-                return Path.GetFullPath( path ).TrimEnd( Path.DirectorySeparatorChar );
-            }
-        }
-
         /// <summary>
         /// Initializes a new <see cref="RepositoryInfoOptions"/>.
         /// </summary>
         public RepositoryInfoOptions()
         {
-            IgnoreModifiedFiles = new HashSet<string>( new PathComparer() );
+            IgnoreModifiedFiles = new HashSet<string>( PathComparer.Default );
         }
 
         /// <summary>
-        /// Gets or sets the commit that will be analysed.
+        /// Gets or sets the commit that will be analyzed.
         /// When null (the default) or empty, the <see cref="StartingBranchName"/> is used.
         /// This property must be used programmatically: it does not appear in the Xml file.
         /// </summary>
         public string StartingCommitSha { get; set; }
 
         /// <summary>
-        /// Gets or sets the branch whose name will be analysed. Applies only when <see cref="StartingCommitSha"/> is null or empty.
+        /// Gets or sets the branch whose name will be analyzed. Applies only when <see cref="StartingCommitSha"/> is null or empty.
         /// When null (the default) or empty, the current head is used.
         /// This property must be used programmatically: it does not appear in the Xml file.
         /// </summary>
@@ -63,14 +45,14 @@ namespace SimpleGitVersion
         /// This property must be used programmatically: it does not appear in the Xml file.
         /// </summary>
         /// <remarks>
-        /// A dictionnary of string to list of sting can be directly assigned to this property.
+        /// A dictionary of string to list of sting can be directly assigned to this property.
         /// </remarks>
-        public IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> OverridenTags { get; set; }
+        public IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> OverriddenTags { get; set; }
 
         /// <summary>
         /// Gets or sets a version from which CSemVer rules are enforced.
         /// When set, any version before this one are silently ignored.
-        /// This is useful to accomodate an existing repository that did not use Simple Git Versionning by easily forgetting the past.
+        /// This is useful to accommodate an existing repository that did not use Simple Git Versioning by easily forgetting the past.
         /// </summary>
         public string StartingVersionForCSemVer { get; set; }
 
@@ -86,8 +68,16 @@ namespace SimpleGitVersion
         public ISet<string> IgnoreModifiedFiles { get; private set; }
 
         /// <summary>
+        /// Gets or sets a filter for modified file: when null, all <see cref="IWorkingFolderModifiedFile"/>
+        /// are considered modified (as if this predicate always evaluates to false).
+        /// This hook is called only if the file does not appear in <see cref="IgnoreModifiedFiles"/>.
+        /// </summary>
+        /// <value>The file filter.</value>
+        public Func<IWorkingFolderModifiedFile, bool> IgnoreModifiedFilePredicate { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the remote repository that will be considered when
-        /// working with branches. Defaults to "origin" (can nerver be null or empty).
+        /// working with branches. Defaults to "origin" (can never be null or empty).
         /// </summary>
         public string RemoteName
         {
