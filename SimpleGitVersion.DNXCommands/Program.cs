@@ -96,6 +96,24 @@ namespace SimpleGitVersion.DNXCommands
                         return 0;
                     } );
                 } );
+                app.Command( "postpack", c =>
+                {
+                    c.Description = "Restores project.json files that differ only version property (ignoring the version property itself).";
+                    var optionProject = c.Option( "-p|--project <PATH>", "Path to project, default is current directory", CommandOptionType.SingleValue );
+                    c.HelpOption( "-?|-h|--help" );
+
+                    c.OnExecute( () =>
+                    {
+                        var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
+                        int count = 0;
+                        if( ctx.SolutionDir != null && ctx.ProjectFiles.Count > 0 )
+                        {
+                            count = ctx.RestoreProjectFilesThatDifferOnlyByVersion();
+                        }
+                        ctx.Logger.Info( string.Format( "sgv postpack: restored {0} project.json file(s).", count ) );
+                        return 0;
+                    } );
+                } );
 
                 // Show help information if no subcommand/option was specified.
                 app.OnExecute( () =>

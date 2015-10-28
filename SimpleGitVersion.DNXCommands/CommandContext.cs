@@ -58,30 +58,50 @@ namespace SimpleGitVersion.DNXCommands
         /// <value>All project.json relative paths.</value>
         public IReadOnlyList<string> RelativeProjectFiles { get { return _relativeProjectFiles; } }
 
+        /// <summary>
+        /// Gets the repository information, ignoring any project.json "version" property.
+        /// </summary>
+        /// <value>The repository information.</value>
         public SimpleRepositoryInfo RepositoryInfo
         {
-            get
-            {
-                if( _info == null )
-                {
-                    _info = SimpleRepositoryInfo.LoadFromPath( _logger, _solutionDir, ( log, hasRepoXml, options ) =>
-                    {
-                        options.IgnoreModifiedFilePredicate = m =>
-                        {
-                            if( m.Path.EndsWith( "project.json", StringComparison.Ordinal ) 
-                                && _relativeProjectFiles.Contains( m.Path, PathComparer.Default )
-                                && new ProjectFileContent( File.ReadAllText( m.FullPath ) )
-                                        .EqualsWithoutVersion( new ProjectFileContent( m.CommittedText ) ) )
-                            {
-                                return true;
-                            }
-                            return false;
-                        };
-                    } );
-                }
-                return _info;
-            }
+            get { return _info ?? (_info = GetRepositoryInfo( _logger, null )); }
         }
+
+        /// <summary>
+        /// Restores the project.json files that differ only by version from committed content.
+        /// </summary>
+        /// <returns>The number of files that have been restored.</returns>
+        public int RestoreProjectFilesThatDifferOnlyByVersion()
+        {
+            int count = 0;
+            GetRepositoryInfo( LoggerAdapter.Empty, m =>
+            {
+                _logger.Trace( string.Format( "Restoring file '{0}'.", m.Path ) );
+                File.WriteAllText( m.FullPath, m.CommittedText );
+                ++count;
+            } );
+            return count;
+        }
+
+        private SimpleRepositoryInfo GetRepositoryInfo( ILogger logger, Action<IWorkingFolderModifiedFile> hook )
+        {
+            return SimpleRepositoryInfo.LoadFromPath( logger, _solutionDir, ( log, hasRepoXml, options ) =>
+            {
+                options.IgnoreModifiedFilePredicate = m =>
+                {
+                    if( m.Path.EndsWith( "project.json", StringComparison.Ordinal )
+                        && _relativeProjectFiles.Contains( m.Path, PathComparer.Default )
+                        && new ProjectFileContent( File.ReadAllText( m.FullPath ) )
+                                .EqualsWithoutVersion( new ProjectFileContent( m.CommittedText ) ) )
+                    {
+                        if( hook != null ) hook( m );
+                        return true;
+                    }
+                    return false;
+                };
+            } );
+        }
+
 
         public IEnumerable<string> ExistingSGVVersionInfoFiles
         {

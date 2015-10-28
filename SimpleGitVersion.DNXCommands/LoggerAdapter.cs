@@ -10,6 +10,26 @@ namespace SimpleGitVersion.DNXCommands
     {
         bool _verbose;
 
+        public static readonly ILogger Empty = new EmptyLogger();
+
+        class EmptyLogger : ILogger
+        {
+            public void Error( string msg )
+            {
+            }
+
+            public void Warn( string msg )
+            {
+            }
+
+            public void Info( string msg )
+            {
+            }
+
+            public void Trace( string msg )
+            {
+            }
+        }
         public LoggerAdapter( bool verbose = false )
         {
             _verbose = verbose;
