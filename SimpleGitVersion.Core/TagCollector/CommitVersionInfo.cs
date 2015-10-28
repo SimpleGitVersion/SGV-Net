@@ -77,11 +77,9 @@ namespace SimpleGitVersion
 
         public int PreviousMaxTagDepth { get { return _maxCommitDepth; } }
 
+        public ITagCommit PreviousCommit { get { return _prevCommit != null ? _prevCommit.ThisCommit : null; } }
 
-        public CommitVersionInfo PreviousCommit { get { return _prevCommit; } }
-
-        public CommitVersionInfo PreviousMaxCommit { get { return _prevMaxCommit; } }
-
+        public ITagCommit PreviousMaxCommit { get { return _prevMaxCommit != null && _prevMaxCommit._maxCommit != null ? _prevMaxCommit._maxCommit : null; } }
 
         /// <summary>
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
@@ -95,7 +93,7 @@ namespace SimpleGitVersion
                 {
                     var allVersions = _tagCollector.ExistingVersions.Versions;
 
-                    // Special case: there is no existing versions (other than this that is skippped it it exists) but
+                    // Special case: there is no existing versions (other than this that is skipped if it exists) but
                     // there is a startingVersionForCSemVer, every commit may be the first one. 
                     if( _tagCollector.StartingVersionForCSemVer != null && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
                     {
@@ -136,8 +134,8 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets the valid versions on this commit: this is a subset of the <see cref="PossibleVersions"/>.
-        /// Valid versions guaranty that subsequent versions, if any, is built on this commit.
-        /// This is not currently implemented: for the moment, ValidVersions are simply a snapshot of the possible ones.
+        /// Valid versions guaranty that existing subsequent versions, if any, is built on this commit.
+        /// This is not currently implemented: for the moment, ValidVersions are simply the possible ones.
         /// </summary>
         public IReadOnlyList<ReleaseTagVersion> ValidVersions
         {

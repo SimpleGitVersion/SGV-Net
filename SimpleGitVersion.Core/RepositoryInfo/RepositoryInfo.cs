@@ -178,8 +178,8 @@ namespace SimpleGitVersion
                             ExistingVersions = collector.ExistingVersions.TagCommits;
                             PossibleVersions = info.PossibleVersions.ToArray();
                             ValidVersions = info.ValidVersions;
-                            if( info.PreviousTag != null ) PreviousRelease = info.PreviousCommit.ThisCommit;
-                            if( info.PreviousMaxTag != null ) PreviousMaxRelease = info.PreviousMaxCommit.ThisCommit;
+                            if( info.PreviousTag != null ) PreviousRelease = info.PreviousCommit;
+                            if( info.PreviousMaxTag != null ) PreviousMaxRelease = info.PreviousMaxCommit;
                             if( info.ThisCommit != null )
                             {
                                 if( ValidVersions.Contains( info.ThisCommit.ThisTag ) )
