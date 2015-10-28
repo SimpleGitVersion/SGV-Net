@@ -66,7 +66,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PathComparer.cs" />
     <Compile Include="RepositoryInfo\CIReleaseInfo.cs" />
+    <Compile Include="RepositoryInfo\Options\IWorkingFolderModifiedFile.cs" />
+    <Compile Include="SimpleRepositoryInfo.Extension.cs" />
     <Compile Include="TagCollector\ITagCommit.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="TagCollector\IFullTagCommit.cs" />
@@ -99,7 +102,6 @@
     <None Include="..\SharedKey.snk">
       <Link>Properties\SharedKey.snk</Link>
     </None>
-    <None Include="NuGetAssets\SimpleGitVersion.Core.props" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

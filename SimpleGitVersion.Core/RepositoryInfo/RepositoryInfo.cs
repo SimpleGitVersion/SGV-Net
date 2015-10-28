@@ -19,6 +19,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the solution directory: the one that contains the .git folder.
         /// Null only if <see cref="RepositoryError"/> is 'No Git repository.'.
+        /// It ends with the <see cref="Path.DirectorySeparatorChar"/>.
         /// </summary>
         public readonly string GitSolutionDirectory;
 
@@ -151,7 +152,7 @@ namespace SimpleGitVersion
             if( r == null ) RepositoryError = "No Git repository.";
             else
             {
-                Debug.Assert( gitSolutionDir != null );
+                Debug.Assert( gitSolutionDir != null && gitSolutionDir[gitSolutionDir.Length-1] == Path.DirectorySeparatorChar );
                 GitSolutionDirectory = gitSolutionDir;
                 Commit commit;
                 CIBranchVersionMode ciVersionMode;
@@ -162,8 +163,7 @@ namespace SimpleGitVersion
                 {
                     CommitSha = commit.Sha;
                     CommitDateUtc = commit.Author.When.ToUniversalTime().DateTime;
-                    RepositoryStatus repositoryStatus = r.RetrieveStatus();
-                    IsDirty = ComputeIsDirty( repositoryStatus, options );
+                    IsDirty = ComputeIsDirty( r, commit, options );
                     if( !IsDirty || options.IgnoreDirtyWorkingFolder )
                     {
                         StringBuilder errors = new StringBuilder();
@@ -171,7 +171,7 @@ namespace SimpleGitVersion
                                                                     r,
                                                                     options.StartingVersionForCSemVer,
                                                                     c => c.Sha == CommitSha ? ReleaseTagParsingMode.RaiseErrorOnMalformedTag : ReleaseTagParsingMode.IgnoreMalformedTag,
-                                                                    options.OverridenTags );
+                                                                    options.OverriddenTags );
                         if( errors.Length == 0 )
                         {
                             CommitVersionInfo info = collector.GetVersionInfo( commit );
@@ -210,15 +210,84 @@ namespace SimpleGitVersion
             }
         }
 
-        bool ComputeIsDirty( RepositoryStatus repositoryStatus, RepositoryInfoOptions options )
+        class ModifiedFile : IWorkingFolderModifiedFile
         {
+            readonly Repository _r;
+            readonly Commit _commit;
+            readonly StatusEntry _entry;
+            Blob _committedBlob;
+            string _committedText;
+
+            public ModifiedFile( Repository r, Commit commit, StatusEntry e )
+            {
+                _r = r;
+                _commit = commit;
+                _entry = e;
+            }
+
+            Blob GetBlob()
+            {
+                if( _committedBlob == null )
+                {
+                    TreeEntry e = _commit[_entry.FilePath];
+                    Debug.Assert( e.TargetType == TreeEntryTargetType.Blob );
+                    _committedBlob = (Blob)e.Target;
+                }
+                return _committedBlob;
+            }
+
+            public long CommittedContentSize
+            {
+                get { return GetBlob().Size; }
+            }
+
+            public Stream GetCommittedContent()
+            {
+                return GetBlob().GetContentStream();
+            }
+
+            public string CommittedText
+            {
+                get
+                {
+                    if( _committedText == null )
+                    {
+                        using( var s = GetCommittedContent() )
+                        using( var r = new StreamReader( s ) )
+                        {
+                            _committedText = r.ReadToEnd();
+                        }
+                    }
+                    return _committedText;
+                }
+            }
+            public string Path
+            {
+                get { return _entry.FilePath; }
+            }
+
+            public string FullPath
+            {
+                get { return _r.Info.WorkingDirectory + _entry.FilePath; }
+            }
+
+            public string RepositoryFullPath
+            {
+                get { return _r.Info.WorkingDirectory; }
+            }
+        }
+
+        bool ComputeIsDirty( Repository r, Commit commit, RepositoryInfoOptions options )
+        {
+            RepositoryStatus repositoryStatus = r.RetrieveStatus();
             if( repositoryStatus.Added.Any()
                 || repositoryStatus.Missing.Any()
                 || repositoryStatus.Removed.Any()
                 || repositoryStatus.Staged.Any() ) return true;
-            foreach( var m in repositoryStatus.Modified )
+            foreach( StatusEntry m in repositoryStatus.Modified )
             {
-                if( !options.IgnoreModifiedFiles.Contains( m.FilePath  ) ) return true;
+                if( !options.IgnoreModifiedFiles.Contains( m.FilePath )
+                    && (options.IgnoreModifiedFilePredicate == null || !options.IgnoreModifiedFilePredicate( new ModifiedFile( r, commit, m ) )) ) return true;
             }
             return false;
         }
