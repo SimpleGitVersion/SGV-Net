@@ -13,26 +13,64 @@ namespace SimpleGitVersion.DNXCommands
     /// </summary>
     class ProjectFileContent
     {
+        string _originalText;
         string _text;
         Tuple<string, int, int, bool> _version;
 
-        public ProjectFileContent( string text )
+        public ProjectFileContent( string text, bool normalizeLineEndings = true )
         {
             Debug.Assert( text != null );
-            _text = text;
+            _text = _originalText = text;
+            if( normalizeLineEndings )
+            {
+                if( Environment.NewLine == "\r\n" )
+                {
+                    _text = ToCRLF( text );
+                }
+                else if( Environment.NewLine == "\n" )
+                {
+                    _text = ToLF( text );
+                }
+                else throw new NotSupportedException( "Unsupported Environment.NewLine." );
+            }
         }
 
+        static readonly Regex _rLFOnly = new Regex( @"(?<!\r)\n", RegexOptions.CultureInvariant );
+
+        static string ToCRLF( string text )
+        {
+            return _rLFOnly.Replace( text, "\r\n" );
+        }
+
+        static string ToLF( string text )
+        {
+            return text.Replace( "\r\n", "\n" );
+        }
+
+        /// <summary>
+        /// Gets the original text without any CRLF normalization applied.
+        /// </summary>
+        /// <value>The original text.</value>
         public string OriginalText
+        {
+            get { return _originalText; }
+        }
+
+        /// <summary>
+        /// Gets the normalized text: line ends with <see cref="Environment.NewLine"/>.
+        /// </summary>
+        /// <value>The normalized text.</value>
+        public string Text
         {
             get { return _text; }
         }
 
         /// <summary>
-        /// Gets the original version: null if this is not a valid json, can be the empty string 
+        /// Gets the version: null if this is not a valid json, can be the empty string 
         /// if the version property does not exist or is empty ("version":""). 
         /// </summary>
         /// <value>The original version.</value>
-        public string OriginalVersion
+        public string Version
         {
             get
             {
@@ -43,17 +81,23 @@ namespace SimpleGitVersion.DNXCommands
 
         public string GetReplacedText( string newVersion )
         {
-            if( OriginalVersion == null || _version.Item1 == newVersion ) return _text;
+            if( Version == null || _version.Item1 == newVersion ) return _text;
             return _text.Substring( 0, _version.Item2 )
                     + @"""version"": """ + newVersion + @""""
                     + (_version.Item4 ? "," : "")
                     + _text.Substring( _version.Item3 );
         }
 
+        /// <summary>
+        /// Checks whether the two files are equal regardless of the "version: "" property.
+        /// Line endings must be normalized (or be the same) for this to work correctly.
+        /// </summary>
+        /// <param name="other">The other.</param>
+        /// <returns><c>true</c> if files are the same or differ only by their version, <c>false</c> otherwise.</returns>
         public bool EqualsWithoutVersion( ProjectFileContent other )
         {
             // This ensures that ExtractVersion has been called.
-            if( (OriginalVersion != null) != (other.OriginalVersion != null) ) return false;
+            if( (Version != null) != (other.Version != null) ) return false;
             if( _version.Item2 != other._version.Item2
                 || (_text.Length - _version.Item3) != (other._text.Length - other._version.Item3)
                 || string.Compare( _text, 0, other._text, 0, _version.Item2, StringComparison.Ordinal ) != 0

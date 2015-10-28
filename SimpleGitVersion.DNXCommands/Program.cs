@@ -144,8 +144,8 @@ namespace SimpleGitVersion.DNXCommands
             logger.Trace( text );
             logger.Trace( "=============== /Original ================" );
             ProjectFileContent content = new ProjectFileContent( text );
-            if( content.OriginalVersion == null ) logger.Warn( "Unable to update version in: " + f );
-            else if( content.OriginalVersion == version )
+            if( content.Version == null ) logger.Warn( "Unable to update version in: " + f );
+            else if( content.Version == version )
             {
                 logger.Trace( "(File is up to date.)" );
             }

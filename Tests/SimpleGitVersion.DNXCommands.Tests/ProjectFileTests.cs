@@ -22,7 +22,7 @@ namespace SimpleGitVersion.DNXCommands.Tests
         public void version_extraction_tests( string text, string version )
         {
             ProjectFileContent f = new ProjectFileContent( text );
-            Assert.That( f.OriginalVersion, Is.EqualTo( version ) );
+            Assert.That( f.Version, Is.EqualTo( version ) );
         }
 
         [TestCase( "", null )]
@@ -48,6 +48,16 @@ namespace SimpleGitVersion.DNXCommands.Tests
         [TestCase( @"{""version""     :    ""YYYY""  }c", @"{""version"": ""XXX""  }c" )]
         [TestCase( @"a{{""version"":""v""b}c""version"":  ""ZZZZZZZZ""  ,A}", @"a{{""version"":""v""b}c""version"": ""XXX"",A}" )]
         public void project_equality_without_version( string text1, string text2 )
+        {
+            ProjectFileContent f1 = new ProjectFileContent( text1 );
+            ProjectFileContent f2 = new ProjectFileContent( text2 );
+            Assert.That( f1.EqualsWithoutVersion( f2 ) );
+        }
+
+        [TestCase( "a\n{\nb\n}\nc\n", "a\r\n{\"version\": \"XXX\",\r\nb\r\n}\r\nc\r\n" )]
+        [TestCase( "{\n\"version\":\n\"KKKKKKKKKK\",\n}", "{\r\n\"version\":\r\n\"XXXX\",\r\n}" )]
+        [TestCase( "{\n\"version\":\"KKKKKKKKKK\"}\n", "{\r\n\"version\":\"XXXX\"}\r\n" )]
+        public void project_equality_CRLF_normalization( string text1, string text2 )
         {
             ProjectFileContent f1 = new ProjectFileContent( text1 );
             ProjectFileContent f2 = new ProjectFileContent( text2 );

@@ -74,34 +74,39 @@ namespace SimpleGitVersion.DNXCommands
         public int RestoreProjectFilesThatDifferOnlyByVersion()
         {
             int count = 0;
-            GetRepositoryInfo( LoggerAdapter.Empty, m =>
+            GetRepositoryInfo( LoggerAdapter.Empty, (m,content) =>
             {
                 _logger.Trace( string.Format( "Restoring file '{0}'.", m.Path ) );
-                File.WriteAllText( m.FullPath, m.CommittedText );
+                // Use content.Text that has normalized line endings instead of m.CommittedText
+                // that comes directly from the git.
+                File.WriteAllText( m.FullPath, content.Text );
                 ++count;
             } );
             return count;
         }
 
-        private SimpleRepositoryInfo GetRepositoryInfo( ILogger logger, Action<IWorkingFolderModifiedFile> hook )
+        private SimpleRepositoryInfo GetRepositoryInfo( ILogger logger, Action<IWorkingFolderModifiedFile,ProjectFileContent> hook )
         {
             return SimpleRepositoryInfo.LoadFromPath( logger, _solutionDir, ( log, hasRepoXml, options ) =>
             {
                 options.IgnoreModifiedFilePredicate = m =>
                 {
                     if( m.Path.EndsWith( "project.json", StringComparison.Ordinal )
-                        && _relativeProjectFiles.Contains( m.Path, PathComparer.Default )
-                        && new ProjectFileContent( File.ReadAllText( m.FullPath ) )
-                                .EqualsWithoutVersion( new ProjectFileContent( m.CommittedText ) ) )
+                        && _relativeProjectFiles.Contains( m.Path, PathComparer.Default ) )
                     {
-                        if( hook != null ) hook( m );
-                        return true;
+                        var local = new ProjectFileContent( File.ReadAllText( m.FullPath ) );
+                        var committed = new ProjectFileContent( m.CommittedText );
+                        if( local.EqualsWithoutVersion( committed ) )
+                        {
+                            if( hook != null ) hook( m, committed );
+                            return true;
+                        }
                     }
                     return false;
                 };
-            } );
+            }
+          );
         }
-
 
         public IEnumerable<string> ExistingSGVVersionInfoFiles
         {
