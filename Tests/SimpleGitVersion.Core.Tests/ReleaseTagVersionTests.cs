@@ -59,7 +59,7 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "0.0.0" )]
         [TestCase( "3.0.1" )]
         [TestCase( "3.0.1" )]
-        [TestCase( "99999.99999.9999" )]
+        [TestCase( "99999.49999.9999" )]
         public void parsing_valid_release( string tag )
         {
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
@@ -73,28 +73,23 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "", -1 )]
         [TestCase( "alpha", 0 )]
         [TestCase( "beta", 1 )]
-        [TestCase( "chi", 2 )]
-        [TestCase( "delta", 3 )]
-        [TestCase( "epsilon", 4 )]
-        [TestCase( "gamma", 5 )]
-        [TestCase( "iota", 6 )]
-        [TestCase( "kappa", 7 )]
-        [TestCase( "lambda", 8 )]
-        [TestCase( "mu", 9 )]
-        [TestCase( "omicron", 10 )]
-        [TestCase( "A", 11 )]
-        [TestCase( "Alpha", 11 )]
-        [TestCase( "c", 11 )]
-        [TestCase( "mmmmm", 11 )]
-        [TestCase( "Rc", 11 )]
-        [TestCase( "rc", 12 )]
+        [TestCase( "delta", 2 )]
+        [TestCase( "epsilon", 3 )]
+        [TestCase( "gamma", 4 )]
+        [TestCase( "kappa", 5 )]
+        [TestCase( "A", 6 )]
+        [TestCase( "Alpha", 6 )]
+        [TestCase( "c", 6 )]
+        [TestCase( "mmmmm", 6 )]
+        [TestCase( "Rc", 6 )]
+        [TestCase( "rc", 7 )]
         public void handling_pre_release_name_index( string n, int idx )
         {
             Assert.That( ReleaseTagVersion.GetPreReleaseNameIdx( n ), Is.EqualTo( idx ), n );
         }
 
         [TestCase( "3.0.1-ready.0.1" )]
-        [TestCase( "99999.99999.9999-nonstandard.99.99" )]
+        [TestCase( "99999.49999.9999-nonstandard.99.99" )]
         public void to_string_pre_release_with_nonstandard_names_works_for_SemVer_but_throws_for_NuGetV2( string tag )
         {
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
@@ -165,31 +160,29 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "0.0.0-alpha.0.2", false, 2 )]
         [TestCase( "0.0.0-alpha.99.99", false, 100 * 99 + 100 - 1 )]
         [TestCase( "0.0.0-beta", false, 100 * 99 + 100 )]
-        [TestCase( "0.0.0-chi", false, 2 * (100 * 99 + 100) )]
-        [TestCase( "0.0.0-delta", false, 3 * (100 * 99 + 100) )]
-        [TestCase( "0.0.0-rc", false, 12 * (100 * 99 + 100) )]
-        [TestCase( "0.0.0-rc.99.99", false, 12 * (100 * 99 + 100) + 100 * 99 + 99 )]
-        [TestCase( "0.0.0", false, 13 * 100 * 100 )]
+        [TestCase( "0.0.0-delta", false, 2 * (100 * 99 + 100) )]
+        [TestCase( "0.0.0-rc", false, 7 * (100 * 99 + 100) )]
+        [TestCase( "0.0.0-rc.99.99", false, 7 * (100 * 99 + 100) + 100 * 99 + 99 )]
+        [TestCase( "0.0.0", false, 8 * 100 * 100 )]
 
-        [TestCase( "0.0.1-alpha", false, (13 * 100 * 100) + 1 )]
-        [TestCase( "0.0.1-alpha.0.1", false, ((13 * 100 * 100) + 1) + 1 )]
-        [TestCase( "0.0.1-alpha.0.2", false, ((13 * 100 * 100) + 1) + 2 )]
-        [TestCase( "0.0.1-alpha.99.99", false, ((13 * 100 * 100) + 1) + 100 * 99 + 100 - 1 )]
-        [TestCase( "0.0.1-beta", false, ((13 * 100 * 100) + 1) + 100 * 99 + 100 )]
-        [TestCase( "0.0.1-chi", false, ((13 * 100 * 100) + 1) + 2 * (100 * 99 + 100) )]
-        [TestCase( "0.0.1-delta", false, ((13 * 100 * 100) + 1) + 3 * (100 * 99 + 100) )]
-        [TestCase( "0.0.1-epsilon", false, ((13 * 100 * 100) + 1) + 4 * (100 * 99 + 100) )]
-        [TestCase( "0.0.1-rc", false, ((13 * 100 * 100) + 1) + 12 * (100 * 99 + 100) )]
-        [TestCase( "0.0.1-rc.99.99", false, ((13 * 100 * 100) + 1) + 12 * (100 * 99 + 100) + 100 * 99 + 99 )]
-        [TestCase( "0.0.1", false, ((13 * 100 * 100) + 1) + 13 * 100 * 100 )]
+        [TestCase( "0.0.1-alpha", false, (8 * 100 * 100) + 1 )]
+        [TestCase( "0.0.1-alpha.0.1", false, ((8 * 100 * 100) + 1) + 1 )]
+        [TestCase( "0.0.1-alpha.0.2", false, ((8 * 100 * 100) + 1) + 2 )]
+        [TestCase( "0.0.1-alpha.99.99", false, ((8 * 100 * 100) + 1) + 100 * 99 + 100 - 1 )]
+        [TestCase( "0.0.1-beta", false, ((8 * 100 * 100) + 1) + 100 * 99 + 100 )]
+        [TestCase( "0.0.1-delta", false, ((8 * 100 * 100) + 1) + 2 * (100 * 99 + 100) )]
+        [TestCase( "0.0.1-epsilon", false, ((8 * 100 * 100) + 1) + 3 * (100 * 99 + 100) )]
+        [TestCase( "0.0.1-rc", false, ((8 * 100 * 100) + 1) + 7 * (100 * 99 + 100) )]
+        [TestCase( "0.0.1-rc.99.99", false, ((8 * 100 * 100) + 1) + 7 * (100 * 99 + 100) + 100 * 99 + 99 )]
+        [TestCase( "0.0.1", false, ((8 * 100 * 100) + 1) + 8 * 100 * 100 )]
 
-        [TestCase( "99999.99999.9998", true, (13 * 100 * 100) + 1 )]
-        [TestCase( "99999.99999.9999-prerelease", true, 2 * (100 * 99 + 100) )]
-        [TestCase( "99999.99999.9999-prerelease.99.99", true, 100 * 99 + 100 + 1 )]
-        [TestCase( "99999.99999.9999-rc", true, 100 * 99 + 100 )]
-        [TestCase( "99999.99999.9999-rc.99.98", true, 2 )]
-        [TestCase( "99999.99999.9999-rc.99.99", true, 1 )]
-        [TestCase( "99999.99999.9999", true, 0 )]
+        [TestCase( "99999.49999.9998", true, (8 * 100 * 100) + 1 )]
+        [TestCase( "99999.49999.9999-prerelease", true, 2 * (100 * 99 + 100) )]
+        [TestCase( "99999.49999.9999-prerelease.99.99", true, 100 * 99 + 100 + 1 )]
+        [TestCase( "99999.49999.9999-rc", true, 100 * 99 + 100 )]
+        [TestCase( "99999.49999.9999-rc.99.98", true, 2 )]
+        [TestCase( "99999.49999.9999-rc.99.99", true, 1 )]
+        [TestCase( "99999.49999.9999", true, 0 )]
         public void checking_extreme_version_ordering( string tag, bool atEnd, int expectedRank )
         {
             var t = ReleaseTagVersion.TryParse( tag );
@@ -241,12 +234,12 @@ namespace SimpleGitVersion.Core.Tests
                     "1.0.0-alpha.2.1",
                     "1.0.0-alpha.3",
                     "1.0.0",
-                    "99999.99999.0",
-                    "99999.99999.9999-alpha.99",
-                    "99999.99999.9999-alpha.99.99",
-                    "99999.99999.9999-rc",
-                    "99999.99999.9999-rc.0.1",
-                    "99999.99999.9999"
+                    "99999.49999.0",
+                    "99999.49999.9999-alpha.99",
+                    "99999.49999.9999-alpha.99.99",
+                    "99999.49999.9999-rc",
+                    "99999.49999.9999-rc.0.1",
+                    "99999.49999.9999"
                 };
             var releasedTags = orderedTags
                                         .Select( ( tag, idx ) => new { Tag = tag, Index = idx, ReleasedTag = ReleaseTagVersion.TryParse( tag ) } )
@@ -265,8 +258,8 @@ namespace SimpleGitVersion.Core.Tests
 
         // A Major.0.0 can be reached from any major version below.
         // One can jump to any prerelease of it.
-        [TestCase( "4.0.0, 4.0.0-alpha, 4.0.0-rc", true, "3.0.0, 3.5.44, 3.0.0-alpha, 3.99999.9999-rc.87, 3.0.3-rc.99.99, 3.0.3-alpha.54.99, 3.999.999" )]
-        [TestCase( "4.1.0, 4.1.0-alpha, 4.1.0-rc", false, "3.0.0, 3.5.44, 3.0.0-alpha, 3.99999.9999-rc.87, 3.0.3-rc.99.99, 3.0.3-alpha.54.99, 3.999.999" )]
+        [TestCase( "4.0.0, 4.0.0-alpha, 4.0.0-rc", true, "3.0.0, 3.5.44, 3.0.0-alpha, 3.49999.9999-rc.87, 3.0.3-rc.99.99, 3.0.3-alpha.54.99, 3.999.999" )]
+        [TestCase( "4.1.0, 4.1.0-alpha, 4.1.0-rc", false, "3.0.0, 3.5.44, 3.0.0-alpha, 3.49999.9999-rc.87, 3.0.3-rc.99.99, 3.0.3-alpha.54.99, 3.999.999" )]
 
         // Same for a minor bump of 1.
         [TestCase( "4.3.0, 4.3.0-alpha, 4.3.0-rc", true, "4.2.0, 4.2.0-alpha, 4.2.44, 4.2.3-rc.87, 4.2.3-rc.99.99, 4.2.3-rc.5.8, 4.2.3-alpha, 4.2.3-alpha.54.99, 4.2.9999" )]
@@ -299,7 +292,7 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "v0.0.0-alpha.0.1", "v0.0.0-alpha.0.2" )]
         [TestCase( "v0.0.0-rc.99", "v0.0.0-rc.99.1" )]
         [TestCase( "v0.0.0-rc.1.99", "" )]
-        [TestCase( "v0.0.0", "v0.0.1-alpha, v0.0.1-beta, v0.0.1-chi, v0.0.1-delta, v0.0.1-epsilon, v0.0.1-gamma, v0.0.1-iota, v0.0.1-kappa,  v0.0.1-lambda, v0.0.1-mu, v0.0.1-omicron, v0.0.1-prerelease, v0.0.1-rc, v0.0.1" )]
+        [TestCase( "v0.0.0", "v0.0.1-alpha, v0.0.1-beta, v0.0.1-delta, v0.0.1-epsilon, v0.0.1-gamma, v0.0.1-kappa, v0.0.1-prerelease, v0.0.1-rc, v0.0.1" )]
         public void checking_next_fixes_and_predecessors( string start, string nextVersions )
         {
             var next = nextVersions.Split( ',' )
@@ -327,7 +320,7 @@ namespace SimpleGitVersion.Core.Tests
             Random r = seed >= 0 ? new Random( seed ) : new Random();
             while( --count > 0 )
             {
-                Decimal start = Decimal.Ceiling( r.NextDecimal() * (ReleaseTagVersion.VeryLastVersion.OrderedVersion + 1) + 1 );
+                long start = (long)decimal.Ceiling( r.NextDecimal() * (ReleaseTagVersion.VeryLastVersion.OrderedVersion + 1) + 1 );
                 ReleaseTagVersion rStart = CheckMapping( start );
                 Assert.That( rStart, Is.Not.Null );
                 ReleaseTagVersion rCurrent;
@@ -349,7 +342,7 @@ namespace SimpleGitVersion.Core.Tests
 
         //static int _greatersuccessorCount = 0;
 
-        ReleaseTagVersion CheckMapping( decimal v )
+        ReleaseTagVersion CheckMapping( long v )
         {
             if( v < 0 || v > ReleaseTagVersion.VeryLastVersion.OrderedVersion )
             {
@@ -398,11 +391,11 @@ namespace SimpleGitVersion.Core.Tests
         public void check_first_possible_versions()
         {
             string firstPossibleVersions = @"
-                        v0.0.0-alpha, v0.0.0-beta, v0.0.0-chi, v0.0.0-delta, v0.0.0-epsilon, v0.0.0-gamma, v0.0.0-iota, v0.0.0-kappa, v0.0.0-lambda, v0.0.0-mu, v0.0.0-omicron, v0.0.0-prerelease, v0.0.0-rc, 
+                        v0.0.0-alpha, v0.0.0-beta, v0.0.0-delta, v0.0.0-epsilon, v0.0.0-gamma, v0.0.0-kappa, v0.0.0-prerelease, v0.0.0-rc, 
                         v0.0.0, 
-                        v0.1.0-alpha, v0.1.0-beta, v0.1.0-chi, v0.1.0-delta, v0.1.0-epsilon, v0.1.0-gamma, v0.1.0-iota, v0.1.0-kappa, v0.1.0-lambda, v0.1.0-mu, v0.1.0-omicron, v0.1.0-prerelease, v0.1.0-rc, 
+                        v0.1.0-alpha, v0.1.0-beta, v0.1.0-delta, v0.1.0-epsilon, v0.1.0-gamma, v0.1.0-kappa, v0.1.0-prerelease, v0.1.0-rc, 
                         v0.1.0, 
-                        v1.0.0-alpha, v1.0.0-beta, v1.0.0-chi, v1.0.0-delta, v1.0.0-epsilon, v1.0.0-gamma, v1.0.0-iota, v1.0.0-kappa, v1.0.0-lambda, v1.0.0-mu, v1.0.0-omicron, v1.0.0-prerelease, v1.0.0-rc, 
+                        v1.0.0-alpha, v1.0.0-beta, v1.0.0-delta, v1.0.0-epsilon, v1.0.0-gamma, v1.0.0-kappa, v1.0.0-prerelease, v1.0.0-rc, 
                         v1.0.0";
             var next = firstPossibleVersions.Split( ',' )
                                     .Select( v => v.Trim() )

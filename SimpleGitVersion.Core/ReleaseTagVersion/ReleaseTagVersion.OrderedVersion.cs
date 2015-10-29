@@ -16,7 +16,7 @@ namespace SimpleGitVersion
         struct SOrderedVersion
         {
             [FieldOffset( 0 )]
-            public UInt64 Number;
+            public long Number;
             [FieldOffset( 6 )]
             public UInt16 Major;
             [FieldOffset( 4 )]
@@ -36,15 +36,15 @@ namespace SimpleGitVersion
         /// <summary>
         /// The maximum number of minor versions for a major one.
         /// </summary>
-        public const int MaxMinor = 99999;
+        public const int MaxMinor = 49999;
         /// <summary>
         /// The maximum number of patches for a minor one.
         /// </summary>
         public const int MaxPatch = 9999;
         /// <summary>
-        /// The index of the "prerelease" entry in <see cref="StandardPreReleaseNames"/>.
+        /// The maximum number of prereleaseis also the index of the "rc" entry in <see cref="StandardPreReleaseNames"/>.
         /// </summary>
-        public const int MaxPreReleaseNameIdx = 12;
+        public const int MaxPreReleaseNameIdx = 7;
         /// <summary>
         /// The maximum number of pre-releases.
         /// </summary>
@@ -53,17 +53,17 @@ namespace SimpleGitVersion
         /// The maximum number of fixes to a pre-release.
         /// </summary>
         public const int MaxPreReleaseFix = 99;
-        static readonly string[] _standardNames = new[]{ "alpha", "beta", "chi", "delta", "epsilon", "gamma", "iota", "kappa", "lambda", "mu", "omicron", "prerelease", "rc" };
+        static readonly string[] _standardNames = new[]{ "alpha", "beta", "delta", "epsilon", "gamma", "kappa", "prerelease", "rc" };
 
-        const UInt64 MulNum = MaxPreReleaseFix + 1;
-        const UInt64 MulName = MulNum * (MaxPreReleaseNumber + 1);
-        const UInt64 MulPatch = MulName * (MaxPreReleaseNameIdx + 1) + 1;
-        const UInt64 MulMinor = MulPatch * (MaxPatch + 1);
-        const UInt64 MulMajor = MulMinor * (MaxMinor + 1);
+        const long MulNum = MaxPreReleaseFix + 1;
+        const long MulName = MulNum * (MaxPreReleaseNumber + 1);
+        const long MulPatch = MulName * (MaxPreReleaseNameIdx + 1) + 1;
+        const long MulMinor = MulPatch * (MaxPatch + 1);
+        const long MulMajor = MulMinor * (MaxMinor + 1);
 
-        const UInt64 DivPatch = MulPatch + 1;
-        const UInt64 DivMinor = DivPatch * (MaxPatch);
-        const UInt64 DivMajor = DivMinor * (MaxMinor + 1);
+        const long DivPatch = MulPatch + 1;
+        const long DivMinor = DivPatch * (MaxPatch);
+        const long DivMajor = DivMinor * (MaxMinor + 1);
 
         /// <summary>
         /// Gets the standard <see cref="PreReleaseName"/>.
@@ -73,7 +73,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the very first possible version (0.0.0-alpha).
         /// </summary>
-        public static readonly ReleaseTagVersion VeryFirstVersion = new ReleaseTagVersion( 1L );
+        public static readonly ReleaseTagVersion VeryFirstVersion = new ReleaseTagVersion( 1L, true );
 
         /// <summary>
         /// Gets the very first possible release versions (0.0.0, 0.1.0 or 1.0.0 or any prereleases of them).
@@ -82,14 +82,14 @@ namespace SimpleGitVersion
 
         static IReadOnlyList<ReleaseTagVersion> BuildFirstPossibleVersions()
         {
-            var versions = new ReleaseTagVersion[3 * 14];
-            UInt64 v = 1L;
+            var versions = new ReleaseTagVersion[3 * 9];
+            long v = 1L;
             int i = 0;
-            while( i < 3 * 14 )
+            while( i < 3 * 9 )
             {
-                versions[i++] = new ReleaseTagVersion( v );
-                if( (i % 28) == 0 ) v += MulMajor - MulMinor - MulPatch + 1;
-                else if( (i % 14) == 0 ) v += MulMinor - MulPatch + 1;
+                versions[i++] = new ReleaseTagVersion( v, true );
+                if( (i % 18) == 0 ) v += MulMajor - MulMinor - MulPatch + 1;
+                else if( (i % 9) == 0 ) v += MulMinor - MulPatch + 1;
                 else v += MulName;
             }
             return versions;
@@ -98,24 +98,24 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the very last possible version.
         /// </summary>
-        public static readonly ReleaseTagVersion VeryLastVersion = new ReleaseTagVersion( string.Format( "{0}.{1}.{2}", MaxMajor, MaxMinor, MaxPatch ), MaxMajor, MaxMinor, MaxPatch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
+        public static readonly ReleaseTagVersion VeryLastVersion = new ReleaseTagVersion( string.Format( "{0}.{1}.{2}", MaxMajor, MaxMinor, MaxPatch ), MaxMajor, MaxMinor, MaxPatch, string.Empty, -1, 0, 0, ReleaseTagKind.OfficialRelease );
 
         /// <summary>
         /// Initializes a new tag from an ordered version that must be between 0 (invalid tag) and <see cref="VeryLastVersion"/>.<see cref="OrderedVersion"/>.
         /// </summary>
         /// <param name="v">The ordered version.</param>
-        public ReleaseTagVersion( Decimal v )
-            : this( ValidateCtorArgument( v ) )
+        public ReleaseTagVersion( long v )
+            : this( ValidateCtorArgument( v ), true )
         {
         }
 
-        static UInt64 ValidateCtorArgument( Decimal v )
+        static long ValidateCtorArgument( long v )
         {
             if( v < 0 || v > VeryLastVersion.OrderedVersion ) throw new ArgumentException( "Must be between 0 and VeryLastVersion.OrderedVersion." ); 
-            return (UInt64)v;
+            return v;
         }
 
-        ReleaseTagVersion( UInt64 v )
+        ReleaseTagVersion( long v, bool privateCall )
         {
             Debug.Assert( v >= 0 && (VeryLastVersion == null || v <= VeryLastVersion._orderedVersion.Number) );
             if( v == 0 )
@@ -128,15 +128,15 @@ namespace SimpleGitVersion
             {
                 _orderedVersion.Number = v;
 
-                UInt64 preReleasePart = v % MulPatch;
+                long preReleasePart = v % MulPatch;
                 if( preReleasePart != 0 )
                 {
                     preReleasePart = preReleasePart - 1L;
                     PreReleaseNameIdx = (int)(preReleasePart / MulName);
                     PreReleaseNameFromTag = _standardNames[PreReleaseNameIdx];
-                    preReleasePart -= (UInt64)PreReleaseNameIdx * MulName;
+                    preReleasePart -= (long)PreReleaseNameIdx * MulName;
                     PreReleaseNumber = (int)(preReleasePart / MulNum);
-                    preReleasePart -= (UInt64)PreReleaseNumber * MulNum;
+                    preReleasePart -= (long)PreReleaseNumber * MulNum;
                     PreReleaseFix = (int)preReleasePart;
                     Kind = ReleaseTagKind.PreRelease;
                 }
@@ -145,35 +145,35 @@ namespace SimpleGitVersion
                     v -= MulPatch;
                     PreReleaseNameIdx = -1;
                     PreReleaseNameFromTag = string.Empty;
-                    Kind = ReleaseTagKind.Release;
+                    Kind = ReleaseTagKind.OfficialRelease;
                 }
                 Major = (int)(v / MulMajor);
-                v -= (UInt64)Major * MulMajor;
+                v -= Major * MulMajor;
                 Minor = (int)(v / MulMinor);
-                v -= (UInt64)Minor * MulMinor;
+                v -= Minor * MulMinor;
                 Patch = (int)(v / MulPatch);
             }
         }
 
-        static UInt64 ComputeOrderedVersion( int major, int minor, int patch, int preReleaseNameIdx = -1, int preReleaseNumber = 0, int preReleaseFix = 0 )
+        static long ComputeOrderedVersion( int major, int minor, int patch, int preReleaseNameIdx = -1, int preReleaseNumber = 0, int preReleaseFix = 0 )
         {
-            UInt64 v = MulMajor * (UInt64)major;
-            v += MulMinor * (UInt64)minor;
-            v += MulPatch * (UInt64)(patch + 1);
+            long v = MulMajor * major;
+            v += MulMinor * minor;
+            v += MulPatch * (patch + 1);
             if( preReleaseNameIdx >= 0 )
             {
                 v -= MulPatch - 1;
-                v += MulName * (UInt64)preReleaseNameIdx;
-                v += MulNum * (UInt64)preReleaseNumber;
-                v += (UInt64)preReleaseFix;
+                v += MulName * preReleaseNameIdx;
+                v += MulNum * preReleaseNumber;
+                v += preReleaseFix;
             }
-            Debug.Assert( new ReleaseTagVersion( v )._orderedVersion.Number == v );
+            Debug.Assert( new ReleaseTagVersion( v, true )._orderedVersion.Number == v );
             Debug.Assert( preReleaseNameIdx >= 0 == ((v % MulPatch) != 0) );
             Debug.Assert( major == (int)((preReleaseNameIdx >= 0 ? v : v - MulPatch) / MulMajor) );
-            Debug.Assert( minor == (int)(((preReleaseNameIdx >= 0 ? v : v - MulPatch) / MulMinor) - (UInt64)major * (MaxMinor + 1L)) );
-            Debug.Assert( patch == (int)(((preReleaseNameIdx >= 0 ? v : v - MulPatch) / MulPatch) - ((UInt64)major * (MaxMinor + 1L) + (UInt64)minor) * (MaxPatch + 1L)) );
+            Debug.Assert( minor == (int)(((preReleaseNameIdx >= 0 ? v : v - MulPatch) / MulMinor) - major * (MaxMinor + 1L)) );
+            Debug.Assert( patch == (int)(((preReleaseNameIdx >= 0 ? v : v - MulPatch) / MulPatch) - (major * (MaxMinor + 1L) + minor) * (MaxPatch + 1L)) );
             Debug.Assert( preReleaseNameIdx == (preReleaseNameIdx >= 0 ? (int)(((v - 1L) % MulPatch) / MulName) : -1) );
-            Debug.Assert( preReleaseNumber == (preReleaseNameIdx >= 0 ? (int)(((v - 1L) % MulPatch) / MulNum - (UInt64)preReleaseNameIdx * MulNum) : 0) );
+            Debug.Assert( preReleaseNumber == (preReleaseNameIdx >= 0 ? (int)(((v - 1L) % MulPatch) / MulNum - preReleaseNameIdx * MulNum) : 0) );
             Debug.Assert( preReleaseFix == (preReleaseNameIdx >= 0 ? (int)(((v - 1L) % MulPatch) % MulNum) : 0) );
             return v;
         }
@@ -188,9 +188,9 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// Gets the projected ordered version.
+        /// Gets the ordered version number.
         /// </summary>
-        public Decimal OrderedVersion { get { return _orderedVersion.Number; } }
+        public long OrderedVersion { get { return _orderedVersion.Number; } }
         
         /// <summary>
         /// Gets the Major (first, most significant) part of the <see cref="OrderedVersion"/>: between 0 and 65535.

@@ -23,7 +23,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// This release tag is 'Major.Minor.Patch' only.
         /// </summary>
-        Release = 2,
+        OfficialRelease = 2,
         /// <summary>
         /// This release tag is 'Major.Minor.Patch-prerelease[.Number[.Fix]]'.
         /// </summary>

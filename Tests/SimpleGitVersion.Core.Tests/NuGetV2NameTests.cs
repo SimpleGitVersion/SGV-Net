@@ -19,7 +19,7 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "0.0.0-alpha.2" )]
         [TestCase( "0.0.0-alpha.0.1" )]
         [TestCase( "1.0.0-rc" )]
-        [TestCase( "99999.99999.9999" )]
+        [TestCase( "99999.49999.9999" )]
         public void display_name_and_successors_samples( string v )
         {
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
@@ -40,7 +40,7 @@ namespace SimpleGitVersion.Core.Tests
 
         [Explicit]
         [TestCase( "0.0.0-alpha, 0.0.0-alpha.1, 0.0.0-alpha.2, 1.0.0-prerelease, 0.0.0-prerelease.99.99, 5.0.0", 10 )]
-        [TestCase( "99999.99999.9999-rc.99.99, 99999.99999.9999", 10 )]
+        [TestCase( "99999.49999.9999-rc.99.99, 99999.49999.9999", 10 )]
         public void display_name_for_CI_build_and_check_20_characters_limit( string versions, int range )
         {
             var buildInfo = new CIBuildDescriptor() { BranchName = "develop", BuildIndex = 21 };
@@ -76,17 +76,12 @@ namespace SimpleGitVersion.Core.Tests
 
         [TestCase( "0.0.0-alpha", "0.0.0-a" )]
         [TestCase( "3.0.1-beta.12", "3.0.1-b12" )]
-        [TestCase( "3.0.1-chi.25", "3.0.1-c25" )]
         [TestCase( "3.0.1-delta.1", "3.0.1-d01" )]
         [TestCase( "3.0.1-epsilon.18", "3.0.1-e18" )]
         [TestCase( "3.0.1-gamma.19", "3.0.1-g19" )]
-        [TestCase( "3.0.1-iota.20", "3.0.1-i20" )]
         [TestCase( "3.0.1-kappa.21", "3.0.1-k21" )]
-        [TestCase( "3.0.1-lambda.22", "3.0.1-l22" )]
-        [TestCase( "3.0.1-mu.23", "3.0.1-m23" )]
-        [TestCase( "3.0.1-omicron.24", "3.0.1-o24" )]
         [TestCase( "3.0.1-prerelease.24", "3.0.1-p24" )]
-        [TestCase( "99999.99999.9999-rc.99", "99999.99999.9999-r99" )]
+        [TestCase( "99999.49999.9999-rc.99", "99999.49999.9999-r99" )]
         public void pre_release_with_standard_names_nugetV2_mappings( string tag, string nuget )
         {
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
@@ -101,17 +96,12 @@ namespace SimpleGitVersion.Core.Tests
 
         [TestCase( "0.0.0-alpha.0.1", "0.0.0-a00-01" )]
         [TestCase( "3.0.1-beta.12.8", "3.0.1-b12-08" )]
-        [TestCase( "3.0.1-chi.0.1", "3.0.1-c00-01" )]
         [TestCase( "3.0.1-delta.1.99", "3.0.1-d01-99" )]
         [TestCase( "3.0.1-epsilon.18.2", "3.0.1-e18-02" )]
         [TestCase( "3.0.1-gamma.19.4", "3.0.1-g19-04" )]
-        [TestCase( "3.0.1-iota.1.1", "3.0.1-i01-01" )]
         [TestCase( "3.0.1-kappa.1.5", "3.0.1-k01-05" )]
-        [TestCase( "3.0.1-lambda.10.10", "3.0.1-l10-10" )]
-        [TestCase( "3.0.1-mu.23.23", "3.0.1-m23-23" )]
-        [TestCase( "3.0.1-omicron.0.1", "3.0.1-o00-01" )]
         [TestCase( "3.0.1-prerelease.0.1", "3.0.1-p00-01" )]
-        [TestCase( "99999.99999.9999-rc.99.99", "99999.99999.9999-r99-99" )]
+        [TestCase( "99999.49999.9999-rc.99.99", "99999.49999.9999-r99-99" )]
         public void pre_release_with_standard_names_and_fix_number_nugetV2_mappings( string tag, string nuget )
         {
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
