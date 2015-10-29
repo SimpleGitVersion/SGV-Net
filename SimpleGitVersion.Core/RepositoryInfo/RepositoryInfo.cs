@@ -106,6 +106,7 @@ namespace SimpleGitVersion
         /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either 
         /// because it is the current branch or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it), the <see cref="RepositoryInfoOptions.StartingCommitSha"/> 
         /// is null or empty and there is no <see cref="ValidReleaseTag"/> on the commit.
+        /// </summary>
         public readonly CIReleaseInfo CIRelease;
 
         /// <summary>

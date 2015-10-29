@@ -232,6 +232,12 @@ namespace SimpleGitVersion
             return _orderedVersion.Number.CompareTo( other._orderedVersion.Number );
         }
 
+        /// <summary>
+        /// Implements == operator.
+        /// </summary>
+        /// <param name="x">First tag.</param>
+        /// <param name="y">Second tag.</param>
+        /// <returns>True if they are equal.</returns>
         static public bool operator ==( ReleaseTagVersion x, ReleaseTagVersion y )
         {
             if( ReferenceEquals( x, y ) ) return true;
@@ -242,11 +248,23 @@ namespace SimpleGitVersion
             return false;
         }
 
+        /// <summary>
+        /// Implements != operator.
+        /// </summary>
+        /// <param name="x">First tag.</param>
+        /// <param name="y">Second tag.</param>
+        /// <returns>True if they are not equal.</returns>
         static public bool operator !=( ReleaseTagVersion x, ReleaseTagVersion y )
         {
             return !(x == y);
         }
 
+        /// <summary>
+        /// Implements &gt; operator.
+        /// </summary>
+        /// <param name="x">First tag.</param>
+        /// <param name="y">Second tag.</param>
+        /// <returns>True if x is greater than y.</returns>
         static public bool operator >( ReleaseTagVersion x, ReleaseTagVersion y )
         {
             if( ReferenceEquals( x, y ) ) return false;
@@ -257,6 +275,12 @@ namespace SimpleGitVersion
             return x != null;
         }
 
+        /// <summary>
+        /// Implements &lt; operator.
+        /// </summary>
+        /// <param name="x">First tag.</param>
+        /// <param name="y">Second tag.</param>
+        /// <returns>True if x is lower than y.</returns>
         static public bool operator <( ReleaseTagVersion x, ReleaseTagVersion y )
         {
             if( ReferenceEquals( x, y ) ) return false;
@@ -267,11 +291,23 @@ namespace SimpleGitVersion
             return y != null;
         }
 
+        /// <summary>
+        /// Implements &lt;= operator.
+        /// </summary>
+        /// <param name="x">First tag.</param>
+        /// <param name="y">Second tag.</param>
+        /// <returns>True if x is lower than or equal to y.</returns>
         static public bool operator <=( ReleaseTagVersion x, ReleaseTagVersion y )
         {
             return !(x > y);
         }
 
+        /// <summary>
+        /// Implements &gt;= operator.
+        /// </summary>
+        /// <param name="x">First tag.</param>
+        /// <param name="y">Second tag.</param>
+        /// <returns>True if x is greater than or equal to y.</returns>
         static public bool operator >=( ReleaseTagVersion x, ReleaseTagVersion y )
         {
             return !(x < y);
@@ -281,8 +317,8 @@ namespace SimpleGitVersion
         /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
         /// No other members are used for equality and comparison.
         /// </summary>
-        /// <param name="other">Other release tag.</param>
-        /// <returns>True if they have the same OrderedVersion.</returns>
+        /// <param name="obj">Other release tag.</param>
+        /// <returns>True if obj is a tag that has the same OrderedVersion as this.</returns>
         public override bool Equals( object obj )
         {
             if( obj == null ) return false;

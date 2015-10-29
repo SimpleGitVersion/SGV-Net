@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
-    public class RepositoryVersions
+    class RepositoryVersions
     {
         readonly IReadOnlyList<TagCommit> _versions;
 

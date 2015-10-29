@@ -13,17 +13,17 @@ namespace SimpleGitVersion
     /// </summary>
     public class CIReleaseInfo
     {
-        internal CIReleaseInfo( ReleaseTagVersion ciBaseTag, int cIBaseDepth, string ciBuildVersion, string ciBuildVersionNuGet )
+        internal CIReleaseInfo( ReleaseTagVersion ciBaseTag, int ciBaseDepth, string ciBuildVersion, string ciBuildVersionNuGet )
         {
             BaseTag = ciBaseTag;
-            Depth = cIBaseDepth;
+            Depth = ciBaseDepth;
             BuildVersion = ciBuildVersion;
             BuildVersionNuGet = ciBuildVersionNuGet;
         }
 
         /// <summary>
         /// The base <see cref="ReleaseTagVersion"/> from which <see cref="BuildVersion"/> is built.
-        /// It is either <see cref="PreviousRelease"/> or <see cref="ReleaseTagVersion.VeryFirstVersion"/>.
+        /// It is either the the previous release or the <see cref="ReleaseTagVersion.VeryFirstVersion"/>.
         /// Null if and only if CIBuildVersion is null.
         /// </summary>
         public readonly ReleaseTagVersion BaseTag;
