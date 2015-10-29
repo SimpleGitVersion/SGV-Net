@@ -29,6 +29,7 @@
     <file src="SimpleGitVersion.Core\bin\{{configuration}}\NativeBinaries\amd64\*.dll" target="NativeBinaries\amd64" />
     <file src="SimpleGitVersion.Core\bin\{{configuration}}\NativeBinaries\x86\*.dll" target="NativeBinaries\x86" />
 
+    <file src="SimpleGitVersion.Core\NuGetAssets\SimpleGitVersion.Core.props" target="Build" />
     <file src="SimpleGitVersionTask\NuGetAssets\RepositoryInfo.xsd" target="RepositoryInfo.xsd" />
   </files>
 
