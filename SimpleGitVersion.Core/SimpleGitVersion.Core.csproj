@@ -102,6 +102,7 @@
     <None Include="..\SharedKey.snk">
       <Link>Properties\SharedKey.snk</Link>
     </None>
+    <None Include="NuGetAssets\SimpleGitVersion.Core.props" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
