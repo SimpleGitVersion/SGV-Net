@@ -197,7 +197,7 @@ namespace SimpleGitVersion
                                 yield return new ReleaseTagVersion( null, Major, Minor, Patch, _standardNames[nextPrereleaseNameIdx], nextPrereleaseNameIdx, 0, 0, ReleaseTagKind.PreRelease );
                             }
                         }
-                        yield return new ReleaseTagVersion( null, Major, Minor, Patch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                        yield return new ReleaseTagVersion( null, Major, Minor, Patch, string.Empty, -1, 0, 0, ReleaseTagKind.OfficialRelease );
                     }
                 }
                 else
@@ -210,7 +210,7 @@ namespace SimpleGitVersion
                         {
                             yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
                         }
-                        yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                        yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, string.Empty, -1, 0, 0, ReleaseTagKind.OfficialRelease );
                     }
                 }
                 if( !fixesOnly )
@@ -226,7 +226,7 @@ namespace SimpleGitVersion
                                 yield return new ReleaseTagVersion( null, Major, nextMinor, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
                             }
                         }
-                        yield return new ReleaseTagVersion( null, Major, nextMinor, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                        yield return new ReleaseTagVersion( null, Major, nextMinor, 0, string.Empty, -1, 0, 0, ReleaseTagKind.OfficialRelease );
                     }
                     int nextMajor = Major + 1;
                     if( nextMajor <= MaxMajor )
@@ -239,7 +239,7 @@ namespace SimpleGitVersion
                                 yield return new ReleaseTagVersion( null, nextMajor, 0, 0, _standardNames[i], i, 0, 0, ReleaseTagKind.PreRelease );
                             }
                         }
-                        yield return new ReleaseTagVersion( null, nextMajor, 0, 0, string.Empty, -1, 0, 0, ReleaseTagKind.Release );
+                        yield return new ReleaseTagVersion( null, nextMajor, 0, 0, string.Empty, -1, 0, 0, ReleaseTagKind.OfficialRelease );
                     }
                 }
             }
@@ -253,7 +253,7 @@ namespace SimpleGitVersion
         public bool IsDirectPredecessor( ReleaseTagVersion previous )
         {
             if( !IsValid ) return false;
-            UInt64 num = _orderedVersion.Number;
+            long num = _orderedVersion.Number;
             if( previous == null ) return FirstPossibleVersions.Contains( this );
             if( previous._orderedVersion.Number >= num ) return false;
             if( previous._orderedVersion.Number == num - 1L ) return true;

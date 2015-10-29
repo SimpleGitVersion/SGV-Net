@@ -17,7 +17,7 @@
       <Output TaskParameter="MajorMinorPatch" PropertyName="SGVMajorMinorPatch" />
       <Output TaskParameter="SemVer" PropertyName="SGVSemVer" />
       <Output TaskParameter="NuGetVersion" PropertyName="SGVNuGetVersion" />
-      <Output TaskParameter="DottedOrderedVersion" PropertyName="SGVFileVersion" />
+      <Output TaskParameter="FileVersion" PropertyName="SGVFileVersion" />
       <Output TaskParameter="CommitSha" PropertyName="SGVCommitSha" />
       <Output TaskParameter="CurrentUserName" PropertyName="SGVCurrentUserName" />
     </SimpleGitVersion.GetGitRepositoryInfoTask>

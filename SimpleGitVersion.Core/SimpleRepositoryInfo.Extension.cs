@@ -70,7 +70,7 @@ class SimpleGitVersionInfoAttribute : Attribute
             {
                 assemblyInformationalVersionInfo = FomatStandardAssemblyInformationalVersionInfo( NuGetVersion, CommitSha, CurrentUserName );
             }
-            string text = FormatAssemblyVersionAttributesFile( MajorMinor, DottedOrderedVersion, SemVer, toolName, assemblyInformationalVersionInfo );
+            string text = FormatAssemblyVersionAttributesFile( MajorMinor, FileVersion, SemVer, toolName, assemblyInformationalVersionInfo );
             return text;
         }
 
@@ -89,22 +89,22 @@ class SimpleGitVersionInfoAttribute : Attribute
         /// <summary>
         /// Formats the assembly version attributes file.
         /// </summary>
-        /// <param name="majorMinor">The major minor: this is used for the AssemblVersion.</param>
-        /// <param name="dottedOrderedVersion">The dotted ordered version, used for the File version.</param>
+        /// <param name="majorMinor">The major.minor: this is used for the AssemblVersion.</param>
+        /// <param name="fileVersion">The file version (4 numbers between 0 and 65535.</param>
         /// <param name="semVer">The semantic version version.</param>
         /// <param name="toolName">Name of the tool.</param>
         /// <param name="assemblyInformationalVersionInfo">The assembly informational version information.</param>
         /// <returns>System.String.</returns>
         public static string FormatAssemblyVersionAttributesFile( 
             string majorMinor, 
-            string dottedOrderedVersion, 
+            string fileVersion, 
             string semVer, 
             string toolName, 
             string assemblyInformationalVersionInfo )
         {
             return string.Format( _format,
                 majorMinor,
-                dottedOrderedVersion,
+                fileVersion,
                 assemblyInformationalVersionInfo,
                 semVer,
                 DateTime.UtcNow.ToString( "u" ),
