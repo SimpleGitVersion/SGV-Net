@@ -52,7 +52,7 @@ namespace SimpleGitVersion
                     var maxTag = pV.MaxTag;
                     if( prevMaxTag == null )
                     {
-                        if( maxTag != null || prevMaxCommitParent.PreviousMaxTagDepth < pV.PreviousMaxTagDepth )
+                        if( maxTag != null || prevMaxCommitParent.PreviousMaxCommitDepth < pV.PreviousMaxCommitDepth )
                         {
                             prevMaxCommitParent = pV;
                         }
@@ -60,7 +60,7 @@ namespace SimpleGitVersion
                     else 
                     {
                         int cmp = prevMaxTag.CompareTo( maxTag );
-                        if( cmp < 0 || (cmp == 0 && prevMaxCommitParent.PreviousMaxTagDepth < pV.PreviousMaxTagDepth) )
+                        if( cmp < 0 || (cmp == 0 && prevMaxCommitParent.PreviousMaxCommitDepth < pV.PreviousMaxCommitDepth) )
                         {
                             prevMaxCommitParent = pV;
                         }

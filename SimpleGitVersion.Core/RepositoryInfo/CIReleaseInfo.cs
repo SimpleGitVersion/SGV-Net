@@ -63,7 +63,7 @@ namespace SimpleGitVersion
             else
             {
                 Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && actualBaseTag != null );
-                CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciVersionName, BuildIndex = info.PreviousMaxTagDepth };
+                CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciVersionName, BuildIndex = info.PreviousMaxCommitDepth };
                 if( !ci.IsValidForNuGetV2 )
                 {
                     errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
@@ -78,7 +78,7 @@ namespace SimpleGitVersion
                 }
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );
-            return ciBuildVersion != null ? new CIReleaseInfo( ciBaseTag, info.PreviousMaxTagDepth, ciBuildVersion, ciBuildVersionNuGet ) : null;
+            return ciBuildVersion != null ? new CIReleaseInfo( ciBaseTag, info.PreviousMaxCommitDepth, ciBuildVersion, ciBuildVersionNuGet ) : null;
         }
 
     }
