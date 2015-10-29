@@ -21,21 +21,33 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
+        /// Gets this version in a <see cref="ReleaseTagFormat.FileVersion"/> format.
+        /// </summary>
+        /// <param name="isCIBuild">True to indicate a CI build: the revision part (last part) is odd.</param>
+        /// <returns>The Major.Minor.Build.Revision number where each part are between 0 and 65535.</returns>
+        public string ToStringFileVersion( bool isCIBuild )
+        {
+            SOrderedVersion v = _orderedVersion;
+            v.Number <<= 1;
+            if( isCIBuild ) v.Revision |= 1;
+            return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}.{3}", v.Major, v.Minor, v.Build, v.Revision );
+        }
+
+        /// <summary>
         /// Gets the string version in the given format.
         /// </summary>
         /// <param name="f">Format to use.</param>
-        /// <param name="buildInfo">Not null to generate a </param>
+        /// <param name="buildInfo">Not null to generate a post-release version.</param>
         /// <param name="usePreReleaseNameFromTag">True to use <see cref="PreReleaseNameFromTag"/> instead of standardized <see cref="PreReleaseName"/>.</param>
         /// <returns>Formated string (or <see cref="ParseErrorMessage"/> if any).</returns>
         public string ToString( ReleaseTagFormat f, CIBuildDescriptor buildInfo = null, bool usePreReleaseNameFromTag = false )
         {
             if( ParseErrorMessage != null ) return ParseErrorMessage;
             if( buildInfo != null && !buildInfo.IsValid ) throw new ArgumentException( "buildInfo must be valid." );
-            if( f == ReleaseTagFormat.DottedOrderedVersion )
+            if( f == ReleaseTagFormat.FileVersion )
             {
-                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}.{3}", OrderedVersionMajor, OrderedVersionMinor, OrderedVersionBuild, OrderedVersionRevision );
+                return ToStringFileVersion( buildInfo != null );
             }
-
 
             string prName = usePreReleaseNameFromTag ? PreReleaseNameFromTag : PreReleaseName;
             switch( f )

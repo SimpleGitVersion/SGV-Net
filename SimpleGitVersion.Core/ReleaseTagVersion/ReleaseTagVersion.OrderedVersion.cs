@@ -193,7 +193,7 @@ namespace SimpleGitVersion
         public long OrderedVersion { get { return _orderedVersion.Number; } }
         
         /// <summary>
-        /// Gets the Major (first, most significant) part of the <see cref="OrderedVersion"/>: between 0 and 65535.
+        /// Gets the Major (first, most significant) part of the <see cref="OrderedVersion"/>: between 0 and 32767.
         /// </summary>
         public int OrderedVersionMajor { get { return _orderedVersion.Major; } }
         /// <summary>

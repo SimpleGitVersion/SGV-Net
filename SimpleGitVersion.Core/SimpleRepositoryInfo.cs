@@ -89,16 +89,17 @@ namespace SimpleGitVersion
         public string MajorMinorPatch { get; private set; }
 
         /// <summary>
-        /// Gets the 'Major.Minor.Revision.Build' windows file version.
+        /// Gets the 'Major.Minor.Build.Revision' windows file version to use.
         /// When <see cref="IsValid"/> is false, it is '0.0.0.0'.
+        /// When it is a release the last part (Revision) is even and it is odd for CI builds. 
         /// </summary>
-        public string DottedOrderedVersion { get; private set; }
+        public string FileVersion { get; private set; }
 
         /// <summary>
         /// Gets the ordered version.
-        /// When <see cref="IsValid"/> is false, it is 0.
+        /// When <see cref="IsValid"/> it is greater than 0.
         /// </summary>
-        public Decimal OrderedVersion { get; private set; }
+        public long OrderedVersion { get; private set; }
 
         /// <summary>
         /// Gets the current user name.
@@ -202,7 +203,7 @@ namespace SimpleGitVersion
                 if( info.CIRelease != null )
                 {
                     IsValidCIBuild = true;
-                    SetNumericalVersionValues( info.CIRelease.BaseTag );
+                    SetNumericalVersionValues( info.CIRelease.BaseTag, true );
                     NuGetVersion = info.CIRelease.BuildVersionNuGet;
                     SemVer = info.CIRelease.BuildVersion;
                     logger.Info( "CI release: '{0}'.", SemVer );
@@ -219,7 +220,7 @@ namespace SimpleGitVersion
                     {
                         IsValidRelease = true;
                         OriginalTagText = t.OriginalTagText;
-                        SetNumericalVersionValues( t );
+                        SetNumericalVersionValues( t, false );
                         NuGetVersion = t.ToString( ReleaseTagFormat.NuGetPackage );
                         SemVer = t.ToString( ReleaseTagFormat.SemVerWithMarker );
                         logger.Info( "Release: '{0}'.", SemVer );
@@ -246,7 +247,7 @@ namespace SimpleGitVersion
             }
         }
 
-        void SetNumericalVersionValues( ReleaseTagVersion t )
+        void SetNumericalVersionValues( ReleaseTagVersion t, bool isCIBuild )
         {
             Major = t.Major;
             Minor = t.Minor;
@@ -254,7 +255,7 @@ namespace SimpleGitVersion
             PreReleaseName = t.PreReleaseName;
             PreReleaseNumber = t.PreReleaseNumber;
             PreReleaseFix = t.PreReleaseFix;
-            DottedOrderedVersion = t.ToString( ReleaseTagFormat.DottedOrderedVersion );
+            FileVersion = t.ToStringFileVersion( isCIBuild );
             OrderedVersion = t.OrderedVersion;
         }
 
@@ -275,7 +276,7 @@ namespace SimpleGitVersion
             if( !InvalidValuesAlreadySet ) SetInvalidValues( reason );
         }
 
-        bool InvalidValuesAlreadySet { get { return DottedOrderedVersion != null; } }
+        bool InvalidValuesAlreadySet { get { return FileVersion != null; } }
 
         void SetInvalidValues( string reason )
         {
@@ -285,7 +286,7 @@ namespace SimpleGitVersion
             PreReleaseName = string.Empty;
             PreReleaseNumber = 0;
             PreReleaseFix = 0;
-            DottedOrderedVersion = "0.0.0.0";
+            FileVersion = "0.0.0.0";
             OrderedVersion = 0;
             NuGetVersion = reason;
             SemVer = reason;

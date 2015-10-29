@@ -47,11 +47,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="SimpleGitVersion.Cake, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SimpleGitVersion.Cake.0.7.3-Cexplore-0015\lib\net45\SimpleGitVersion.Cake.dll</HintPath>
+      <HintPath>..\packages\SimpleGitVersion.Cake.0.7.3-Cexplore-0016\lib\net45\SimpleGitVersion.Cake.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SimpleGitVersion.Core, Version=0.7.0.0, Culture=neutral, PublicKeyToken=731c291b31fb8d27, processorArchitecture=MSIL">
-      <HintPath>..\packages\SimpleGitVersion.Core.0.7.3-Cexplore-0015\lib\net45\SimpleGitVersion.Core.dll</HintPath>
+      <HintPath>..\packages\SimpleGitVersion.Core.0.7.3-Cexplore-0016\lib\net45\SimpleGitVersion.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

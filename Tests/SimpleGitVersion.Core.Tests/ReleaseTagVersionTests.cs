@@ -116,7 +116,12 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( t.OrderedVersionMinor, Is.EqualTo( oMinor ) );
             Assert.That( t.OrderedVersionBuild, Is.EqualTo( oBuild ) );
             Assert.That( t.OrderedVersionRevision, Is.EqualTo( oRevision ) );
-            Assert.That( t.ToString( ReleaseTagFormat.DottedOrderedVersion ), Is.EqualTo( string.Format( "{0}.{1}.{2}.{3}", oMajor, oMinor, oBuild, oRevision ) ) );
+            long vf = t.OrderedVersion << 1;
+            Assert.That( t.ToStringFileVersion( false ),
+                    Is.EqualTo( string.Format( "{0}.{1}.{2}.{3}", vf >> 48, (vf >> 32) & 0xFFFF, (vf >> 16) & 0xFFFF, vf & 0xFFFF ) ) );
+            vf |= 1;
+            Assert.That( t.ToStringFileVersion( true ),
+                    Is.EqualTo( string.Format( "{0}.{1}.{2}.{3}", vf >> 48, (vf >> 32) & 0xFFFF, (vf >> 16) & 0xFFFF, vf & 0xFFFF ) ) );
         }
 
         [TestCase( "0", false )]
