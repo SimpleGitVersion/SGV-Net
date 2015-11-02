@@ -57,6 +57,7 @@ namespace SimpleGitVersion.DNXCommands
                         var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
                         if( ctx.SolutionDir != null )
                         {
+                            ctx.UpdateProjectFiles();
                             string f = ctx.ProjectSGVVersionInfoFile;
                             if( f == null )
                             {
@@ -81,36 +82,25 @@ namespace SimpleGitVersion.DNXCommands
                         var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
                         if( ctx.SolutionDir != null )
                         {
-                            if( ctx.ProjectFiles.Count > 0 )
-                            {
-                                SimpleRepositoryInfo info = ctx.RepositoryInfo;
-                                string version = info.IsValid ? info.SemVer : "0.0.0-Absolutely-Invalid";
-                                ctx.Logger.Info( string.Format( "sgv prepack: updating or injecting \"version\": \"{0}\" in {1} project.json file(s).", version, ctx.ProjectFiles.Count ) );
-                                foreach( var f in ctx.ProjectFiles )
-                                {
-                                    UpdateProjectFile( ctx.Logger, f, version );
-                                }
-                            }
-                            else ctx.Logger.Warn( "sgv prepack: no project.json files found." );
+                            ctx.UpdateProjectFiles();
                         }
                         return 0;
                     } );
                 } );
-                app.Command( "postpack", c =>
+
+                app.Command( "restore", c =>
                 {
-                    c.Description = "Restores project.json files that differ only version property (ignoring the version property itself).";
+                    c.Description = "Restores project.json files that differ only by version property for this solution.";
                     var optionProject = c.Option( "-p|--project <PATH>", "Path to project, default is current directory", CommandOptionType.SingleValue );
                     c.HelpOption( "-?|-h|--help" );
 
                     c.OnExecute( () =>
                     {
                         var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
-                        int count = 0;
-                        if( ctx.SolutionDir != null && ctx.ProjectFiles.Count > 0 )
+                        if( ctx.SolutionDir != null )
                         {
-                            count = ctx.RestoreProjectFilesThatDifferOnlyByVersion();
+                            ctx.RestoreProjectFilesThatDifferOnlyByVersion();
                         }
-                        ctx.Logger.Info( string.Format( "sgv postpack: restored {0} project.json file(s).", count ) );
                         return 0;
                     } );
                 } );
@@ -128,34 +118,6 @@ namespace SimpleGitVersion.DNXCommands
             {
                 Console.WriteLine( "Error: {0}", exception.Message );
                 return 1;
-            }
-        }
-
-        /// <summary>
-        /// Updates the project.json file with the given version.
-        /// </summary>
-        /// <param name="logger">The logger.</param>
-        /// <param name="f">The project file path.</param>
-        /// <param name="version">The version to set.</param>
-        static void UpdateProjectFile( LoggerAdapter logger, string f, string version )
-        {
-            string text = File.ReadAllText( f );
-            logger.Trace( "================ Original ================" );
-            logger.Trace( text );
-            logger.Trace( "=============== /Original ================" );
-            ProjectFileContent content = new ProjectFileContent( text );
-            if( content.Version == null ) logger.Warn( "Unable to update version in: " + f );
-            else if( content.Version == version )
-            {
-                logger.Trace( "(File is up to date.)" );
-            }
-            else
-            {
-                string modified = content.GetReplacedText( version );
-                logger.Trace( "================ Modified ================" );
-                logger.Trace( modified );
-                File.WriteAllText( f, modified );
-                logger.Trace( "=============== /Modified ================" );
             }
         }
 

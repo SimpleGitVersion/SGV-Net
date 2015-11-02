@@ -14,6 +14,7 @@ namespace SimpleGitVersion.DNXCommands
         readonly LoggerAdapter _logger;
         readonly string[] _projectFiles;
         readonly string[] _relativeProjectFiles;
+        readonly string[] _projectNames;
         SimpleRepositoryInfo _info;
 
         public CommandContext( string projectPath, bool verbose )
@@ -29,6 +30,7 @@ namespace SimpleGitVersion.DNXCommands
                                     .Where( p => p.IndexOf( @"\bin\", _solutionDir.Length ) < 0 )
                                     .ToArray();
                 _relativeProjectFiles = _projectFiles.Select( p => p.Substring( _solutionDir.Length ) ).ToArray();
+                _projectNames = _projectFiles.Select( p => Path.GetFileName( Path.GetDirectoryName( p ) ) ).ToArray();
                 _logger.Trace( String.Format( "{0} project(s): {1}", _projectFiles.Length, String.Join( ", ", _relativeProjectFiles ) ) );
             }
         }
@@ -82,7 +84,47 @@ namespace SimpleGitVersion.DNXCommands
                 File.WriteAllText( m.FullPath, content.Text );
                 ++count;
             } );
+            _logger.Info( string.Format( "Restored {0} project.json file(s).", count ) );
             return count;
+        }
+
+        /// <summary>
+        /// Updates the project.json files with the given version (or the computed version from <see cref="RepositoryInfo"/>).
+        /// </summary>
+        /// <param name="version">The version to set.</param>
+        public void UpdateProjectFiles( string version = null )
+        {
+            if( _projectFiles.Length > 0 )
+            {
+                if( version == null )
+                {
+                    SimpleRepositoryInfo info = RepositoryInfo;
+                    version = info.IsValid ? info.SemVer : "0.0.0-Absolutely-Invalid";
+                }
+                _logger.Info( string.Format( "Updating or injecting \"version\": \"{0}\" in {1} project.json file(s).", version, _projectFiles.Length ) );
+                foreach( var f in _projectFiles )
+                {
+                    string text = File.ReadAllText( f );
+                    _logger.Trace( "================ Original ================" );
+                    _logger.Trace( text );
+                    _logger.Trace( "=============== /Original ================" );
+                    ProjectFileContent content = new ProjectFileContent( text, _projectNames.Contains );
+                    if( content.Version == null ) _logger.Warn( "Unable to update version in: " + f );
+                    else if( content.Version == version )
+                    {
+                        _logger.Trace( "(File is up to date.)" );
+                    }
+                    else
+                    {
+                        string modified = content.GetReplacedText( version );
+                        _logger.Trace( "================ Modified ================" );
+                        _logger.Trace( modified );
+                        File.WriteAllText( f, modified );
+                        _logger.Trace( "=============== /Modified ================" );
+                    }
+                }
+            }
+            else _logger.Warn( "No project.json files found." );
         }
 
         private SimpleRepositoryInfo GetRepositoryInfo( ILogger logger, Action<IWorkingFolderModifiedFile,ProjectFileContent> hook )
@@ -94,8 +136,8 @@ namespace SimpleGitVersion.DNXCommands
                     if( m.Path.EndsWith( "project.json", StringComparison.Ordinal )
                         && _relativeProjectFiles.Contains( m.Path, PathComparer.Default ) )
                     {
-                        var local = new ProjectFileContent( File.ReadAllText( m.FullPath ) );
-                        var committed = new ProjectFileContent( m.CommittedText );
+                        var local = new ProjectFileContent( File.ReadAllText( m.FullPath ), _projectNames.Contains );
+                        var committed = new ProjectFileContent( m.CommittedText, _projectNames.Contains );
                         if( local.EqualsWithoutVersion( committed ) )
                         {
                             if( hook != null ) hook( m, committed );
@@ -112,6 +154,7 @@ namespace SimpleGitVersion.DNXCommands
         {
             get { return Directory.EnumerateFiles( _solutionDir, "SGVVersionInfo.cs" ); }
         }
+
         public string ProjectSGVVersionInfoFile
         {
             get

@@ -31,15 +31,11 @@ namespace SimpleGitVersion.Core.Tests
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
             var succ = t.GetDirectSuccessors( false );
 
-            Console.WriteLine( " -> - found {0} successors for '{1}' (Ordered Version = {2}, File = {3}.{4}.{5}.{6}):",
+            Console.WriteLine( " -> - found {0} successors for '{1}' (Ordered Version = {2}, File = {3}):",
                                 succ.Count(),
                                 t,
                                 t.OrderedVersion,
-                                t.OrderedVersionMajor,
-                                t.OrderedVersionMinor,
-                                t.OrderedVersionBuild,
-                                t.OrderedVersionRevision
-                                );
+                                t.ToStringFileVersion( false ) );
             Console.WriteLine( "      " + string.Join( ", ", succ.Select( s => s.ToString() ) ) );
 
             var closest = t.GetDirectSuccessors( true ).Select( s => s.ToString() ).ToList();
