@@ -125,10 +125,13 @@ namespace SimpleGitVersion.DNXCommands.Tests
 " )]
         public void replace_version_dependencies( string text )
         {
-            ProjectFileContent f = new ProjectFileContent( text, 
+            ProjectFileContent f = new ProjectFileContent( 
+                text, 
                 name => name == "In.The.Same.Solution" 
                         || name == "Another.In.The.Same.Solution"
-                        || name == "CK.Core" );
+                        || name == "CK.Core",
+                // AppVeyor build machines have Environment.NewLine == "\n"!!  
+                normalizeLineEndings: false );
             string r = f.GetReplacedText( "!TheVersion!" );
             Assert.That( r, Is.EqualTo( text.Replace( "VVVVVVVV", "!TheVersion!" ) ) );
         }
