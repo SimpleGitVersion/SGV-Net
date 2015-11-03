@@ -45,8 +45,8 @@ During a build, logs are displayed (MSBuild outputs):
 
 #DNX: SimpleGitVersion.DNXComands:
 ## Installation
-To install the command: 
-`dnu commands install --source "C:\Dev\LocalFeed" SimpleGitVersion.DNXCommands` 
+To install the command (latest CI-build): 
+`dnu commands install -s="https://www.myget.org/F/invenietis-explore/api/v2" SimpleGitVersion.DNXCommands` 
 
 This installs the command here: %USERPROFILE%\.dnx\bin\packages\SimpleGitVersion.DNXCommands
 

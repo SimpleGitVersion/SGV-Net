@@ -19,7 +19,8 @@ namespace SimpleGitVersion
         /// </summary>
         /// <param name="path">Path of the directory that contains the project.json file.</param>
         /// <param name="logger">Logger to use. Must not be null.</param>
-        public DNXSolution( string path, ILogger logger )
+        /// <param name="projectFilter">Optional project filter.</param>
+        public DNXSolution( string path, ILogger logger, Func<DNXProjectFile, bool> projectFilter = null )
         {
             if( path == null ) throw new ArgumentNullException( nameof( path ) );
             if( logger == null ) throw new ArgumentNullException( nameof( logger ) );
@@ -33,6 +34,7 @@ namespace SimpleGitVersion
                 _projects = Directory.EnumerateFiles( _solutionDir, "project.json", SearchOption.AllDirectories )
                                     .Where( p => p.IndexOf( @"\bin\", _solutionDir.Length ) < 0 )
                                     .Select( p => new DNXProjectFile( this, p ) )
+                                    .Where( p => projectFilter == null || projectFilter( p ) )
                                     .ToArray();
                 var dup = _projects.GroupBy( p => p.ProjectName, StringComparer.OrdinalIgnoreCase )
                                     .Where( g => g.Count() > 1 );
