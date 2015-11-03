@@ -6,18 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleGitVersion.DNXCommands
+namespace SimpleGitVersion
 {
-    class VersionOccurrence
-    {
-        public string Version;
-        public int Start;
-        public int Length;
-        public bool ExpectComma;
-        public int End { get { return Start + Length; } }
-        public bool NakedVersionNumber { get { return Length == Version.Length + 2; } }
-    }
-
     class JSONVersionFinder : JSONVisitor
     {
         int _propLevel;
@@ -39,13 +29,7 @@ namespace SimpleGitVersion.DNXCommands
             {
                 if( _thisVersion == null && _objectStart >= 0 )
                 {
-                    _thisVersion = new VersionOccurrence()
-                    {
-                        Version = String.Empty,
-                        Start = _objectStart,
-                        Length = 0,
-                        ExpectComma = _hasTopLevelProperties
-                    };
+                    _thisVersion = new VersionOccurrence( String.Empty, _objectStart, 0, _hasTopLevelProperties );
                     if( _versions != null ) _versions.Insert( 0, _thisVersion );
                 }
             }
@@ -96,13 +80,8 @@ namespace SimpleGitVersion.DNXCommands
                     int start = Matcher.StartIndex;
                     string version;
                     if( !Matcher.TryMatchJSONQuotedString( out version ) ) return Matcher.SetError( "Version string expected." );
-                    VersionOccurrence v = new VersionOccurrence()
-                    {
-                        Start = start,
-                        Version = version,
-                        Length = Matcher.StartIndex - start
-                    };
-                    Debug.Assert( v.Length == version.Length + 2 );
+                    VersionOccurrence v = new VersionOccurrence( version, start, Matcher.StartIndex - start, false );
+                    Debug.Assert( v.NakedVersionNumber );
                     CollectVersion( v );
                 }
                 return true;
@@ -123,7 +102,7 @@ namespace SimpleGitVersion.DNXCommands
 
         void CollectVersion( VersionOccurrence v )
         {
-            Debug.Assert( v != null );
+            Debug.Assert( _versions != null && v != null );
             if( _versions.Count > 0 )
             {
                 _diffVersions |= _versions[0].Version != v.Version;
@@ -141,13 +120,7 @@ namespace SimpleGitVersion.DNXCommands
             Matcher.MatchWhiteSpaces( 0 );
             bool comma = Matcher.Head == ',';
             if( comma ) end = Matcher.StartIndex + 1;
-            v = new VersionOccurrence()
-            {
-                Version = version,
-                Start = startPropertyIndex,
-                Length = end - startPropertyIndex,
-                ExpectComma = comma
-            };
+            v = new VersionOccurrence( version, startPropertyIndex, end - startPropertyIndex, comma );
             if( _versions != null ) CollectVersion( v );
             return true;
         }

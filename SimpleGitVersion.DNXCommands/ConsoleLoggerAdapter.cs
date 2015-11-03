@@ -6,31 +6,11 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion.DNXCommands
 {
-    class LoggerAdapter : ILogger
+    class ConsoleLoggerAdapter : ILogger
     {
         bool _verbose;
 
-        public static readonly ILogger Empty = new EmptyLogger();
-
-        class EmptyLogger : ILogger
-        {
-            public void Error( string msg )
-            {
-            }
-
-            public void Warn( string msg )
-            {
-            }
-
-            public void Info( string msg )
-            {
-            }
-
-            public void Trace( string msg )
-            {
-            }
-        }
-        public LoggerAdapter( bool verbose = false )
+        public ConsoleLoggerAdapter( bool verbose = false )
         {
             _verbose = verbose;
         }

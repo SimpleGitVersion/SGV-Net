@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleGitVersion.DNXCommands.Tests
+namespace SimpleGitVersion.DNX.Tests
 {
     [TestFixture]
     public class JSONVisitorTests

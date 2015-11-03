@@ -55,8 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JSONVisitorTests.cs" />
-    <Compile Include="ProjectFileTests.cs" />
+    <Compile Include="FakeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

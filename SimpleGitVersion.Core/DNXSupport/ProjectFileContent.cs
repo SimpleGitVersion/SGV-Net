@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SimpleGitVersion.DNXCommands
+namespace SimpleGitVersion
 {
     /// <summary>
     /// Project.json wrapper. 
@@ -18,6 +18,7 @@ namespace SimpleGitVersion.DNXCommands
         readonly string _text;
         readonly Func<string, bool> _projectNameFinder;
 
+        string _parseError;
         VersionOccurrence _thisVersion;
         IReadOnlyList<VersionOccurrence> _allVersions;
         bool _sameVersions;
@@ -70,6 +71,11 @@ namespace SimpleGitVersion.DNXCommands
         {
             get { return _text; }
         }
+
+        /// <summary>
+        /// Gets the error message whenever the project.json has not been parsed correctly.
+        /// </summary>
+        public string ErrorMessage { get { return _parseError; } }
 
         /// <summary>
         /// Gets the version: null if this is not a valid json, can be the empty string 
@@ -148,6 +154,7 @@ namespace SimpleGitVersion.DNXCommands
             _thisVersion = finder.ThisVersion;
             _allVersions = allVersions;
             _sameVersions = finder.SameVersions;
+            _parseError = m.ErrorMessage;
         }
     }
 }

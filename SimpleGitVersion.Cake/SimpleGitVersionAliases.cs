@@ -11,20 +11,6 @@ namespace SimpleGitVersion
     [CakeAliasCategory( "SimpleGitVersion" )]
     public static class SimpleGitVersionAliases
     {
-        /// <summary>
-        /// Gets a <see cref="RepositoryInfo"/> immutable object computed from the current head of the Git repository.
-        /// Use <see cref="GetSimpleRepositoryInfo"/> to obtain a simpler object.
-        /// </summary>
-        /// <param name="context">The Cake context.</param>
-        /// <param name="options">Optional options.</param>
-        /// <returns>A RepositoryInformation object.</returns>
-        [CakeMethodAlias]
-        public static RepositoryInfo GetRepositoryInfo( this ICakeContext context, RepositoryInfoOptions options = null )
-        {
-            if( context == null ) throw new ArgumentNullException( "context" );
-            return RepositoryInfo.LoadFromPath( context.Environment.WorkingDirectory.FullPath, options );
-        }
-
         class Logger : ILogger
         {
             readonly ICakeContext _ctx;
@@ -38,6 +24,7 @@ namespace SimpleGitVersion
             {
                 _ctx.Log.Error( Verbosity.Quiet, msg );
             }
+
             public void Warn( string msg )
             {
                 _ctx.Log.Warning( Verbosity.Quiet, msg );
@@ -52,6 +39,20 @@ namespace SimpleGitVersion
             {
                 _ctx.Log.Verbose( Verbosity.Quiet, msg );
             }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="RepositoryInfo"/> immutable object computed from the current head of the Git repository.
+        /// Use <see cref="GetSimpleRepositoryInfo"/> to obtain a simpler object.
+        /// </summary>
+        /// <param name="context">The Cake context.</param>
+        /// <param name="options">Optional options.</param>
+        /// <returns>A RepositoryInformation object.</returns>
+        [CakeMethodAlias]
+        public static RepositoryInfo GetRepositoryInfo( this ICakeContext context, RepositoryInfoOptions options = null )
+        {
+            if( context == null ) throw new ArgumentNullException( "context" );
+            return RepositoryInfo.LoadFromPath( context.Environment.WorkingDirectory.FullPath, options );
         }
 
         /// <summary>

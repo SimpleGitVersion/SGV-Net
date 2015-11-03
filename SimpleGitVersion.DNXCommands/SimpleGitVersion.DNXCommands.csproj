@@ -49,20 +49,15 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CommandContext.cs" />
     <Compile Include="CommandLine\AnsiConsole.cs" />
     <Compile Include="CommandLine\CommandArgument.cs" />
     <Compile Include="CommandLine\CommandLineApplication.cs" />
     <Compile Include="CommandLine\CommandOption.cs" />
     <Compile Include="CommandLine\CommandOptionType.cs" />
     <Compile Include="CommandLine\CommandParsingException.cs" />
-    <Compile Include="JSONVersionFinder.cs" />
-    <Compile Include="JSONVisitor.cs" />
-    <Compile Include="LoggerAdapter.cs" />
+    <Compile Include="ConsoleLoggerAdapter.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProjectFileContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringMatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleGitVersion.Core\SimpleGitVersion.Core.csproj">

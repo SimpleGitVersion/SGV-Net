@@ -28,59 +28,57 @@ namespace SimpleGitVersion.DNXCommands
                 app.Command( "info", c =>
                 {
                     c.Description = "Display SimpleGitVersion information from Git repository.";
-                    var optionProject = c.Option( "-p|--project <PATH>", "Path to project, default is current directory", CommandOptionType.SingleValue );
+                    var optionProject = c.Option( "-p|--project <PATH>", "Path to a project, solution or any path under the solution directory, default is current directory", CommandOptionType.SingleValue );
                     c.HelpOption( "-?|-h|--help" );
 
                     c.OnExecute( () =>
                     {
-                        var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
-                        if( ctx.SolutionDir != null )
+                        ConsoleLoggerAdapter logger = new ConsoleLoggerAdapter( true );
+                        string path = optionProject.Value() ?? Directory.GetCurrentDirectory();
+                        SimpleRepositoryInfo info = SimpleRepositoryInfo.LoadFromPath( logger, path, ( log, hasRepoXml, options ) =>
                         {
-                            ctx.Logger.Verbose = true;
-                            SimpleRepositoryInfo info = SimpleRepositoryInfo.LoadFromPath( ctx.Logger, ctx.SolutionDir, ( log, hasRepoXml, options ) =>
-                            {
-                                options.IgnoreDirtyWorkingFolder = true;
-                            } );
-                        }
+                            options.IgnoreDirtyWorkingFolder = true;
+                        } );
                         return 0;
                     } );
                 } );
 
                 app.Command( "prebuild", c =>
                 {
-                    c.Description = "Updates Properties/SGVVersionInfo.cs files from Git (ignoring their own changes).";
+                    c.Description = "Creates or updates Properties/SGVVersionInfo.cs files from Git repository.";
                     var optionProject = c.Option( "-p|--project <PATH>", "Path to project, default is current directory", CommandOptionType.SingleValue );
                     c.HelpOption( "-?|-h|--help" );
 
                     c.OnExecute( () =>
                     {
-                        var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
-                        if( ctx.SolutionDir != null )
+                        ConsoleLoggerAdapter logger = new ConsoleLoggerAdapter( optVerbose.HasValue() );
+                        string path = optionProject.Value() ?? Directory.GetCurrentDirectory();
+                        var ctx = new DNXSolution( path, logger );
+                        if( ctx.IsValid )
                         {
-                            ctx.UpdateProjectFiles();
-                            string f = ctx.ProjectSGVVersionInfoFile;
-                            if( f == null )
+                            var project = ctx.FindFromPath( path );
+                            if( project != null )
                             {
-                                ctx.Logger.Warn( "File SGVVersionInfo.cs not found. Creating it." );
-                                f = ctx.TheoreticalProjectSGVVersionInfoFile;
+                                project.CreateOrUpdateSGVVersionInfoFile();
                             }
-                            string text = ctx.RepositoryInfo.BuildAssemblyVersionAttributesFile( "'sgv prebuild'" );
-                            File.WriteAllText( f, text );
+                            else logger.Warn( "Project not found." );
                         }
                         return 0;
                     } );
                 } );
 
-                app.Command( "prepack", c =>
+                app.Command( "update", c =>
                 {
-                    c.Description = "Updates version property in project.json files from Git (ignoring the version property itself).";
+                    c.Description = "Updates version properties in project.json files based on Git repository.";
                     var optionProject = c.Option( "-p|--project <PATH>", "Path to project, default is current directory", CommandOptionType.SingleValue );
                     c.HelpOption( "-?|-h|--help" );
 
                     c.OnExecute( () =>
                     {
-                        var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
-                        if( ctx.SolutionDir != null )
+                        ConsoleLoggerAdapter logger = new ConsoleLoggerAdapter( optVerbose.HasValue() );
+                        string path = optionProject.Value() ?? Directory.GetCurrentDirectory();
+                        var ctx = new DNXSolution( path, logger );
+                        if( ctx.IsValid )
                         {
                             ctx.UpdateProjectFiles();
                         }
@@ -90,14 +88,16 @@ namespace SimpleGitVersion.DNXCommands
 
                 app.Command( "restore", c =>
                 {
-                    c.Description = "Restores project.json files that differ only by version property for this solution.";
+                    c.Description = "Restores project.json files that differ only by version properties for this solution.";
                     var optionProject = c.Option( "-p|--project <PATH>", "Path to project, default is current directory", CommandOptionType.SingleValue );
                     c.HelpOption( "-?|-h|--help" );
 
                     c.OnExecute( () =>
                     {
-                        var ctx = new CommandContext( optionProject.Value() ?? Directory.GetCurrentDirectory(), optVerbose.HasValue() );
-                        if( ctx.SolutionDir != null )
+                        ConsoleLoggerAdapter logger = new ConsoleLoggerAdapter( optVerbose.HasValue() );
+                        string path = optionProject.Value() ?? Directory.GetCurrentDirectory();
+                        var ctx = new DNXSolution( path, logger );
+                        if( ctx.IsValid )
                         {
                             ctx.RestoreProjectFilesThatDifferOnlyByVersion();
                         }
