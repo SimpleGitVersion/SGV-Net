@@ -153,6 +153,7 @@ namespace SimpleGitVersion
         {
             return SimpleRepositoryInfo.LoadFromPath( logger, _solutionDir, ( log, hasRepoXml, options ) =>
             {
+                options.IgnoreModifiedFileFullProcess = true;
                 options.IgnoreModifiedFilePredicate = m =>
                 {
                     if( m.Path.EndsWith( "project.json", StringComparison.Ordinal )

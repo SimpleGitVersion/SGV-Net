@@ -565,20 +565,55 @@ namespace SimpleGitVersion.Core.Tests
                 info = repoTest.GetRepositoryInfo( options );
                 Assert.That( info.IsDirty, Is.False, "Working folder is dirty but IgnoreModifiedFiles explicitly ignores the 2 files." );
 
+                int nbCall = 0;
                 options.IgnoreModifiedFiles.Clear();
-                options.IgnoreModifiedFilePredicate = m => true;
+                options.IgnoreModifiedFilePredicate = m =>
+                {
+                    // Always returns true: the file is NOT modified.
+                    ++nbCall;
+                    return true;
+                };
                 info = repoTest.GetRepositoryInfo( options );
-                Assert.That( info.IsDirty, Is.False, "Working folder is dirty but ModifiedFileFilter explicitly ignores all files." );
+                Assert.That( info.IsDirty, Is.False, "Working folder is dirty but IgnoreModifiedFilePredicate explicitly ignores all files." );
+                Assert.That( nbCall, Is.EqualTo( 2 ) );
 
+                nbCall = 0;
+                options.IgnoreModifiedFilePredicate = m => 
+                {
+                    // Returns false: the file is actually modified.
+                    // without IgnoreModifiedFileFullProcess, this stops the lookups.
+                    ++nbCall;
+                    return false;
+                };
+                info = repoTest.GetRepositoryInfo( options );
+                Assert.That( info.IsDirty, "Working folder is dirty (IgnoreModifiedFilePredicate returned false)." );
+                Assert.That( nbCall, Is.EqualTo( 1 ), "As soon as the predicate returns false, the lookup stops." );
+
+                nbCall = 0;
+                options.IgnoreModifiedFileFullProcess = true;
+                options.IgnoreModifiedFilePredicate = m =>
+                {
+                    // Returns false: the file is actually modified.
+                    // with IgnoreModifiedFileFullProcess = true, the process continues.
+                    ++nbCall;
+                    return false;
+                };
+                info = repoTest.GetRepositoryInfo( options );
+                Assert.That( info.IsDirty, "Working folder is dirty (IgnoreModifiedFilePredicate returned false)." );
+                Assert.That( nbCall, Is.EqualTo( 2 ), "Thanks to IgnoreModifiedFileFullProcess, all modified files are processed." );
+
+                nbCall = 0;
                 options.IgnoreModifiedFiles.Add( "Dev in Alpha.txt" );
                 options.IgnoreModifiedFilePredicate = m => 
                 {
+                    ++nbCall;
                     Assert.That( m.Path, Is.Not.EqualTo( "Dev in Alpha.txt" ), "This has been filtered by IgnoreModifiedFiles set." );
                     Assert.That( m.CommittedText, Is.EqualTo( "Real Dev in Alpha." ) );
                     return m.Path == "Real Dev in Alpha.txt";
                 };
                 info = repoTest.GetRepositoryInfo( options );
                 Assert.That( info.IsDirty, Is.False, "Working folder is dirty but IgnoreModifiedFiles ignores one file and ModifiedFileFilter ignores the other one." );
+                Assert.That( nbCall, Is.EqualTo( 1 ) );
             }
             finally
             {

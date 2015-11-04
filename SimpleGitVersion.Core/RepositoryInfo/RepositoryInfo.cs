@@ -280,6 +280,7 @@ namespace SimpleGitVersion
 
         bool ComputeIsDirty( Repository r, Commit commit, RepositoryInfoOptions options )
         {
+            bool isDirty = false;
             RepositoryStatus repositoryStatus = r.RetrieveStatus();
             if( repositoryStatus.Added.Any()
                 || repositoryStatus.Missing.Any()
@@ -288,9 +289,13 @@ namespace SimpleGitVersion
             foreach( StatusEntry m in repositoryStatus.Modified )
             {
                 if( !options.IgnoreModifiedFiles.Contains( m.FilePath )
-                    && (options.IgnoreModifiedFilePredicate == null || !options.IgnoreModifiedFilePredicate( new ModifiedFile( r, commit, m ) )) ) return true;
+                    && (options.IgnoreModifiedFilePredicate == null || !options.IgnoreModifiedFilePredicate( new ModifiedFile( r, commit, m ) )) )
+                {
+                    isDirty = true;
+                    if( !options.IgnoreModifiedFileFullProcess ) break;
+                }
             }
-            return false;
+            return isDirty;
         }
 
         string TryFindCommit( RepositoryInfoOptions options, Repository r, out Commit commit, out CIBranchVersionMode ciVersionMode, out string branchNameForCIVersion )

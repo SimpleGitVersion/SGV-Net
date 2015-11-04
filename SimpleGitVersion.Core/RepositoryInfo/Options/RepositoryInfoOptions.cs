@@ -76,6 +76,13 @@ namespace SimpleGitVersion
         public Func<IWorkingFolderModifiedFile, bool> IgnoreModifiedFilePredicate { get; set; }
 
         /// <summary>
+        /// Gets or sets whether all modified files must be processed: when false (the default), as soon as a modified file 
+        /// is not in the <see cref="IgnoreModifiedFiles"/> and <see cref="IgnoreModifiedFilePredicate"/> returned 
+        /// false, the process stops.
+        /// </summary>
+        public bool IgnoreModifiedFileFullProcess { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the remote repository that will be considered when
         /// working with branches. Defaults to "origin" (can never be null or empty).
         /// </summary>
