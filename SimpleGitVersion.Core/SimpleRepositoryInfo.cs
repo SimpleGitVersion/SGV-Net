@@ -200,6 +200,11 @@ namespace SimpleGitVersion
                 {
                     logger.Trace( "Previous max release found '{0}' on commit '{1}'.", info.PreviousMaxRelease.ThisTag, info.PreviousMaxRelease.CommitSha );
                 }
+                if( info.PreviousRelease == null && info.PreviousMaxRelease == null )
+                {
+                    logger.Trace( "No previous release found'." );
+                }
+
                 if( info.CIRelease != null )
                 {
                     IsValidCIBuild = true;
