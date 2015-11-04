@@ -23,6 +23,7 @@
   <files>
     <file src="SimpleGitVersionTask\bin\{{configuration}}\ILMerged\SimpleGitVersionTask.dll" target="SimpleGitVersionTask.dll" />
     <file src="SimpleGitVersionTask\bin\{{configuration}}\ILMerged\SimpleGitVersionTask.pdb" target="SimpleGitVersionTask.pdb" />
+
     <file src="SimpleGitVersion.Core\bin\{{configuration}}\NativeBinaries\amd64\*.dll" target="NativeBinaries\amd64" />
     <file src="SimpleGitVersion.Core\bin\{{configuration}}\NativeBinaries\x86\*.dll" target="NativeBinaries\x86" />
 

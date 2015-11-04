@@ -14,6 +14,9 @@ using System;
 using System.Linq;
 using Cake.Core.Diagnostics;
 using Cake.Common.Tools.NuGet.Push;
+using Cake.Core.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace CodeCake
 {
@@ -99,6 +102,12 @@ namespace CodeCake
                 .Does( () =>
                 {
                     Cake.CreateDirectory( releasesDir );
+                    // Preparing SimpleGitVersion.DNXCommands/app folder.
+                    var dnxAppPath = releasesDir.Path + "/SimpleGitVersion.DNXCommands/app";
+                    Cake.CreateDirectory( dnxAppPath );
+                    Cake.CopyFiles( "SimpleGitVersion.DNXCommands/NuGetAssets/app/*", dnxAppPath );
+                    TransformText( dnxAppPath + "/project.json", configuration, gitInfo );
+                    // 
                     var settings = new NuGetPackSettings()
                     {
                         Version = gitInfo.NuGetVersion,
@@ -108,54 +117,74 @@ namespace CodeCake
                     Cake.CopyFiles( "CodeCakeBuilder/NuSpec/*.nuspec", releasesDir );
                     foreach( var nuspec in Cake.GetFiles( releasesDir.Path + "/*.nuspec" ) )
                     {
-                        Cake.TransformTextFile( nuspec, "{{", "}}" )
-                                .WithToken( "configuration", configuration )
-                                .WithToken( "CSemVer", gitInfo.SemVer )
-                                .Save( nuspec );
+                        TransformText( nuspec, configuration, gitInfo );
                         Cake.NuGetPack( nuspec, settings );
                     }
                     Cake.DeleteFiles( releasesDir.Path + "/*.nuspec" );
+                    Cake.DeleteDirectory( dnxAppPath, true );
                 } );
 
             Task( "Push-NuGet-Packages" )
                 .IsDependentOn( "Create-NuGet-Packages" )
-                .WithCriteria( () => gitInfo.IsValidRelease )
                 .Does( () =>
                 {
+                    IEnumerable<FilePath> nugetPackages = Cake.GetFiles( releasesDir.Path + "/*.nupkg" );
                     if( Cake.IsInteractiveMode() )
                     {
                         var localFeed = Cake.FindDirectoryAbove( "LocalFeed" );
                         if( localFeed != null )
                         {
                             Cake.Information( "LocalFeed directory found: {0}", localFeed );
-                            if( Cake.ReadInteractiveOption( "Do you want to publish to LocalFeed?", 'y', 'n' ) == 'y' )
+                            if( Cake.ReadInteractiveOption( "Do you want to publish to LocalFeed?", 'Y', 'N' ) == 'Y' )
                             {
-                                Cake.CopyFiles( releasesDir.Path + "/*.nupkg", localFeed );
+                                Cake.CopyFiles( nugetPackages, localFeed );
                             }
                         }
                     }
-                    // Resolves nuget.com API key.
-                    var apiKey = Cake.InteractiveEnvironmentVariable( "NUGET_API_KEY" );
-                    if( string.IsNullOrEmpty( apiKey ) )
+                    if( gitInfo.IsValidRelease )
                     {
-                        Cake.Information( "Could not resolve NuGet API key. Push to NuGet is skipped." );
+                        PushNuGetPackages( "NUGET_API_KEY", "https://www.nuget.org/api/v2/package", nugetPackages );
                     }
                     else
                     {
-                        var settings = new NuGetPushSettings
-                        {
-                            Source = "https://www.nuget.org/api/v2/package",
-                            ApiKey = apiKey
-                        };
-
-                        foreach( var nupkg in Cake.GetFiles( releasesDir.Path + "/*.nupkg" ) )
-                        {
-                            Cake.NuGetPush( nupkg, settings );
-                        }
+                        Debug.Assert( gitInfo.IsValidCIBuild );
+                        PushNuGetPackages( "MYGET_EXPLORE_API_KEY", "https://www.myget.org/F/invenietis-explore/api/v2/package", nugetPackages );
                     }
                 } );
 
             Task( "Default" ).IsDependentOn( "Push-NuGet-Packages" );
+        }
+
+        private void TransformText( FilePath textFilePath, string configuration, SimpleRepositoryInfo gitInfo )
+        {
+            Cake.TransformTextFile( textFilePath, "{{", "}}" )
+                    .WithToken( "configuration", configuration )
+                    .WithToken( "NuGetVersion", gitInfo.NuGetVersion )
+                    .WithToken( "CSemVer", gitInfo.SemVer )
+                    .Save( textFilePath );
+        }
+
+        private void PushNuGetPackages( string apiKeyName, string pushUrl, IEnumerable<FilePath> nugetPackages )
+        {
+            // Resolves the API key.
+            var apiKey = Cake.InteractiveEnvironmentVariable( apiKeyName );
+            if( string.IsNullOrEmpty( apiKey ) )
+            {
+                Cake.Information( "Could not resolve {0}. Push to {1} is skipped.", apiKeyName, pushUrl );
+            }
+            else
+            {
+                var settings = new NuGetPushSettings
+                {
+                    Source = pushUrl,
+                    ApiKey = apiKey
+                };
+
+                foreach( var nupkg in nugetPackages )
+                {
+                    Cake.NuGetPush( nupkg, settings );
+                }
+            }
         }
     }
 }

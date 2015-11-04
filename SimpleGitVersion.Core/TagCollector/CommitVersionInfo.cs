@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
+    /// <summary>
+    /// Final object describing a commit. Release information can easily be generated from this.
+    /// </summary>
     public class CommitVersionInfo
     {
         readonly TagCollector _tagCollector;
@@ -61,27 +64,56 @@ namespace SimpleGitVersion
                             : (_prevMaxCommit._contentCommit != null ? _prevMaxCommit._contentCommit.BestCommit : null);
         }
 
+        /// <summary>
+        /// Gets this commit sha.
+        /// </summary>
         public string CommitSha { get { return _commitSha; } }
 
+        /// <summary>
+        /// Gets this release tag. Null if no tag is associated to this commit.
+        /// </summary>
         public ReleaseTagVersion ThisTag { get { return _thisCommit != null ? _thisCommit.ThisTag : null; } }
 
-        public ITagCommit ThisCommit { get { return _thisCommit; } }
+        /// <summary>
+        /// Gets this <see cref="ITagCommit"/>. Null if no tag is associated to this commit.
+        /// </summary>
+         public ITagCommit ThisCommit { get { return _thisCommit; } }
 
-        public ReleaseTagVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }
-
-        public ReleaseTagVersion PreviousTag { get { return _prevCommit != null ? _prevCommit.ThisTag : null; } }
-
+        /// <summary>
+        /// Gets the maximum release tag: it can be this tag, this content tag or a previous tag.
+        /// </summary>
         public ReleaseTagVersion MaxTag { get { return _maxCommit != null ? _maxCommit.ThisTag : null; } }
 
+        /// <summary>
+        /// Gets the maximmum <see cref="ITagCommit"/>. It can be this commit or any previous commit.
+        /// </summary>
+        public ITagCommit MaxCommit { get { return _maxCommit; } }
+
+        /// <summary>
+        /// Gets the best previous release tag set among the parent commits.
+        /// </summary>
+        public ReleaseTagVersion PreviousTag { get { return _prevCommit != null ? _prevCommit.ThisTag : null; } }
+
+        /// <summary>
+        /// Gets the best previous <see cref="ITagCommit"/> set among the parent commits.
+        /// </summary>
+        public ITagCommit PreviousCommit { get { return _prevCommit != null ? _prevCommit.ThisCommit : null; } }
+
+        /// <summary>
+        /// Gets the maximum release tag among parents (either explicit tags or tags on content).
+        /// </summary>
         public ReleaseTagVersion PreviousMaxTag { get { return _prevMaxCommit != null ? _prevMaxCommit.MaxTag : null; } }
 
-        public int PreviousMaxTagDepth { get { return _maxCommitDepth; } }
+        /// <summary>
+        /// Gets the maximum <see cref="ITagCommit"/> among parents (either explicit tags or tags on content).
+        /// </summary>
+        public ITagCommit PreviousMaxCommit { get { return _prevMaxCommit != null ? _prevMaxCommit._maxCommit : null; } }
 
-
-        public CommitVersionInfo PreviousCommit { get { return _prevCommit; } }
-
-        public CommitVersionInfo PreviousMaxCommit { get { return _prevMaxCommit; } }
-
+        /// <summary>
+        /// Gets the number of commits between this commit (longest path) and the <see cref="PreviousMaxCommit"/>, including this one:
+        /// this is the build index to use for post-releases.
+        /// </summary>
+        public int PreviousMaxCommitDepth { get { return _maxCommitDepth; } }
 
         /// <summary>
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
@@ -95,7 +127,7 @@ namespace SimpleGitVersion
                 {
                     var allVersions = _tagCollector.ExistingVersions.Versions;
 
-                    // Special case: there is no existing versions (other than this that is skippped it it exists) but
+                    // Special case: there is no existing versions (other than this that is skipped if it exists) but
                     // there is a startingVersionForCSemVer, every commit may be the first one. 
                     if( _tagCollector.StartingVersionForCSemVer != null && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
                     {
@@ -122,6 +154,18 @@ namespace SimpleGitVersion
             }
         }
 
+        /// <summary>
+        /// Gets the valid versions on this commit: this is a subset of the <see cref="PossibleVersions"/>.
+        /// Valid versions guaranty that existing subsequent versions, if any, is built on this commit.
+        /// This is not currently implemented: for the moment, ValidVersions are simply the possible ones.
+        /// </summary>
+        public IReadOnlyList<ReleaseTagVersion> ValidVersions
+        {
+            get { return PossibleVersions; }
+        }
+
+        ReleaseTagVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }
+
         IReadOnlyList<ReleaseTagVersion> GetBaseTags()
         {
             var tP = PreviousTag;
@@ -135,15 +179,9 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// Gets the valid versions on this commit: this is a subset of the <see cref="PossibleVersions"/>.
-        /// Valid versions guaranty that subsequent versions, if any, is built on this commit.
-        /// This is not currently implemented: for the moment, ValidVersions are simply a snapshot of the possible ones.
+        /// Overridden to describe the content, previous and max previous tags if they exist.
         /// </summary>
-        public IReadOnlyList<ReleaseTagVersion> ValidVersions
-        {
-            get { return PossibleVersions; }
-        }
-
+        /// <returns>Detailed string.</returns>
         public override string ToString()
         {
             StringBuilder b = new StringBuilder();

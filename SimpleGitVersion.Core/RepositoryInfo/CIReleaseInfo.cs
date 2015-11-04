@@ -13,17 +13,17 @@ namespace SimpleGitVersion
     /// </summary>
     public class CIReleaseInfo
     {
-        internal CIReleaseInfo( ReleaseTagVersion ciBaseTag, int cIBaseDepth, string ciBuildVersion, string ciBuildVersionNuGet )
+        internal CIReleaseInfo( ReleaseTagVersion ciBaseTag, int ciBaseDepth, string ciBuildVersion, string ciBuildVersionNuGet )
         {
             BaseTag = ciBaseTag;
-            Depth = cIBaseDepth;
+            Depth = ciBaseDepth;
             BuildVersion = ciBuildVersion;
             BuildVersionNuGet = ciBuildVersionNuGet;
         }
 
         /// <summary>
         /// The base <see cref="ReleaseTagVersion"/> from which <see cref="BuildVersion"/> is built.
-        /// It is either <see cref="PreviousRelease"/> or <see cref="ReleaseTagVersion.VeryFirstVersion"/>.
+        /// It is either the the previous release or the <see cref="ReleaseTagVersion.VeryFirstVersion"/>.
         /// Null if and only if CIBuildVersion is null.
         /// </summary>
         public readonly ReleaseTagVersion BaseTag;
@@ -56,14 +56,21 @@ namespace SimpleGitVersion
             // If there is no base release found, we fall back to ZeroTimedBased mode.
             if( ciVersionMode == CIBranchVersionMode.ZeroTimed || actualBaseTag == null )
             {
-                var name = string.Format( "0.0.0--ci-{0}-{1:u}", ciVersionName, commit.Committer.When );
                 string suffix = actualBaseTag != null ? '+' + actualBaseTag.ToString() : null;
-                ciBuildVersion = ciBuildVersionNuGet = ciVersionName + suffix;
+                var name = string.Format( "0.0.0--ci-{0}.{1:yyyyMMddHHmmss}", ciVersionName, commit.Committer.When );
+                ciBuildVersion = name + suffix;
+
+                TimeSpan delta200 = commit.Committer.When.ToUniversalTime() - new DateTime( 2015, 1, 1, 0, 0, 0, DateTimeKind.Utc );
+                Debug.Assert( Math.Log( 1000 * 366 * 24 * 60 * (long)60, 62 ) < 7, "Using Base62: 1000 years in seconds on 7 chars!" );
+                long second = (long)delta200.TotalSeconds;
+                string b62 = ToBase62( second );
+                string ver = new string( '0', 7 - b62.Length ) + b62;
+                ciBuildVersionNuGet = string.Format( "0.0.0-C{0}-{1}", ciVersionName, ver ) + suffix;
             }
             else
             {
                 Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && actualBaseTag != null );
-                CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciVersionName, BuildIndex = info.PreviousMaxTagDepth };
+                CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciVersionName, BuildIndex = info.PreviousMaxCommitDepth };
                 if( !ci.IsValidForNuGetV2 )
                 {
                     errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
@@ -78,9 +85,25 @@ namespace SimpleGitVersion
                 }
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );
-            return ciBuildVersion != null ? new CIReleaseInfo( ciBaseTag, info.PreviousMaxTagDepth, ciBuildVersion, ciBuildVersionNuGet ) : null;
+            return ciBuildVersion != null ? new CIReleaseInfo( ciBaseTag, info.PreviousMaxCommitDepth, ciBuildVersion, ciBuildVersionNuGet ) : null;
         }
 
+        static string ToBase62( long number )
+        {
+            // Naïve implementation that does the job.
+            var alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            var n = number;
+            long basis = 62;
+            var ret = "";
+            while( n > 0 )
+            {
+                long temp = n % basis;
+                ret = alphabet[(int)temp] + ret;
+                n = (n / basis);
+
+            }
+            return ret;
+        }
     }
 
 }

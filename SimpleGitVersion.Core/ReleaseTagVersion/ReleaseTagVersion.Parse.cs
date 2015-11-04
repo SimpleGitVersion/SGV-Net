@@ -89,7 +89,7 @@ namespace SimpleGitVersion
                 if( sPRNum.Length > 0 ) prNum = Int32.Parse( sPRNum );
                 if( prFix == 0 && prNum == 0 && sPRNum.Length > 0 ) return new ReleaseTagVersion( s, true, string.Format( "Incorrect '.0' Release Number version. 0 can appear only to fix the first pre release (ie. '.0.F' where F is between 1 and {0}).", MaxPreReleaseFix ) );
             }
-            ReleaseTagKind kind = prNameIdx >= 0 ? ReleaseTagKind.PreRelease : ReleaseTagKind.Release;
+            ReleaseTagKind kind = prNameIdx >= 0 ? ReleaseTagKind.PreRelease : ReleaseTagKind.OfficialRelease;
             if( sBuldMetaData.Length > 0 ) kind |= ReleaseTagKind.MarkedInvalid;
             return new ReleaseTagVersion( s, major, minor, patch, sPRName, prNameIdx, prNum, prFix, kind );
         }

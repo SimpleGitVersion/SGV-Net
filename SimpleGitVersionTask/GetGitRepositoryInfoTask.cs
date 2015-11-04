@@ -88,10 +88,10 @@ namespace SimpleGitVersion
         public string MajorMinorPatch { get; set; }
 
         [Output]
-        public string DottedOrderedVersion { get; set; }
+        public string FileVersion { get; set; }
 
         [Output]
-        public Decimal OrderedVersion { get; set; }
+        public long OrderedVersion { get; set; }
 
         [Output]
         public string CurrentUserName { get; set; }
@@ -155,7 +155,7 @@ namespace SimpleGitVersion
                 PreReleaseFix = i.PreReleaseFix;
                 MajorMinor = i.MajorMinor;
                 MajorMinorPatch = i.MajorMinorPatch;
-                DottedOrderedVersion = i.DottedOrderedVersion;
+                FileVersion = i.FileVersion;
                 OrderedVersion = i.OrderedVersion;
                 CurrentUserName = i.CurrentUserName;
                 CommitSha = i.CommitSha;
