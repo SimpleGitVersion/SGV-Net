@@ -99,7 +99,7 @@ namespace SimpleGitVersion.DNXCommands
                         var ctx = new DNXSolution( path, logger );
                         if( ctx.IsValid )
                         {
-                            ctx.RestoreProjectFilesThatDifferOnlyByVersion();
+                            ctx.RestoreProjectFilesFromGitThatDifferOnlyByVersion();
                         }
                         return 0;
                     } );

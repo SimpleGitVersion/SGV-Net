@@ -110,12 +110,14 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Restores the project.json files that differ only by version from committed content.
+        /// This can always be called since it uses the comitted content but restores the 
+        /// local project.json file if and only if it differs only by the version number.
         /// </summary>
         /// <returns>The number of files that have been restored.</returns>
-        public int RestoreProjectFilesThatDifferOnlyByVersion()
+        public int RestoreProjectFilesFromGitThatDifferOnlyByVersion()
         {
             int count = 0;
-            GetRepositoryInfo( EmptyLogger.Empty, (m,content) =>
+            GetRepositoryInfo( EmptyLogger.Empty, ( m, content ) =>
             {
                 _logger.Trace( string.Format( "Restoring file '{0}'.", m.Path ) );
                 // Use content.Text that has normalized line endings instead of m.CommittedText
@@ -128,11 +130,32 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
+        /// Restores the project files (and the project.lock.json files) after a 
+        /// call to <see cref="UpdateProjectFiles(string)"/>.
+        /// </summary>
+        /// <returns>The number of files that have been restored.</returns>
+        public int RestoreProjectFiles()
+        {
+            int count = 0;
+            if( _projects != null && _projects.Length > 0 )
+            {
+                foreach( var f in _projects )
+                {
+                    if( f.RestoreProjectJSONFile() ) ++count;
+                }
+            }
+            _logger.Info( string.Format( "Restored {0} project.json file(s).", count ) );
+            return count;
+        }
+
+        /// <summary>
         /// Updates the project.json files with the given version (or the computed version from <see cref="RepositoryInfo"/>).
         /// </summary>
         /// <param name="version">The version to set.</param>
-        public void UpdateProjectFiles( string version = null )
+        /// <returns>The number of updated files.</returns>
+        public int UpdateProjectFiles( string version = null )
         {
+            int count = 0;
             if( _projects != null && _projects.Length > 0 )
             {
                 if( version == null )
@@ -143,10 +166,11 @@ namespace SimpleGitVersion
                 _logger.Info( string.Format( "Updating or injecting \"version\": \"{0}\" in {1} project.json file(s).", version, _projects.Length ) );
                 foreach( var f in _projects )
                 {
-                    f.UpdateProjectJSONFile( version );
+                    if( f.UpdateProjectJSONFile( version ) ) ++count;
                 }
             }
             else _logger.Warn( "No project.json files found." );
+            return count;
         }
 
         private SimpleRepositoryInfo GetRepositoryInfo( ILogger logger, Action<IWorkingFolderModifiedFile,ProjectFileContent> hook )
