@@ -149,11 +149,23 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// Updates the project.json files with the given version (or the computed version from <see cref="RepositoryInfo"/>).
+        /// Updates the project.json files with the version computed from <see cref="RepositoryInfo"/>).
+        /// </summary>
+        /// <param name="useNuGetV2Version">True to use NuGetV2 version, otherwise SemVer version is used.</param>
+        /// <returns>The number of updated files.</returns>
+        public int UpdateProjectFiles( bool useNuGetV2Version = false )
+        {
+            SimpleRepositoryInfo info = RepositoryInfo;
+            string version = info.IsValid ? (useNuGetV2Version ? info.NuGetVersion : info.SemVer) : "0.0.0-Absolutely-Invalid";
+            return UpdateProjectFiles( version );
+        }
+
+        /// <summary>
+        /// Updates the project.json files with the given version.
         /// </summary>
         /// <param name="version">The version to set.</param>
         /// <returns>The number of updated files.</returns>
-        public int UpdateProjectFiles( string version = null )
+        public int UpdateProjectFiles( string version )
         {
             int count = 0;
             if( _projects != null && _projects.Length > 0 )
