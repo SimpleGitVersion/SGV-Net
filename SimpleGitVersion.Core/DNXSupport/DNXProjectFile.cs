@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
+    /// <summary>
+    /// Simple project.json description.
+    /// </summary>
     public class DNXProjectFile
     {
         readonly DNXSolution _ctx;
@@ -15,6 +18,8 @@ namespace SimpleGitVersion
         readonly string _relativeProjectFile;
         readonly string _projectName;
         readonly string _projectDir;
+        string _projectFileCache;
+        string _projectLockFileCache;
 
         internal DNXProjectFile( DNXSolution ctx, string projectFile )
         {
@@ -104,12 +109,10 @@ namespace SimpleGitVersion
         /// Updates the project.json file with the specified version.
         /// </summary>
         /// <param name="version">The version to inject.</param>
-        public void UpdateProjectJSONFile( string version )
+        /// <returns>True if the file has actually been modified. False if they are the same or the project file can not be updated.</returns>
+        public bool UpdateProjectJSONFile( string version )
         {
             string text = File.ReadAllText( _projectFile );
-            _ctx.Logger.Trace( "================ Original ================" );
-            _ctx.Logger.Trace( text );
-            _ctx.Logger.Trace( "=============== /Original ================" );
             ProjectFileContent content = new ProjectFileContent( text, _ctx.ContainsProject );
             if( content.Version == null ) _ctx.Logger.Warn( "Unable to update version in: " + _projectFile );
             else if( content.Version == version )
@@ -119,12 +122,33 @@ namespace SimpleGitVersion
             else
             {
                 string modified = content.GetReplacedText( version );
-                _ctx.Logger.Trace( "================ Modified ================" );
-                _ctx.Logger.Trace( modified );
+                if( _projectFileCache == null )
+                {
+                    _projectFileCache = text;
+                    string fLock = _projectDir + "project.lock.json";
+                    if( File.Exists( fLock ) ) _projectLockFileCache = File.ReadAllText( fLock );
+                }
                 File.WriteAllText( _projectFile, modified );
-                _ctx.Logger.Trace( "=============== /Modified ================" );
+                return true;
             }
+            return false;
+        }
 
+        /// <summary>
+        /// Restores the project.json and project.lock.json files (and project.lock.json) if <see cref="UpdateProjectJSONFile(string)"/>
+        /// has been called.
+        /// </summary>
+        /// <returns>True if the files have been actually restored. False otherwise.</returns>
+        public bool RestoreProjectJSONFile()
+        {
+            if( _projectFileCache != null )
+            {
+                File.WriteAllText( _projectFile, _projectFileCache );
+                if( _projectLockFileCache != null ) File.WriteAllText( _projectDir + "project.lock.json", _projectLockFileCache );
+                _projectFileCache = _projectLockFileCache = null;
+                return true;
+            }
+            return false;
         }
     }
 }

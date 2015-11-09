@@ -41,9 +41,9 @@ namespace CodeCake
                     if( !gitInfo.IsValid )
                     {
                         if( Cake.IsInteractiveMode() 
-                            && Cake.ReadInteractiveOption( "Repository is not ready to be published. Processd anyway?", 'Y', 'N' ) == 'Y' )
+                            && Cake.ReadInteractiveOption( "Repository is not ready to be published. Proceed anyway?", 'Y', 'N' ) == 'Y' )
                         {
-                            Cake.Warning( "GitInfo is not valid, but you choose to proceed..." );
+                            Cake.Warning( "GitInfo is not valid, but you choose to continue..." );
                         }
                         else throw new Exception( "Repository is not ready to be published." );
                     }

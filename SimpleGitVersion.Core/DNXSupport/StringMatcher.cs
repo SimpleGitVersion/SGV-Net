@@ -122,6 +122,7 @@ namespace CK.Core
 
         /// <summary>
         /// Clears any error and returns true. 
+        /// </summary>
         /// <returns>Always true to use it as the return statement in a match method.</returns>
         public bool SetSuccess()
         {
@@ -154,7 +155,7 @@ namespace CK.Core
         }
 
         /// <summary>
-        /// Moves the head without any check and returns always true:  typically called by 
+        /// Moves the head without any check and returns always true: typically called by 
         /// successful TryMatch methods.
         /// </summary>
         /// <param name="delta">Number of characters.</param>
@@ -264,55 +265,6 @@ namespace CK.Core
             Match m = _rDouble.Match( _text, _startIndex, _length );
             if( !m.Success ) return false;
             return UncheckedMove( m.Length );
-        }
-
-        /// <summary>
-        /// Matches Int32 values that must not start with '0' ('0' is valid but '0d', where d is any digit, is not).
-        /// A signed integer starts with a '-'. '-0' is valid but '-0d' (where d is any digit) is not.
-        /// If the value is to big for an Int32, it fails.
-        /// </summary>
-        /// <param name="i">The result integer. 0 on failure.</param>
-        /// <param name="minValue">Optional minimal value.</param>
-        /// <param name="maxValue">Optional maximal value.</param>
-        /// <returns><c>true</c> when matched, <c>false</c> otherwise.</returns>
-        public bool MatchInt32( out int i, int minValue = Int32.MinValue, int maxValue = Int32.MaxValue )
-        {
-            i = 0;
-            int savedIndex = _startIndex;
-            long value = 0;
-            bool signed;
-            if( IsEnd ) return SetError();
-            if( (signed = TryMatchChar( '-' )) && IsEnd ) return BackwardSetError( savedIndex );
-
-            char c;
-            if( TryMatchChar( '0' ) )
-            {
-                if( !IsEnd && (c = Head) >= '0' && c <= '9' ) return BackwardSetError( savedIndex, "0...9" );
-                return SetSuccess();
-            }
-            unchecked
-            {
-                long iMax = Int32.MaxValue;
-                if( signed ) iMax = iMax + 1;
-                while( !IsEnd && (c = Head) >= '0' && c <= '9' )
-                {
-                    value = value * 10 + (c - '0');
-                    if( value > iMax ) break;
-                    ++_startIndex;
-                    --_length;
-                }
-            }
-            if( _startIndex > savedIndex )
-            {
-                if( signed ) value = -value;
-                if( value < (long)minValue || value > (long)maxValue )
-                {
-                    return BackwardSetError( savedIndex, String.Format( CultureInfo.InvariantCulture, "value between {0} and {1}", minValue, maxValue ) );
-                }
-                i = (int)value;
-                return SetSuccess();
-            }
-            return SetError();
         }
 
         /// <summary>
