@@ -101,7 +101,7 @@ namespace SimpleGitVersion
         public readonly string ParseErrorMessage;
         /// <summary>
         /// The original text.
-        /// Null when this release tag has been built from an ordered version number (new <see cref="ReleaseTagVersion(Decimal)"/>).
+        /// Null when this release tag has been built from an ordered version number (new <see cref="ReleaseTagVersion(long)"/>).
         /// </summary>
         public readonly string OriginalTagText;
 

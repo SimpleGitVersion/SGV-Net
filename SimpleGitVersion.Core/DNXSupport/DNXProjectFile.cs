@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
+    /// <summary>
+    /// Simple project.json description.
+    /// </summary>
     public class DNXProjectFile
     {
         readonly DNXSolution _ctx;

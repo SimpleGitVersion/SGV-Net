@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
+    /// <summary>
+    /// Simple DNX Solution: discovers and handles project.json files below the solution directory.
+    /// </summary>
     public class DNXSolution
     {
         readonly string _solutionDir;
@@ -212,7 +215,6 @@ namespace SimpleGitVersion
         /// <summary>
         /// Finds a named directory above or next to the specified <paramref name="start"/>.
         /// </summary>
-        /// <param name="context">The context.</param>
         /// <param name="start">Starting directory.</param>
         /// <param name="directoryName">Name of the directory.</param>
         /// <returns>Null if not found, otherwise the path of the directory.</returns>

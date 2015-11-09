@@ -12,21 +12,24 @@ namespace SimpleGitVersion
     /// </summary>
     public class EmptyLogger : ILogger
     {
+        /// <summary>
+        /// The empty logger to use.
+        /// </summary>
         public static readonly ILogger Empty = new EmptyLogger();
 
-        public void Error( string msg )
+        void ILogger.Error( string msg )
         {
         }
 
-        public void Warn( string msg )
+        void ILogger.Warn( string msg )
         {
         }
 
-        public void Info( string msg )
+        void ILogger.Info( string msg )
         {
         }
 
-        public void Trace( string msg )
+        void ILogger.Trace( string msg )
         {
         }
     }
