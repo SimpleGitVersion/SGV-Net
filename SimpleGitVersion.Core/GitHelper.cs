@@ -9,6 +9,8 @@ namespace SimpleGitVersion
     {
         public static Repository LoadFromPath( string path )
         {
+            // This trick enables the SimpleGitVersion.Core used by the DNX command
+            // to locate the native LibGit2Sharp libraries.
             using( new DllPath() )
             {
                 path = Path.GetFullPath( path );
