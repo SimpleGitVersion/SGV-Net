@@ -30,5 +30,20 @@ namespace SimpleGitVersion.Core.Tests
             }
         }
 
+        [Test]
+        public void testing_connection_to_this_repository()
+        {
+            using( var thisRepo = GitHelper.LoadFromPath( TestHelper.SolutionFolder ) )
+            {
+                Console.WriteLine( "This repo has {0} commits", thisRepo.Commits.Count() );
+            }
+        }
+
+        [Test]
+        public void testing_SimpleGitRepositoryInfo_on_this_repository()
+        {
+            var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), TestHelper.SolutionFolder );
+            Console.WriteLine( "This repo's SemVer: {0}", info.SemVer );
+        }
     }
 }

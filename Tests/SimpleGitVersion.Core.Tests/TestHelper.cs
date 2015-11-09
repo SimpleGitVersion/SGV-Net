@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LibGit2Sharp;
+using NUnit.Framework;
 
 namespace SimpleGitVersion
 {
@@ -33,12 +34,23 @@ namespace SimpleGitVersion
                     string gitPath = _testGitRepositoryFolder + @"\.git";
                     if( !Directory.Exists( gitPath ) )
                     {
+                        // Let any exceptions be thrown here: if we can't have a copy of the test repository, it 
+                        // is too risky to Assume(false).
                         Directory.CreateDirectory( _testGitRepositoryFolder );
                         gitPath = Repository.Clone( "https://github.com/SimpleGitVersion/TestGitRepository.git", _testGitRepositoryFolder );
                     }
-                    using( var r = new Repository( gitPath ) )
+                    try
                     {
-                        r.Fetch( "origin", new FetchOptions() { TagFetchMode = TagFetchMode.All } );
+                        using( var r = new Repository( gitPath ) )
+                        {
+                            r.Fetch( "origin", new FetchOptions() { TagFetchMode = TagFetchMode.All } );
+                        }
+                    }
+                    catch( LibGit2SharpException ex )
+                    {
+                        // Fetch fails: Assume(false) here will make inconclusive the first test. This acts as a 
+                        // warning that will not prevent all the tests to run whenever internet is not availbale.
+                        Assume.That( ex == null, "Internet access failure." );
                     }
                 }
                 return _testGitRepositoryFolder;
