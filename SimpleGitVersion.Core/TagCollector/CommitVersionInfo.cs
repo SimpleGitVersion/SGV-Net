@@ -140,6 +140,8 @@ namespace SimpleGitVersion
                         List<ReleaseTagVersion> result = new List<ReleaseTagVersion>();
                         foreach( var b in GetBaseTags() )
                         {
+                            // The base tag b can be null here: a null version tag correctly generates 
+                            // the very first possible versions.
                             var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
                             var successors = ReleaseTagVersion.GetDirectSuccessors( nextReleased != null, b );
                             foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer && (nextReleased == null || v < nextReleased.ThisTag) ) )
@@ -166,6 +168,10 @@ namespace SimpleGitVersion
 
         ReleaseTagVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }
 
+        /// <summary>
+        /// Returns either { PreviousTag, PreviousMaxTag }, { PreviousTag }, { PreviousMaxTag } or { null }.
+        /// </summary>
+        /// <returns></returns>
         IReadOnlyList<ReleaseTagVersion> GetBaseTags()
         {
             var tP = PreviousTag;
