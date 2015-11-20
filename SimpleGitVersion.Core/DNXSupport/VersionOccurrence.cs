@@ -13,7 +13,7 @@ namespace SimpleGitVersion
         public readonly int Length;
         public readonly bool ExpectComma;
         public int End { get { return Start + Length; } }
-        public bool NakedVersionNumber { get { return Length == Version.Length + 2; } }
+        public bool IsNakedVersionNumber { get { return Length == Version.Length + 2; } }
 
         public VersionOccurrence( string version, int start, int length, bool expectComma )
         {

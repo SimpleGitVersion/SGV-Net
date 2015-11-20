@@ -20,6 +20,7 @@ namespace SimpleGitVersion
         readonly string _projectDir;
         string _projectFileCache;
         string _projectLockFileCache;
+        IReadOnlyList<string> _frameworks;
 
         internal DNXProjectFile( DNXSolution ctx, string projectFile )
         {
@@ -56,6 +57,22 @@ namespace SimpleGitVersion
         /// </summary>
         /// <value>The project.json file path.</value>
         public string RelativeProjectFilePath { get { return _relativeProjectFile; } }
+
+
+        /// <summary>
+        /// Gets the frameworks.
+        /// </summary>
+        public IReadOnlyList<string> Frameworks
+        {
+            get
+            {
+                if( _frameworks == null )
+                {
+                    _frameworks = JSONFrameworksFinder.GetFrameworks( File.ReadAllText( _projectFile ) );
+                }
+                return _frameworks;
+            }
+        }
 
         /// <summary>
         /// Gets the path to the 'SGVVersionInfo.cs' file in <see cref="ProjectDir"/>.
@@ -113,6 +130,7 @@ namespace SimpleGitVersion
         public bool UpdateProjectJSONFile( string version )
         {
             string text = File.ReadAllText( _projectFile );
+            if( _frameworks == null ) _frameworks = JSONFrameworksFinder.GetFrameworks( text );
             ProjectFileContent content = new ProjectFileContent( text, _ctx.ContainsProject );
             if( content.Version == null ) _ctx.Logger.Warn( "Unable to update version in: " + _projectFile );
             else if( content.Version == version )

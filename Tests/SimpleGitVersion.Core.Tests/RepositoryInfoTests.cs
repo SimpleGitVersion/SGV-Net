@@ -24,6 +24,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.ReleaseTagErrorLines, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 Assert.That( i.PreviousRelease, Is.Null );
+                Assert.That( i.PreviousMaxRelease, Is.Null );
                 CollectionAssert.AreEqual( ReleaseTagVersion.FirstPossibleVersions, i.PossibleVersions );
             }
         }
@@ -109,10 +110,12 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.ReleaseTagErrorText, Is.Not.Null );
             }
             {
-                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions {
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
                     StartingCommitSha = cOK.Sha,
                     OverriddenTags = overrides.Overrides,
-                    StartingVersionForCSemVer = "4.0.3-beta" } );
+                    StartingVersionForCSemVer = "4.0.3-beta"
+                } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag.ToString(), Is.EqualTo( "v4.0.3-beta" ) );
                 Assert.That( i.PreviousRelease, Is.Null );
@@ -209,7 +212,7 @@ namespace SimpleGitVersion.Core.Tests
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag.ToString(), Is.EqualTo( "v2.0.0" ) );
-            }            
+            }
             // Subsequent developments of alpha branch now starts after 2.0.0, for instance 2.1.0-beta.
             overrides.MutableAdd( cAlphaContinue.Sha, "2.1.0-beta" );
             {
@@ -237,8 +240,8 @@ namespace SimpleGitVersion.Core.Tests
             var cPickReset = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Cherry Pick - Reset change in parallel-world.txt content (2)." ) );
             var cPickChange = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Cherry Pick - Change in parallel-world.txt content (1)." ) );
             var cPostReset = repoTest.Commits.Single( sc => sc.Sha == "3035a581af1302293739e5caf7dfbc009a71454f" ); // "Merge branch 'gamma' into parallel-world" (there are two of them);
-            var cDevInGamma = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Dev in Gamma." ) ); 
-            var cMergeAll = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Merge branch 'parallel-world' into alpha" ) ); 
+            var cDevInGamma = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Dev in Gamma." ) );
+            var cMergeAll = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Merge branch 'parallel-world' into alpha" ) );
 
             var v1 = ReleaseTagVersion.TryParse( "1.0.0" );
             var v2 = ReleaseTagVersion.TryParse( "2.0.0" );
@@ -389,7 +392,7 @@ namespace SimpleGitVersion.Core.Tests
                 {
                     StartingBranchName = "gamma",
                     OverriddenTags = overrides.Overrides,
-                    Branches = new RepositoryInfoOptionsBranch[] 
+                    Branches = new RepositoryInfoOptionsBranch[]
                     {
                         new RepositoryInfoOptionsBranch() { Name = "gamma", CIVersionMode = CIBranchVersionMode.LastReleaseBased }
                     }
@@ -403,7 +406,7 @@ namespace SimpleGitVersion.Core.Tests
                 {
                     StartingBranchName = "alpha",
                     OverriddenTags = overrides.Overrides,
-                    Branches = new RepositoryInfoOptionsBranch[] 
+                    Branches = new RepositoryInfoOptionsBranch[]
                     {
                         new RepositoryInfoOptionsBranch() { Name = "alpha", VersionName="ALPHAAAA", CIVersionMode = CIBranchVersionMode.LastReleaseBased }
                     }
@@ -417,7 +420,7 @@ namespace SimpleGitVersion.Core.Tests
                 {
                     StartingBranchName = "beta",
                     OverriddenTags = overrides.Overrides,
-                    Branches = new RepositoryInfoOptionsBranch[] 
+                    Branches = new RepositoryInfoOptionsBranch[]
                     {
                         new RepositoryInfoOptionsBranch() { Name = "beta", VersionName="BBBBBB", CIVersionMode = CIBranchVersionMode.LastReleaseBased }
                     }
@@ -444,7 +447,7 @@ namespace SimpleGitVersion.Core.Tests
                 {
                     StartingBranchName = branchName,
                     OverriddenTags = overrides.Overrides,
-                    Branches = new RepositoryInfoOptionsBranch[] 
+                    Branches = new RepositoryInfoOptionsBranch[]
                     {
                         new RepositoryInfoOptionsBranch() { Name = branchName, CIVersionMode = CIBranchVersionMode.LastReleaseBased, VersionName = branchVersionName }
                     }
@@ -486,7 +489,7 @@ namespace SimpleGitVersion.Core.Tests
                 {
                     StartingBranchName = branchName,
                     OverriddenTags = overrides.Overrides,
-                    Branches = new RepositoryInfoOptionsBranch[] 
+                    Branches = new RepositoryInfoOptionsBranch[]
                     {
                         new RepositoryInfoOptionsBranch() { Name = branchName, CIVersionMode = CIBranchVersionMode.LastReleaseBased, VersionName = branchNameVersion }
                     }
@@ -578,7 +581,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( nbCall, Is.EqualTo( 2 ) );
 
                 nbCall = 0;
-                options.IgnoreModifiedFilePredicate = m => 
+                options.IgnoreModifiedFilePredicate = m =>
                 {
                     // Returns false: the file is actually modified.
                     // without IgnoreModifiedFileFullProcess, this stops the lookups.
@@ -604,7 +607,7 @@ namespace SimpleGitVersion.Core.Tests
 
                 nbCall = 0;
                 options.IgnoreModifiedFiles.Add( "Dev in Alpha.txt" );
-                options.IgnoreModifiedFilePredicate = m => 
+                options.IgnoreModifiedFilePredicate = m =>
                 {
                     ++nbCall;
                     Assert.That( m.Path, Is.Not.EqualTo( "Dev in Alpha.txt" ), "This has been filtered by IgnoreModifiedFiles set." );
@@ -619,6 +622,108 @@ namespace SimpleGitVersion.Core.Tests
             {
                 File.WriteAllText( devPath, devTxt );
                 File.WriteAllText( realDevPath, realDevTxt );
+            }
+        }
+
+        [Test]
+        public void fumble_commit_scenario()
+        {
+            var repoTest = TestHelper.TestGitRepository;
+            var cD = repoTest.Commits.First( sc => sc.Message.StartsWith( "D-Commit." ) );
+            var cC = repoTest.Commits.First( sc => sc.Message.StartsWith( "C-Commit." ) );
+            var cF = repoTest.Commits.First( sc => sc.Sha == "27a629754c6b9034f7ca580442b589a0241773c5" );
+            var cB = repoTest.Commits.First( sc => sc.Message.StartsWith( "B-Commit." ) );
+            var cA = repoTest.Commits.First( sc => sc.Message.StartsWith( "Merge branch 'fumble-develop' into fumble-master" ) );
+            var cFix = repoTest.Commits.First( sc => sc.Sha == "e6766d127f9a2df42567151222c6569601614626" );
+            var cX = repoTest.Commits.First( sc => sc.Message.StartsWith( "X-Commit." ) );
+            var overrides = new TagsOverride()
+                .MutableAdd( cD.Sha, "v4.3.2" )
+                .MutableAdd( cC.Sha, "v4.4.0-alpha" )
+                .MutableAdd( cB.Sha, "v5.0.0-rc" )
+                .MutableAdd( cA.Sha, "v5.0.0" );
+            var v5 = ReleaseTagVersion.TryParse( "v5.0.0" );
+            var v5rc = ReleaseTagVersion.TryParse( "v5.0.0-rc" );
+            var v5rc01 = ReleaseTagVersion.TryParse( "v5.0.0-rc.0.1" );
+            {
+                // On the fix of the fumble commit, only v5.0.0-rc.0.1 is possible.
+                // We could have allowed rc.1 (next version below the first already released next one) but this
+                // would be a bit stupid: releasing a rc.1 when a final release is available does not make sense.
+                // However, if this appears to be a valid scenario, we could add an option (like 'AllowNotOnlyFixWhenNextReleaseExist' 
+                // or 'AllowAllSuccessorsWhenNextReleaseExist'.  
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
+                    OverriddenTags = overrides.Overrides,
+                    StartingCommitSha = cFix.Sha
+                } );
+                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
+                Assert.That( i.PreviousMaxRelease.ThisTag, Is.SameAs( i.PreviousRelease.ThisTag ) );
+                CollectionAssert.AreEqual( new[] { v5rc01 }, i.PossibleVersions );
+            }
+            {
+                // Above the fix of the fumble commit, v5.0.0-rc.0.1 and any successor of the 5.0.0 is possible.
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
+                    OverriddenTags = overrides.Overrides,
+                    StartingCommitSha = cX.Sha
+                } );
+                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
+                Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v5 ) );
+
+                var possible = new List<ReleaseTagVersion>() { v5rc01 };
+                possible.AddRange( v5.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possible, i.PossibleVersions );
+            }
+        }
+
+        [Test]
+        public void fumble_commit_plus_an_extra_content_with_a_big_release_number()
+        {
+            var repoTest = TestHelper.TestGitRepository;
+            var cD = repoTest.Commits.First( sc => sc.Message.StartsWith( "D-Commit." ) );
+            var cC = repoTest.Commits.First( sc => sc.Message.StartsWith( "C-Commit." ) );
+            var cF = repoTest.Commits.First( sc => sc.Sha == "27a629754c6b9034f7ca580442b589a0241773c5" );
+            var cB = repoTest.Commits.First( sc => sc.Message.StartsWith( "B-Commit." ) );
+            var cA = repoTest.Commits.First( sc => sc.Message.StartsWith( "Merge branch 'fumble-develop' into fumble-master" ) );
+            var cFix = repoTest.Commits.First( sc => sc.Sha == "e6766d127f9a2df42567151222c6569601614626" );
+            var cX = repoTest.Commits.First( sc => sc.Message.StartsWith( "X-Commit." ) );
+            var cExtra = repoTest.Commits.First( sc => sc.Message.StartsWith( "C-Commit (cherry pick)." ) );
+            var overrides = new TagsOverride()
+                .MutableAdd( cD.Sha, "v4.3.2" )
+                .MutableAdd( cC.Sha, "v4.4.0-alpha" )
+                .MutableAdd( cB.Sha, "v5.0.0-rc" )
+                .MutableAdd( cA.Sha, "v5.0.0" )
+                .MutableAdd( cExtra.Sha, "v10.0.0" );
+            var v5 = ReleaseTagVersion.TryParse( "v5.0.0" );
+            var v5rc = ReleaseTagVersion.TryParse( "v5.0.0-rc" );
+            var v5rc01 = ReleaseTagVersion.TryParse( "v5.0.0-rc.0.1" );
+            var v10 = ReleaseTagVersion.TryParse( "v10.0.0" );
+            {
+                // The injected v10 overrides everything except the possibilty to release the v5.0.0-rc.0.1.
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
+                    OverriddenTags = overrides.Overrides,
+                    StartingCommitSha = cFix.Sha
+                } );
+                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
+                Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
+                var possible = new List<ReleaseTagVersion>() { v5rc01 };
+                possible.AddRange( v10.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possible, i.PossibleVersions );
+            }
+            {
+                // On B-Commit, it is the same: v4.4.0-alpha.0.1 and successors of v10.
+                var v44a = ReleaseTagVersion.TryParse( "v4.4.0-alpha" );
+                var v44a01 = ReleaseTagVersion.TryParse( "v4.4.0-alpha.0.1" );
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
+                    OverriddenTags = overrides.Overrides,
+                    StartingCommitSha = cB.Sha
+                } );
+                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v44a ) );
+                Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
+                var possible = new List<ReleaseTagVersion>() { v44a01 };
+                possible.AddRange( v10.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possible, i.PossibleVersions );
             }
         }
     }

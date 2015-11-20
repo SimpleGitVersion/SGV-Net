@@ -90,7 +90,7 @@ namespace SimpleGitVersion.DNX.Tests
   ""dependencies"": {
     ""CK.Core"": ""VVVVVVVV""
   }
-}" )]
+}", "dnx451|dnxcore50" )]
         [TestCase( @"
 {
     ""version"": ""VVVVVVVV"",
@@ -120,10 +120,11 @@ namespace SimpleGitVersion.DNX.Tests
                 ""System.Threading.Tasks"": ""4.0.0.0""
             },
             ""In.The.Same.Solution"": ""MUST not be changed""
-        }
+        },
+        ""ANOTHERFRAMEWORK"": {}
     }
-" )]
-        public void replace_version_dependencies( string text )
+", "In.The.Same.Solution|dnxcore50|ANOTHERFRAMEWORK" )]
+        public void replace_version_dependencies_and_extract_frameworks( string text, string frameworks )
         {
             ProjectFileContent f = new ProjectFileContent( 
                 text, 
@@ -134,6 +135,9 @@ namespace SimpleGitVersion.DNX.Tests
                 normalizeLineEndings: false );
             string r = f.GetReplacedText( "!TheVersion!" );
             Assert.That( r, Is.EqualTo( text.Replace( "VVVVVVVV", "!TheVersion!" ) ) );
+
+            var extractedFrameworks = JSONFrameworksFinder.GetFrameworks( text );
+            CollectionAssert.AreEqual( extractedFrameworks, frameworks.Split( '|' ) );
         }
     }
 }

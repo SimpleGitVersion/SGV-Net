@@ -99,7 +99,7 @@ namespace SimpleGitVersion
             foreach( var occ in _allVersions )
             {
                 b.Append( _text, last, occ.Start - last );
-                if( occ.NakedVersionNumber ) b.Append( '"' ).Append( newVersion ).Append( '"' );
+                if( occ.IsNakedVersionNumber ) b.Append( '"' ).Append( newVersion ).Append( '"' );
                 else
                 {
                     b.Append( @"""version"": """ ).Append( newVersion ).Append( '"' );
