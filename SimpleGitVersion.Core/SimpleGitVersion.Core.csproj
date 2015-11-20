@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="DNXSupport\DNXProjectFile.cs" />
     <Compile Include="DNXSupport\DNXSolution.cs" />
+    <Compile Include="DNXSupport\JSONFrameworksFinder.cs" />
     <Compile Include="DNXSupport\JSONVersionFinder.cs" />
     <Compile Include="DNXSupport\JSONVisitor.cs" />
     <Compile Include="DNXSupport\ProjectFileContent.cs" />

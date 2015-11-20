@@ -10,8 +10,6 @@ namespace SimpleGitVersion
 {
     class JSONVersionFinder : JSONVisitor
     {
-        int _propLevel;
-        string _parentPropertyName;
         int _objectStart;
         bool _hasTopLevelProperties;
         bool _diffVersions;
@@ -55,18 +53,18 @@ namespace SimpleGitVersion
             return base.VisitObjectContent();
         }
 
-        public override bool VisitObjectProperty( int startPropertyIndex, string propName )
+        public override bool VisitObjectProperty( int startPropertyIndex, string propertyName, int propertyIndex )
         {
-            if( _propLevel == 0 )
+            if( Path.Count == 0 )
             {
                 _hasTopLevelProperties = true;
-                if( propName == "version" )
+                if( propertyName == "version" )
                 {
                     if( _thisVersion != null ) return Matcher.SetError( "Duplicate version." );
                     return GetVersionValue( startPropertyIndex, out _thisVersion );
                 }
             }
-            if( _versions != null && _parentPropertyName == "dependencies" && _projectNameFinder( propName ) )
+            else if( _versions != null && Path[Path.Count-1].PropertyName == "dependencies" && _projectNameFinder( propertyName ) )
             {
                 Matcher.MatchWhiteSpaces( 0 );
                 if( Matcher.Head == '{' )
@@ -81,23 +79,12 @@ namespace SimpleGitVersion
                     string version;
                     if( !Matcher.TryMatchJSONQuotedString( out version ) ) return Matcher.SetError( "Version string expected." );
                     VersionOccurrence v = new VersionOccurrence( version, start, Matcher.StartIndex - start, false );
-                    Debug.Assert( v.NakedVersionNumber );
+                    Debug.Assert( v.IsNakedVersionNumber );
                     CollectVersion( v );
                 }
                 return true;
             }
-            string prevParentName = _parentPropertyName;
-            try
-            {
-                ++_propLevel;
-                _parentPropertyName = propName;
-                return base.VisitObjectProperty( startPropertyIndex, propName );
-            }
-            finally
-            {
-                --_propLevel;
-                _parentPropertyName = prevParentName;
-            }
+            return base.VisitObjectProperty( startPropertyIndex, propertyName, propertyIndex );
         }
 
         void CollectVersion( VersionOccurrence v )
