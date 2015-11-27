@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Code.Cake
 {
-    static class DNXSupport
+    public static class DNXSupport
     {
         /// <summary>
         /// Runs cmd.exe with a command line and throws an exception if the command exits with a result that is not 0.
