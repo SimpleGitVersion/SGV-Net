@@ -37,6 +37,7 @@ namespace CodeCake
             Task( "Check-Repository" )
                 .Does( () =>
                 {
+                    Cake.GetDNXRuntimeInformation();
                     gitInfo = Cake.GetSimpleRepositoryInfo();
                     if( !gitInfo.IsValid )
                     {

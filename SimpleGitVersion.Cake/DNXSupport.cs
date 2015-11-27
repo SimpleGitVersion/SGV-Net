@@ -4,11 +4,26 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Code.Cake
 {
     public static class DNXSupport
     {
+        static DNXRuntimeInformation _dnxRTI;
+
+        /// <summary>
+        /// Gets the DNX runtime information. Never null but <see cref="DNXRuntimeInformation.IsValid"/>
+        /// may be false.
+        /// </summary>
+        /// <param name="context">The cake context.</param>
+        /// <returns>A runtime information object.</returns>
+        public static DNXRuntimeInformation GetDNXRuntimeInformation( this ICakeContext context )
+        {
+            return _dnxRTI ?? (_dnxRTI = LoadDNXRuntimeInformation( context ));
+        }
+
+
         /// <summary>
         /// Runs cmd.exe with a command line and throws an exception if the command exits with a result that is not 0.
         /// This is currently private but may be exposed once.
@@ -27,11 +42,12 @@ namespace Code.Cake
         /// </summary>
         /// <param name="context">The cake context.</param>
         /// <param name="commandLine">The command line to execute.</param>
-        /// <param name="output">Optional standard output collector.</param>
-        static int RunCmd( this ICakeContext context, string commandLine, StringBuilder output = null )
+        /// <param name="output">Optional standard output lines collector.</param>
+        static int RunCmd( this ICakeContext context, string commandLine, Action<string> output = null )
         {
             ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
             cmdStartInfo.FileName = @"cmd.exe";
+            cmdStartInfo.Arguments = "/C " + commandLine;
             cmdStartInfo.RedirectStandardOutput = true;
             cmdStartInfo.RedirectStandardError = true;
             cmdStartInfo.RedirectStandardInput = true;
@@ -41,20 +57,17 @@ namespace Code.Cake
             Process cmdProcess = new Process();
             cmdProcess.StartInfo = cmdStartInfo;
             cmdProcess.ErrorDataReceived += ( o, e ) => { if( !string.IsNullOrEmpty( e.Data ) ) context.Log.Error( e.Data ); };
-            cmdProcess.OutputDataReceived += ( o, e ) => 
+            cmdProcess.OutputDataReceived += ( o, e ) =>
             {
                 if( e.Data != null )
                 {
-                    if( e.Data.Length > 0 ) context.Log.Information( e.Data );
-                    if( output != null ) output.AppendLine( e.Data );
+                    context.Log.Information( e.Data );
+                    if( output != null ) output( e.Data );
                 }
             };
-            cmdProcess.EnableRaisingEvents = true;
             cmdProcess.Start();
-            cmdProcess.BeginOutputReadLine();
             cmdProcess.BeginErrorReadLine();
-            cmdProcess.StandardInput.WriteLine( commandLine );
-            cmdProcess.StandardInput.WriteLine( "exit" );
+            cmdProcess.BeginOutputReadLine();
             cmdProcess.WaitForExit();
             return cmdProcess.ExitCode;
         }
@@ -90,30 +103,25 @@ namespace Code.Cake
             config( c );
             var b = new StringBuilder();
             var current = GetDNXRuntimeInformation( context );
-            if( c.EstimatedRuntime != null )
+            if( c.EstimatedRuntime != null && c.EstimatedRuntime != current.Runtime )
             {
-                if( c.EstimatedRuntime != current.Runtime )
-                {
-                    b.Append( "dnvm use " ).Append( current.Version ).Append( " -r " ).Append( c.EstimatedRuntime ).Append( " && " );
-                }
+                b.Append( "dnvm use " ).Append( current.Version ).Append( " -r " ).Append( c.EstimatedRuntime ).Append( " && " );
             }
             b.Append( "dnx " );
             c.ToString( b );
             RunSuccessfullCmd( context, b.ToString() );
         }
 
+        /// <summary>
+        /// Always create a <see cref="DNXRuntimeInformation"/> object that may be not valid.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         static DNXRuntimeInformation LoadDNXRuntimeInformation( ICakeContext context )
         {
-            StringBuilder output = new StringBuilder();
-            if( RunCmd( context, "where dnx", output ) != 0 ) return new DNXRuntimeInformation( null );
-            return new DNXRuntimeInformation( Path.GetDirectoryName( output.ToString().Trim() ) );
-        }
-
-        static DNXRuntimeInformation _dnxRTI;
-
-        static DNXRuntimeInformation GetDNXRuntimeInformation( ICakeContext context )
-        {
-            return _dnxRTI ?? (_dnxRTI = LoadDNXRuntimeInformation( context ));
+            var output = new List<string>();
+            if( RunCmd( context, "where dnx", output.Add ) != 0 ) return new DNXRuntimeInformation( null );
+            return new DNXRuntimeInformation( output[0] );
         }
 
     }

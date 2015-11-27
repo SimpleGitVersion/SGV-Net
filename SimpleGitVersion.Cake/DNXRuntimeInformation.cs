@@ -17,14 +17,16 @@ namespace Code.Cake
         readonly string _operatingSystem;
 
         /// <summary>
-        /// Initializes a new DNX information based on the current dnx path.
+        /// Initializes a new DNX information based on the current dnx path
+        /// from the ful path to dnx.exe application (can benull if not found: <see cref="IsValid"/> will 
+        /// be false).
         /// </summary>
-        /// <param name="dnxPath">Path to the dnx application.</param>
-        public DNXRuntimeInformation( string dnxPath )
+        /// <param name="dnxExeFullPath">Full path of the dnx.exe application.</param>
+        public DNXRuntimeInformation( string dnxExeFullPath )
         {
-            if( !string.IsNullOrEmpty( dnxPath ) )
+            if( !string.IsNullOrEmpty( dnxExeFullPath ) )
             {
-                _runtimePath = Path.GetDirectoryName( dnxPath );
+                _runtimePath = Path.GetDirectoryName( dnxExeFullPath );
                 _fullRuntime = Path.GetFileName( Path.GetDirectoryName( _runtimePath ) );
                 int idxVersion = _fullRuntime.IndexOf( '.' );
                 _version = _fullRuntime.Substring( idxVersion + 1 );
@@ -35,18 +37,39 @@ namespace Code.Cake
             }
         }
 
+        /// <summary>
+        /// Gets whether this runtime information is valid.
+        /// </summary>
         public bool IsValid { get { return _runtimePath != null; } }
 
+        /// <summary>
+        /// Gets the runtime path: the [runtime]/bin folder.
+        /// </summary>
         public string RuntimePath { get { return _runtimePath; } }
 
+        /// <summary>
+        /// Gets the full runtime name: like "dnx-clr-win-x86.1.0.0-rc".
+        /// </summary>
         public string FullRuntime { get { return _fullRuntime; } }
 
+        /// <summary>
+        /// Gets the runtime version string (ie. "1.0.0-rc")
+        /// </summary>
         public string Version { get { return _version; } }
 
+        /// <summary>
+        /// Gets the architecture (ie. "x86").
+        /// </summary>
         public string Architecture { get { return _architecture; } }
 
+        /// <summary>
+        /// Gets the runtime (ie. "clr", "coreclr", etc.).
+        /// </summary>
         public string Runtime { get { return _runtime; } }
 
+        /// <summary>
+        /// Gets the OS (ie. "win").
+        /// </summary>
         public string OperatingSystem { get { return _operatingSystem; } }
 
     }
