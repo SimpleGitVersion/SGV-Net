@@ -56,6 +56,11 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="DNUBuildSettings.cs" />
+    <Compile Include="DNURestoreSettings.cs" />
+    <Compile Include="DNXRunSettings.cs" />
+    <Compile Include="DNXRuntimeInformation.cs" />
+    <Compile Include="DNXSupport.cs" />
     <Compile Include="SimpleGitVersionAliases.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
