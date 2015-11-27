@@ -26,13 +26,15 @@ namespace Code.Cake
         public string Framework { get; set; }
 
         /// <summary>
-        /// Gets whether the <see cref="Framework"/> can run on the clr.
+        /// Gets the runtime from the <see cref="Framework"/>.
+        /// Can be null (if Framework is null), "clr" or "coreclr".
         /// </summary>
-        public bool IsClrFramework
+        public string EstimatedRuntime
         {
             get
             {
-                return Framework == null || Regex.IsMatch( Framework, @"^(dnx|net)\d+$" );
+                if( Framework == null ) return null;
+                return Regex.IsMatch( Framework, @"^(dnx|net)\d+$" ) ? "clr" : "coreclr";
             }
         }
 
@@ -73,7 +75,7 @@ namespace Code.Cake
         /// <returns>The string builder.</returns>
         public StringBuilder ToString( StringBuilder b )
         {
-            if( Framework != null && IsClrFramework )
+            if( Framework != null && EstimatedRuntime == "clr" )
             {
                 b.Append( " --framework " ).Append( Framework );
             }

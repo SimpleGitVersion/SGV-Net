@@ -74,6 +74,7 @@
       <Link>Properties\SharedKey.snk</Link>
     </None>
     <None Include="App.config" />
+    <None Include="Bootstrap.ps1" />
     <None Include="NuSpec\nuspec.xsd">
       <SubType>Designer</SubType>
     </None>

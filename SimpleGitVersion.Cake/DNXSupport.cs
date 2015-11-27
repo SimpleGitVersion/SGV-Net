@@ -89,13 +89,16 @@ namespace Code.Cake
             var c = new DNXRunSettings();
             config( c );
             var b = new StringBuilder();
-            if( !c.IsClrFramework )
+            var current = GetDNXRuntimeInformation( context );
+            if( c.EstimatedRuntime != null )
             {
-                b.Append( "dnvm use " ).Append( GetDNXRuntimeInformation( context ).Version ).Append( " -r coreclr" ).Append( " && " );
+                if( c.EstimatedRuntime != current.Runtime )
+                {
+                    b.Append( "dnvm use " ).Append( current.Version ).Append( " -r " ).Append( c.EstimatedRuntime ).Append( " && " );
+                }
             }
             b.Append( "dnx " );
             c.ToString( b );
-            //context.Information( b.ToString() );
             RunSuccessfullCmd( context, b.ToString() );
         }
 

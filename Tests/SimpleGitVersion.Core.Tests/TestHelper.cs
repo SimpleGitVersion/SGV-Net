@@ -54,7 +54,7 @@ namespace SimpleGitVersion
                             catch( LibGit2SharpException ex )
                             {
                                 // Fetch fails. We don't care.
-                                Console.WriteLine( "Warning: Fetching the TestGitRepository (https://github.com/SimpleGitVersion/TestGitRepository.git) failed. Check the internet connection." );
+                                Console.WriteLine( "Warning: Fetching the TestGitRepository (https://github.com/SimpleGitVersion/TestGitRepository.git) failed. Check the internet connection. Error: {0}.", ex.Message );
                             }
                         }
                     }
