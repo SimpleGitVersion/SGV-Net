@@ -61,7 +61,7 @@ namespace SimpleGitVersion.Core.Tests
             ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
             Assert.That( t.IsValid );
             Assert.That( t.IsPreRelease, Is.False );
-            Assert.That( t.IsPreReleaseFix, Is.False );
+            Assert.That( t.IsPreReleasePatch, Is.False );
             Assert.That( t.ToString( ReleaseTagFormat.SemVer ), Is.EqualTo( tag ) );
             Assert.That( t.ToString( ReleaseTagFormat.NuGetPackage ), Is.EqualTo( tag ) );
         }
@@ -92,8 +92,8 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( t.IsValid );
             Assert.That( t.IsPreRelease );
             Assert.That( !t.IsPreReleaseNameStandard );
-            Assert.That( t.IsPreReleaseFix );
-            Assert.That( t.PreReleaseFix, Is.GreaterThan( 0 ) );
+            Assert.That( t.IsPreReleasePatch );
+            Assert.That( t.PreReleasePatch, Is.GreaterThan( 0 ) );
             Assert.That( t.ToString( ReleaseTagFormat.SemVer, null, true ), Is.EqualTo( tag ) );
             Assert.Throws<ArgumentException>( () => t.ToString( ReleaseTagFormat.NugetPackageV2, null, true ) );
         }

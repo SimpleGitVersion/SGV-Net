@@ -31,7 +31,7 @@ namespace SimpleGitVersion
             }
             ParseErrorMessage = isMalformed ? string.Format( "Tag '{0}': {1}", tag, errorMessage ) : errorMessage;
             PreReleaseNameIdx = -1;
-            PreReleaseFix = 0;
+            PreReleasePatch = 0;
         }
 
         const string _noTagParseErrorMessage = "Not a release tag.";

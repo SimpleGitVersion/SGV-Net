@@ -78,6 +78,7 @@ namespace SimpleGitVersion.Core.Tests
         <Branch Name=""other"" CIVersionMode=""None"" />
     </Branches>
 	<StartingVersionForCSemVer>v4.2.0</StartingVersionForCSemVer>
+    <PossibleVersionsMode>AllSuccessors</PossibleVersionsMode>
     <IgnoreModifiedFiles>
         <Add>SharedKey.snk</Add>
     </IgnoreModifiedFiles>
@@ -97,6 +98,7 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( opt.StartingVersionForCSemVer, Is.EqualTo( opt2.StartingVersionForCSemVer ) );
             Assert.That( opt.Branches.Count, Is.EqualTo( opt2.Branches.Count ) );
             Assert.That( opt.IgnoreModifiedFiles.Count, Is.EqualTo( opt2.IgnoreModifiedFiles.Count ) );
+            Assert.That( opt.PossibleVersionsMode, Is.EqualTo( PossibleVersionsMode.AllSuccessors ) );
         }
 
         private static void ValidateAgainstSchema( XDocument d )

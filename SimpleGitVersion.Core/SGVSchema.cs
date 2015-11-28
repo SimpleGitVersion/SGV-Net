@@ -13,6 +13,7 @@ namespace SimpleGitVersion
         public static readonly XName RepositoryInfo = SVGNS + "RepositoryInfo";
         public static readonly XName StartingVersionForCSemVer = SVGNS + "StartingVersionForCSemVer";
         public static readonly XName IgnoreModifiedFiles = SVGNS + "IgnoreModifiedFiles";
+        public static readonly XName PossibleVersionsMode = SVGNS + "PossibleVersionsMode";
         public static readonly XName Add = SVGNS + "Add";
         public static readonly XName Debug = SVGNS + "Debug";
         public static readonly XName Branches = SVGNS + "Branches";

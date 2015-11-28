@@ -78,6 +78,7 @@
     <Compile Include="PathComparer.cs" />
     <Compile Include="RepositoryInfo\CIReleaseInfo.cs" />
     <Compile Include="RepositoryInfo\Options\IWorkingFolderModifiedFile.cs" />
+    <Compile Include="RepositoryInfo\Options\PossibleVersionsMode.cs" />
     <Compile Include="SimpleRepositoryInfo.Extension.cs" />
     <Compile Include="TagCollector\ITagCommit.cs" />
     <Compile Include="ILogger.cs" />

@@ -67,13 +67,13 @@ namespace SimpleGitVersion
                         }
                         if( IsPreRelease )
                         {
-                            if( IsPreReleaseFix )
+                            if( IsPreReleasePatch )
                             {
                                 if( isCIBuild )
                                 {
-                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}-{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleasePatch, suffix );
                                 }
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}{4:00}-{5:00}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleasePatch, suffix );
                             }
                             if( PreReleaseNumber > 0 )
                             {
@@ -106,13 +106,13 @@ namespace SimpleGitVersion
                         }
                         if( IsPreRelease )
                         {
-                            if( IsPreReleaseFix )
+                            if( IsPreReleasePatch )
                             {
                                 if( isCIBuild )
                                 {
-                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}.{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                    return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}.{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleasePatch, suffix );
                                 }
-                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, suffix );
+                                return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleasePatch, suffix );
                             }
                             if( PreReleaseNumber > 0 )
                             {
@@ -139,9 +139,9 @@ namespace SimpleGitVersion
                         Debug.Assert( f == ReleaseTagFormat.Normalized );
                         if( IsPreRelease )
                         {
-                            if( IsPreReleaseFix )
+                            if( IsPreReleasePatch )
                             {
-                                return string.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleaseFix, Marker );
+                                return string.Format( CultureInfo.InvariantCulture, "v{0}.{1}.{2}-{3}.{4}.{5}{6}", Major, Minor, Patch, prName, PreReleaseNumber, PreReleasePatch, Marker );
                             }
                             if( PreReleaseNumber > 0 )
                             {

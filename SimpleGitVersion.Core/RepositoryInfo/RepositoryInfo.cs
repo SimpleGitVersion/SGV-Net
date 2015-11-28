@@ -95,11 +95,14 @@ namespace SimpleGitVersion
         public readonly IReadOnlyList<ReleaseTagVersion> PossibleVersions;
 
         /// <summary>
-        /// Among possible versions this gives the versions that are valid regarding the whole repository.
+        /// Gets the possible versions on this commit in a strict sense: this is a subset 
+        /// of the <see cref="PossibleVersions"/>.
+        /// A possible versions that is not a <see cref="ReleaseTagVersion.IsPatch"/> do not appear here 
+        /// if a greater version exists in the repository.
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
         /// </summary>
-        public readonly IReadOnlyList<ReleaseTagVersion> ValidVersions;
+        public readonly IReadOnlyList<ReleaseTagVersion> PossibleVersionsStrict;
 
         /// <summary>
         /// Gets CI informations if a CI release must be done.
@@ -178,12 +181,14 @@ namespace SimpleGitVersion
                             CommitVersionInfo info = collector.GetVersionInfo( commit );
                             ExistingVersions = collector.ExistingVersions.TagCommits;
                             PossibleVersions = info.PossibleVersions;
-                            ValidVersions = info.ValidVersions;
+                            PossibleVersionsStrict = info.PossibleVersionsStrict;
                             PreviousRelease = info.PreviousCommit;
                             PreviousMaxRelease = info.PreviousMaxCommit;
                             if( info.ThisCommit != null )
                             {
-                                if( ValidVersions.Contains( info.ThisCommit.ThisTag ) )
+                                bool strictMode = options.PossibleVersionsMode.IsStrict();
+                                var possibleSet = strictMode ? info.PossibleVersionsStrict : info.PossibleVersions;
+                                if( possibleSet.Contains( info.ThisCommit.ThisTag ) )
                                 {
                                     ValidReleaseTag = info.ThisCommit.ThisTag;
                                 }
@@ -193,8 +198,19 @@ namespace SimpleGitVersion
                                     errors.Append( "Release tag '" )
                                            .Append( info.ThisCommit.ThisTag.OriginalTagText )
                                            .Append( "' is not valid here. Valid tags are: " )
-                                           .Append( string.Join( ", ", ValidVersions ) )
+                                           .Append( string.Join( ", ", possibleSet ) )
                                            .AppendLine();
+                                    if( strictMode && info.PossibleVersions.Contains( info.ThisCommit.ThisTag ))
+                                    {
+                                        if( options.PossibleVersionsMode == PossibleVersionsMode.Default )
+                                        {
+                                            errors.Append( "Consider setting <PossibleVersionsMode>AllSuccessors</PossibleVersionsMode> in RepositoryInfo.xml to allow this version." );
+                                        }
+                                        else
+                                        {
+                                            errors.Append( "Current <PossibleVersionsMode>Restricted</PossibleVersionsMode> in RepositoryInfo.xml forbids this version." );
+                                        }
+                                    }
                                 }
                             }
                             else
