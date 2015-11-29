@@ -58,13 +58,17 @@ namespace SimpleGitVersion
         /// </summary>
         public readonly int PreReleaseNumber;
         /// <summary>
-        /// When <see cref="IsPreReleaseFix"/>, a number between 1 and <see cref="MaxPreReleaseFix"/>, otherwise 0. 
+        /// When <see cref="IsPreReleasePatch"/>, a number between 1 and <see cref="MaxPreReleaseFix"/>, otherwise 0. 
         /// </summary>
-        public readonly int PreReleaseFix;
+        public readonly int PreReleasePatch;
         /// <summary>
-        /// Gets whether this is a pre release fix (<see cref="IsPreRelease"/> is necessarily true): <see cref="PreReleaseFix"/> number is greater than 0.
+        /// Gets whether this is a pre release patch (<see cref="IsPreRelease"/> is necessarily true): <see cref="PreReleasePatch"/> number is greater than 0.
         /// </summary>
-        public bool IsPreReleaseFix { get { return PreReleaseFix > 0; } }
+        public bool IsPreReleasePatch { get { return PreReleasePatch > 0; } }
+        /// <summary>
+        /// Gets whether this is a patch: either <see cref="Patch"/> or <see cref="PreReleasePatch"/> are greater than 0.
+        /// </summary>
+        public bool IsPatch { get { return PreReleasePatch > 0 || Patch > 0; } }
         /// <summary>
         /// Gets the "+invalid" marker.
         /// Normalized in lowercase and <see cref="string.Empty"/> when <see cref="IsMarkedInvalid"/> is false.
@@ -135,7 +139,7 @@ namespace SimpleGitVersion
                             || 
                           (preReleaseName.Length > 0 && preReleaseNameIdx >= 0 && preReleaseNameIdx <= MaxPreReleaseNameIdx ));
             Debug.Assert( preReleaseNumber >= 0 && preReleaseNumber <= MaxPreReleaseNumber );
-            Debug.Assert( PreReleaseFix >= 0 && PreReleaseFix <= MaxPreReleaseNumber );
+            Debug.Assert( PreReleasePatch >= 0 && PreReleasePatch <= MaxPreReleaseNumber );
             Debug.Assert( kind != ReleaseTagKind.Malformed );
             Major = major;
             Minor = minor;
@@ -143,7 +147,7 @@ namespace SimpleGitVersion
             PreReleaseNameFromTag = preReleaseName;
             PreReleaseNameIdx = preReleaseNameIdx;
             PreReleaseNumber = preReleaseNumber;
-            PreReleaseFix = preReleaseFix;
+            PreReleasePatch = preReleaseFix;
             Kind = kind;
             Marker = kind.ToStringMarker();
             OriginalTagText = tag ?? ToString();
@@ -160,28 +164,28 @@ namespace SimpleGitVersion
         /// <returns>The "+valid" tag.</returns>
         public ReleaseTagVersion MarkInvalid()
         {
-            return IsMarkedInvalid ? this : new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, PreReleaseNumber, PreReleaseFix, Kind | ReleaseTagKind.MarkedInvalid );
+            return IsMarkedInvalid ? this : new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, PreReleaseNumber, PreReleasePatch, Kind | ReleaseTagKind.MarkedInvalid );
         }
 
         /// <summary>
         /// Computes the next possible ordered versions, from the closest one to the biggest possible bump.
         /// If <see cref="IsValid"/> is false, the list is empty.
         /// </summary>
-        /// <param name="fixesOnly">True to obtain only fixes to this version. False to generate the full list of valid successors (up to 43 successors).</param>
+        /// <param name="patchesOnly">True to obtain only patches to this version. False to generate the full list of valid successors (up to 43 successors).</param>
         /// <returns>Next possible versions.</returns>
-        public IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool fixesOnly = false )
+        public IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool patchesOnly = false )
         {
             Debug.Assert( _standardNames[0] == "alpha" );
             if( IsValid )
             {
                 if( IsPreRelease )
                 {
-                    int nextFix = PreReleaseFix + 1;
+                    int nextFix = PreReleasePatch + 1;
                     if( nextFix <= ReleaseTagVersion.MaxPreReleaseFix )
                     {
                         yield return new ReleaseTagVersion( null, Major, Minor, Patch, PreReleaseName, PreReleaseNameIdx, PreReleaseNumber, nextFix, ReleaseTagKind.PreRelease );
                     }
-                    if( !fixesOnly )
+                    if( !patchesOnly )
                     {
                         int nextPrereleaseNumber = PreReleaseNumber + 1;
                         if( nextPrereleaseNumber <= ReleaseTagVersion.MaxPreReleaseNumber )
@@ -213,13 +217,13 @@ namespace SimpleGitVersion
                         yield return new ReleaseTagVersion( null, Major, Minor, nextPatch, string.Empty, -1, 0, 0, ReleaseTagKind.OfficialRelease );
                     }
                 }
-                if( !fixesOnly )
+                if( !patchesOnly )
                 {
                     int nextMinor = Minor + 1;
                     if( nextMinor <= MaxMinor )
                     {
                         yield return new ReleaseTagVersion( null, Major, nextMinor, 0, "alpha", 0, 0, 0, ReleaseTagKind.PreRelease );
-                        if( !fixesOnly )
+                        if( !patchesOnly )
                         {
                             for( int i = 1; i <= MaxPreReleaseNameIdx; ++i )
                             {
@@ -232,7 +236,7 @@ namespace SimpleGitVersion
                     if( nextMajor <= MaxMajor )
                     {
                         yield return new ReleaseTagVersion( null, nextMajor, 0, 0, "alpha", 0, 0, 0, ReleaseTagKind.PreRelease );
-                        if( !fixesOnly )
+                        if( !patchesOnly )
                         {
                             for( int i = 1; i <= MaxPreReleaseNameIdx; ++i )
                             {
@@ -263,7 +267,7 @@ namespace SimpleGitVersion
             // Major bump of 1: if we are the first major (Major.0.0) or one of its first prerelases (Major.0.0-alpha or Major.0.0-rc), this is fine.
             if( Major != previous.Major ) 
             {
-                return Minor == 0 && Patch == 0 && PreReleaseNumber == 0 && PreReleaseFix == 0;
+                return Minor == 0 && Patch == 0 && PreReleaseNumber == 0 && PreReleasePatch == 0;
             }
             Debug.Assert( Major == previous.Major );
             // Minor bump greater than 1: previous can not be a direct predecessor.
@@ -271,7 +275,7 @@ namespace SimpleGitVersion
             // Minor bump of 1: if we are the first minor (Major.Minor.0) or one of its first prerelases (Major.Minor.0-alpha or Major.Minor.0-rc), this is fine.
             if( Minor != previous.Minor ) 
             {
-                return Patch == 0 && PreReleaseNumber == 0 && PreReleaseFix == 0;
+                return Patch == 0 && PreReleaseNumber == 0 && PreReleasePatch == 0;
             }
             Debug.Assert( Major == previous.Major && Minor == previous.Minor );
             // Patch bump greater than 1: previous can not be a direct predecessor.
@@ -283,7 +287,7 @@ namespace SimpleGitVersion
             if( Patch != previous.Patch )
             {
                 if( previous.IsPreRelease ) return false;
-                return PreReleaseNumber == 0 && PreReleaseFix == 0;
+                return PreReleaseNumber == 0 && PreReleasePatch == 0;
             }
             Debug.Assert( Major == previous.Major && Minor == previous.Minor && Patch == previous.Patch );
             Debug.Assert( previous.IsPreRelease, "if previous was not a prerelease, this and previous would be equal." );
@@ -295,7 +299,7 @@ namespace SimpleGitVersion
             //  1 - the previous is the one just before us.
             //  2 - the previous is not the one just before us.
             // Case 1 has been handled at the top of this function (oredered version + 1): if this is a fix, previous can not be a direct predecessor here.
-            if( PreReleaseFix > 0 ) return false;
+            if( PreReleasePatch > 0 ) return false;
             // This is not a fix.
             // If this is a numbered prerelease, the previous must have the same PreReleaseName.
             if( PreReleaseNumber > 0 )
@@ -316,15 +320,15 @@ namespace SimpleGitVersion
         /// If the version is not valid or it it is <see cref="VeryLastVersion"/>, the list is empty.
         /// </summary>
         /// <param name="version">Any version (can be null).</param>
-        /// <param name="fixesOnly">True to obtain only fixes to this version. False to generate the full list of valid successors (up to 43 successors).</param>
+        /// <param name="patchesOnly">True to obtain only patches to the version. False to generate the full list of valid successors (up to 43 successors).</param>
         /// <returns>The direct successors.</returns>
-        public static IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool fixesOnly, ReleaseTagVersion version = null )
+        public static IEnumerable<ReleaseTagVersion> GetDirectSuccessors( bool patchesOnly, ReleaseTagVersion version = null )
         {
             if( version == null )
             {
                 return FirstPossibleVersions;
             }
-            return version.GetDirectSuccessors( fixesOnly );
+            return version.GetDirectSuccessors( patchesOnly );
         }
     }
 }

@@ -13,6 +13,14 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="possibleVersionsMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default" />
+      <xs:enumeration value="AllSuccessors" />
+      <xs:enumeration value="Restricted" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="StringMax8">
     <xs:restriction base="xs:string">
       <xs:maxLength value="8" />
@@ -74,6 +82,16 @@
               The version from which CSemVer rules are enforced.
               When set, any version before this one are silently ignored.
               This is useful to start working with an existing repository that did not previosuly use Simple Git Versionning by easily forgetting the past.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="PossibleVersionsMode" minOccurs="0" type="possibleVersionsMode">
+          <xs:annotation>
+            <xs:documentation>
+              Defines which set of possible versions must be used to consider a version tag as a valid one.
+              Default is 'Restricted': Restricted mode prevents a non-patch version to be produced whenever
+              a greater version exists in the repository. 'AllSuccessors' mode considers all valid successors: this can be used
+              on "Long Term Support" branches since this allows a 4.3.0 to be released even if a 5.0.0 version exists.
             </xs:documentation>
           </xs:annotation>
         </xs:element>

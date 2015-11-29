@@ -137,7 +137,7 @@ namespace SimpleGitVersion
                     preReleasePart -= (long)PreReleaseNameIdx * MulName;
                     PreReleaseNumber = (int)(preReleasePart / MulNum);
                     preReleasePart -= (long)PreReleaseNumber * MulNum;
-                    PreReleaseFix = (int)preReleasePart;
+                    PreReleasePatch = (int)preReleasePart;
                     Kind = ReleaseTagKind.PreRelease;
                 }
                 else

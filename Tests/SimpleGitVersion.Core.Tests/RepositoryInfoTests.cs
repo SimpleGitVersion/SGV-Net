@@ -69,7 +69,7 @@ namespace SimpleGitVersion.Core.Tests
             {
                 var i = repoTest.GetRepositoryInfo( tagged.Sha, overrides );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( bb1Tag ) );
-                CollectionAssert.AreEqual( ReleaseTagVersion.FirstPossibleVersions, i.ValidVersions );
+                CollectionAssert.AreEqual( ReleaseTagVersion.FirstPossibleVersions, i.PossibleVersionsStrict );
             };
 
             // Checking possible versions before: none.
@@ -191,6 +191,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v1beta ) );
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 CollectionAssert.AreEqual( v1beta.GetDirectSuccessors(), i.PossibleVersions );
+                CollectionAssert.AreEqual( v1beta.GetDirectSuccessors(), i.PossibleVersionsStrict );
             }
 
             var cAlphaContinue = repoTest.Commits.First( sc => sc.Message.StartsWith( "Dev again in Alpha." ) );
@@ -224,12 +225,22 @@ namespace SimpleGitVersion.Core.Tests
                 var tagged = ReleaseTagVersion.TryParse( "2.1.0-beta" );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( tagged ) );
-                CollectionAssert.AreEqual( new[] { ReleaseTagVersion.TryParse( "1.0.0-beta.0.1" ) }.Concat( ReleaseTagVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), i.PossibleVersions );
+                CollectionAssert.AreEqual( 
+                    new[] { ReleaseTagVersion.TryParse( "1.0.0-beta.0.1" ) }
+                            .Concat( ReleaseTagVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
+                    i.PossibleVersionsStrict );
+                // In no strict mode, alpha branch can continue with any successors of
+                // the 1.0.0-beta except the v2.0.0 of course.
+                CollectionAssert.AreEqual( 
+                            ReleaseTagVersion.TryParse( "1.0.0-beta" ).GetDirectSuccessors()
+                            .Where( v => v != ReleaseTagVersion.TryParse( "2.0.0" ) )
+                            .Concat( ReleaseTagVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
+                    i.PossibleVersions );
             }
         }
 
         [Test]
-        public void content_based_decisions_saves_the_cherry_picks()
+        public void StrictMode_content_based_decisions_saves_the_cherry_picks()
         {
             var repoTest = TestHelper.TestGitRepository;
 
@@ -277,7 +288,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = commit.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                CollectionAssert.AreEqual( v1.GetDirectSuccessors().Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersions );
+                CollectionAssert.AreEqual( v1.GetDirectSuccessors().Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersionsStrict );
             };
 
             Action<SimpleCommit> v1FixSuccessors = commit =>
@@ -287,7 +298,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = commit.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersions );
+                CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersionsStrict );
             };
 
             Action<SimpleCommit> v1FixAndV2Successors = commit =>
@@ -297,7 +308,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = commit.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ).Concat( v2.GetDirectSuccessors() ), i.PossibleVersions );
+                CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ).Concat( v2.GetDirectSuccessors() ), i.PossibleVersionsStrict );
             };
 
             Action<SimpleCommit> v2Successors = commit =>
@@ -305,9 +316,10 @@ namespace SimpleGitVersion.Core.Tests
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     StartingCommitSha = commit.Sha,
+                    PossibleVersionsMode = PossibleVersionsMode.Restricted,
                     OverriddenTags = overrides.Overrides
                 } );
-                CollectionAssert.AreEqual( v2.GetDirectSuccessors(), i.PossibleVersions );
+                CollectionAssert.AreEqual( v2.GetDirectSuccessors(), i.PossibleVersionsStrict );
             };
 
             v2Successors( cReset );
@@ -644,12 +656,10 @@ namespace SimpleGitVersion.Core.Tests
             var v5 = ReleaseTagVersion.TryParse( "v5.0.0" );
             var v5rc = ReleaseTagVersion.TryParse( "v5.0.0-rc" );
             var v5rc01 = ReleaseTagVersion.TryParse( "v5.0.0-rc.0.1" );
+            var v5rc1 = ReleaseTagVersion.TryParse( "v5.0.0-rc.1" );
             {
-                // On the fix of the fumble commit, only v5.0.0-rc.0.1 is possible.
-                // We could have allowed rc.1 (next version below the first already released next one) but this
-                // would be a bit stupid: releasing a rc.1 when a final release is available does not make sense.
-                // However, if this appears to be a valid scenario, we could add an option (like 'AllowNotOnlyFixWhenNextReleaseExist' 
-                // or 'AllowAllSuccessorsWhenNextReleaseExist'.  
+                // On the fix of the fumble commit, only v5.0.0-rc.0.1 is possible in Restricted mode.
+                // Restricted mode disallow rc.1 (next version below the first already released next one).  
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     OverriddenTags = overrides.Overrides,
@@ -657,7 +667,9 @@ namespace SimpleGitVersion.Core.Tests
                 } );
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.SameAs( i.PreviousRelease.ThisTag ) );
-                CollectionAssert.AreEqual( new[] { v5rc01 }, i.PossibleVersions );
+                CollectionAssert.AreEqual( new[] { v5rc01 }, i.PossibleVersionsStrict );
+                // In default mode, the fix of the fumble commit, v5.0.0-rc.0.1 and rc.1 are possible.  
+                CollectionAssert.AreEqual( new[] { v5rc01, v5rc1 }, i.PossibleVersions );
             }
             {
                 // Above the fix of the fumble commit, v5.0.0-rc.0.1 and any successor of the 5.0.0 is possible.
@@ -669,9 +681,13 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v5 ) );
 
-                var possible = new List<ReleaseTagVersion>() { v5rc01 };
+                var possible = new List<ReleaseTagVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v5.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
+
+                var possibleStrict = new List<ReleaseTagVersion>() { v5rc01 };
+                possibleStrict.AddRange( v5.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
             }
         }
 
@@ -696,6 +712,7 @@ namespace SimpleGitVersion.Core.Tests
             var v5 = ReleaseTagVersion.TryParse( "v5.0.0" );
             var v5rc = ReleaseTagVersion.TryParse( "v5.0.0-rc" );
             var v5rc01 = ReleaseTagVersion.TryParse( "v5.0.0-rc.0.1" );
+            var v5rc1 = ReleaseTagVersion.TryParse( "v5.0.0-rc.1" );
             var v10 = ReleaseTagVersion.TryParse( "v10.0.0" );
             {
                 // The injected v10 overrides everything except the possibilty to release the v5.0.0-rc.0.1.
@@ -706,14 +723,23 @@ namespace SimpleGitVersion.Core.Tests
                 } );
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
-                var possible = new List<ReleaseTagVersion>() { v5rc01 };
+
+                var possibleStrict = new List<ReleaseTagVersion>() { v5rc01 };
+                possibleStrict.AddRange( v10.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
+
+                var possible = new List<ReleaseTagVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
             }
             {
-                // On B-Commit, it is the same: v4.4.0-alpha.0.1 and successors of v10.
+                // On B-Commit:
+                // Restricted Mode: it is the same, v4.4.0-alpha.0.1 and successors of v10.
+                // AllSuccessors Mode: all successors of v4.4.0-alpha (except the v5.0.0) are allowed and successors of v10.
                 var v44a = ReleaseTagVersion.TryParse( "v4.4.0-alpha" );
                 var v44a01 = ReleaseTagVersion.TryParse( "v4.4.0-alpha.0.1" );
+                var v44a1 = ReleaseTagVersion.TryParse( "v4.4.0-alpha.1" );
+                var v500 = ReleaseTagVersion.TryParse( "v5.0.0" );
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     OverriddenTags = overrides.Overrides,
@@ -721,7 +747,13 @@ namespace SimpleGitVersion.Core.Tests
                 } );
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v44a ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
-                var possible = new List<ReleaseTagVersion>() { v44a01 };
+
+                var possibleStrict = new List<ReleaseTagVersion>() { v44a01 };
+                possibleStrict.AddRange( v10.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
+
+                var possible = new List<ReleaseTagVersion>();
+                possible.AddRange( v44a.GetDirectSuccessors().Where( v => v != v500 ) );
                 possible.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
             }

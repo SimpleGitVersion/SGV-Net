@@ -21,6 +21,7 @@ namespace SimpleGitVersion
         readonly IFullTagCommit _maxCommit;
         readonly int _maxCommitDepth;
         IReadOnlyList<ReleaseTagVersion> _possibleVersions;
+        IReadOnlyList<ReleaseTagVersion> _possibleVersionsStrict;
 
         internal CommitVersionInfo( 
             TagCollector tagCollector, 
@@ -123,47 +124,64 @@ namespace SimpleGitVersion
         {
             get
             {
-                if( _possibleVersions == null )
-                {
-                    var allVersions = _tagCollector.ExistingVersions.Versions;
-
-                    // Special case: there is no existing versions (other than this that is skipped if it exists) but
-                    // there is a startingVersionForCSemVer, every commit may be the first one. 
-                    if( _tagCollector.StartingVersionForCSemVer != null && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
-                    {
-                        _possibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
-                    }
-                    else
-                    {
-                        var versions = allVersions.Where( c => c != _thisCommit );
-
-                        List<ReleaseTagVersion> result = new List<ReleaseTagVersion>();
-                        foreach( var b in GetBaseTags() )
-                        {
-                            // The base tag b can be null here: a null version tag correctly generates 
-                            // the very first possible versions.
-                            var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
-                            var successors = ReleaseTagVersion.GetDirectSuccessors( nextReleased != null, b );
-                            foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer && (nextReleased == null || v < nextReleased.ThisTag) ) )
-                            {
-                                if( !result.Contains( v ) ) result.Add( v );
-                            }
-                        }
-                        _possibleVersions = result;
-                    }
-                }
+                if( _possibleVersions == null ) CompoutePossibleVersions();
                 return _possibleVersions;
             }
         }
 
         /// <summary>
-        /// Gets the valid versions on this commit: this is a subset of the <see cref="PossibleVersions"/>.
-        /// Valid versions guaranty that existing subsequent versions, if any, is built on this commit.
-        /// This is not currently implemented: for the moment, ValidVersions are simply the possible ones.
+        /// Gets the possible versions on this commit in a strict sense: this is a subset 
+        /// of the <see cref="PossibleVersions"/>.
+        /// A possible versions that is not a <see cref="ReleaseTagVersion.IsPatch"/> do not appear here 
+        /// if a greater version exists in the repository.
         /// </summary>
-        public IReadOnlyList<ReleaseTagVersion> ValidVersions
+        public IReadOnlyList<ReleaseTagVersion> PossibleVersionsStrict
         {
-            get { return PossibleVersions; }
+            get
+            {
+                if( _possibleVersionsStrict == null ) CompoutePossibleVersions();
+                return _possibleVersionsStrict;
+            }
+        }
+
+
+        void CompoutePossibleVersions()
+        {
+            var allVersions = _tagCollector.ExistingVersions.Versions;
+
+            // Special case: there is no existing versions (other than this that is skipped if it exists) but
+            // there is a startingVersionForCSemVer, every commit may be the first one. 
+            if( _tagCollector.StartingVersionForCSemVer != null && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
+            {
+                _possibleVersionsStrict = _possibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
+            }
+            else
+            {
+                var versions = allVersions.Where( c => c != _thisCommit );
+
+                List<ReleaseTagVersion> resultLarge = new List<ReleaseTagVersion>();
+                List<ReleaseTagVersion> resultStrict = new List<ReleaseTagVersion>();
+                foreach( var b in GetBaseTags() )
+                {
+                    // The base tag b can be null here: a null version tag correctly generates 
+                    // the very first possible versions.
+                    var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
+                    var successors = ReleaseTagVersion.GetDirectSuccessors( false, b );
+                    foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer && (nextReleased == null || v < nextReleased.ThisTag) ) )
+                    {
+                        if( !resultLarge.Contains( v ) )
+                        {
+                            resultLarge.Add( v );
+                            if( nextReleased == null || v.IsPatch )
+                            {
+                                resultStrict.Add( v );
+                            }
+                        }
+                    }
+                }
+                _possibleVersions = resultLarge;
+                _possibleVersionsStrict = resultStrict;
+            }
         }
 
         ReleaseTagVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }

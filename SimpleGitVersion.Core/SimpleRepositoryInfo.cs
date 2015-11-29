@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace SimpleGitVersion
 {
@@ -187,7 +188,7 @@ namespace SimpleGitVersion
             }
             else
             {
-                Debug.Assert( info.ValidVersions != null );
+                Debug.Assert( info.PossibleVersions != null );
                 if( info.IsDirty )
                 {
                     logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
@@ -238,17 +239,20 @@ namespace SimpleGitVersion
 
         void LogValidVersions( ILogger logger, RepositoryInfo info )
         {
-            if( info.ValidVersions.Count == 0 )
+            if( info.PossibleVersions.Count == 0 )
             {
-                logger.Info( "Not a releaseable commit." );
-            }
-            else if( info.ValidVersions.Count == 1 )
-            {
-                logger.Info( "This can be released with '{0}' tag.", info.ValidVersions[0] );
+                logger.Info( "No possible versions." );
             }
             else
             {
-                logger.Info( "Valid release tags are: {0}", string.Join( ", ", info.ValidVersions ) );
+                if( info.Options.PossibleVersionsMode == PossibleVersionsMode.Restricted )
+                {
+                    logger.Info( "Possible version(s) (Restricted): {0}", string.Join( ", ", info.PossibleVersionsStrict ) );
+                }
+                else
+                {
+                    logger.Info( "Possible version(s) (AllSuccessors): {0}", string.Join( ", ", info.PossibleVersions ) );
+                }
             }
         }
 
@@ -259,7 +263,7 @@ namespace SimpleGitVersion
             Patch = t.Patch;
             PreReleaseName = t.PreReleaseName;
             PreReleaseNumber = t.PreReleaseNumber;
-            PreReleaseFix = t.PreReleaseFix;
+            PreReleaseFix = t.PreReleasePatch;
             FileVersion = t.ToStringFileVersion( isCIBuild );
             OrderedVersion = t.OrderedVersion;
         }
