@@ -172,64 +172,65 @@ namespace SimpleGitVersion
             if( info == null ) throw new ArgumentNullException( nameof( info ) );
 
             Info = info;
-            if( HandleRepositoryInfoError( logger, info ) ) return;
-
-            CommitSha = info.CommitSha;
-            CommitDateUtc = info.CommitDateUtc;
-            var t = info.ValidReleaseTag;
-            // Always warn on non standard pre release name.
-            if( t != null && t.IsPreRelease && !t.IsPreReleaseNameStandard )
+            if( !HandleRepositoryInfoError( logger, info ) )
             {
-                logger.Warn( "Non standard pre release name '{0}' is mapped to '{1}'.", t.PreReleaseNameFromTag, t.PreReleaseName );
-            }
-            if( info.IsDirty && !info.Options.IgnoreDirtyWorkingFolder )
-            {
-                SetInvalidValuesAndLog( logger, "Working folder has non committed changes.", false );
-            }
-            else
-            {
-                Debug.Assert( info.PossibleVersions != null );
-                if( info.IsDirty )
+                CommitSha = info.CommitSha;
+                CommitDateUtc = info.CommitDateUtc;
+                var t = info.ValidReleaseTag;
+                // Always warn on non standard pre release name.
+                if( t != null && t.IsPreRelease && !t.IsPreReleaseNameStandard )
                 {
-                    logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
+                    logger.Warn( "Non standard pre release name '{0}' is mapped to '{1}'.", t.PreReleaseNameFromTag, t.PreReleaseName );
                 }
-                if( info.PreviousRelease != null )
+                if( info.IsDirty && !info.Options.IgnoreDirtyWorkingFolder )
                 {
-                    logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease.ThisTag, info.PreviousRelease.CommitSha );
-                }
-                if( info.PreviousMaxRelease != null && info.PreviousMaxRelease != info.PreviousRelease )
-                {
-                    logger.Trace( "Previous max release found '{0}' on commit '{1}'.", info.PreviousMaxRelease.ThisTag, info.PreviousMaxRelease.CommitSha );
-                }
-                if( info.PreviousRelease == null && info.PreviousMaxRelease == null )
-                {
-                    logger.Trace( "No previous release found'." );
-                }
-
-                if( info.CIRelease != null )
-                {
-                    IsValidCIBuild = true;
-                    SetNumericalVersionValues( info.CIRelease.BaseTag, true );
-                    NuGetVersion = info.CIRelease.BuildVersionNuGet;
-                    SemVer = info.CIRelease.BuildVersion;
-                    logger.Info( "CI release: '{0}'.", SemVer );
-                    LogValidVersions( logger, info );
+                    SetInvalidValuesAndLog( logger, "Working folder has non committed changes.", false );
                 }
                 else
                 {
-                    if( t == null )
+                    Debug.Assert( info.PossibleVersions != null );
+                    if( info.IsDirty )
                     {
-                        SetInvalidValuesAndLog( logger, "No valid release tag.", false );
+                        logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
+                    }
+                    if( info.PreviousRelease != null )
+                    {
+                        logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease.ThisTag, info.PreviousRelease.CommitSha );
+                    }
+                    if( info.PreviousMaxRelease != null && info.PreviousMaxRelease != info.PreviousRelease )
+                    {
+                        logger.Trace( "Previous max release found '{0}' on commit '{1}'.", info.PreviousMaxRelease.ThisTag, info.PreviousMaxRelease.CommitSha );
+                    }
+                    if( info.PreviousRelease == null && info.PreviousMaxRelease == null )
+                    {
+                        logger.Trace( "No previous release found'." );
+                    }
+
+                    if( info.CIRelease != null )
+                    {
+                        IsValidCIBuild = true;
+                        SetNumericalVersionValues( info.CIRelease.BaseTag, true );
+                        NuGetVersion = info.CIRelease.BuildVersionNuGet;
+                        SemVer = info.CIRelease.BuildVersion;
+                        logger.Info( "CI release: '{0}'.", SemVer );
                         LogValidVersions( logger, info );
                     }
                     else
                     {
-                        IsValidRelease = true;
-                        OriginalTagText = t.OriginalTagText;
-                        SetNumericalVersionValues( t, false );
-                        NuGetVersion = t.ToString( ReleaseTagFormat.NuGetPackage );
-                        SemVer = t.ToString( ReleaseTagFormat.SemVerWithMarker );
-                        logger.Info( "Release: '{0}'.", SemVer );
+                        if( t == null )
+                        {
+                            SetInvalidValuesAndLog( logger, "No valid release tag.", false );
+                            LogValidVersions( logger, info );
+                        }
+                        else
+                        {
+                            IsValidRelease = true;
+                            OriginalTagText = t.OriginalTagText;
+                            SetNumericalVersionValues( t, false );
+                            NuGetVersion = t.ToString( ReleaseTagFormat.NuGetPackage );
+                            SemVer = t.ToString( ReleaseTagFormat.SemVerWithMarker );
+                            logger.Info( "Release: '{0}'.", SemVer );
+                        }
                     }
                 }
             }
