@@ -124,7 +124,7 @@ namespace SimpleGitVersion
         {
             get
             {
-                if( _possibleVersions == null ) CompoutePossibleVersions();
+                if( _possibleVersions == null ) ComputePossibleVersions();
                 return _possibleVersions;
             }
         }
@@ -139,19 +139,20 @@ namespace SimpleGitVersion
         {
             get
             {
-                if( _possibleVersionsStrict == null ) CompoutePossibleVersions();
+                if( _possibleVersionsStrict == null ) ComputePossibleVersions();
                 return _possibleVersionsStrict;
             }
         }
 
 
-        void CompoutePossibleVersions()
+        void ComputePossibleVersions()
         {
             var allVersions = _tagCollector.ExistingVersions.Versions;
 
             // Special case: there is no existing versions (other than this that is skipped if it exists) but
             // there is a startingVersionForCSemVer, every commit may be the first one. 
-            if( _tagCollector.StartingVersionForCSemVer != null && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
+            if( _tagCollector.StartingVersionForCSemVer != null 
+                && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
             {
                 _possibleVersionsStrict = _possibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
             }
@@ -164,7 +165,7 @@ namespace SimpleGitVersion
                 foreach( var b in GetBaseTags() )
                 {
                     // The base tag b can be null here: a null version tag correctly generates 
-                    // the very first possible versions.
+                    // the very first possible versions (and the comparison operators handle null).
                     var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
                     var successors = ReleaseTagVersion.GetDirectSuccessors( false, b );
                     foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer && (nextReleased == null || v < nextReleased.ThisTag) ) )
