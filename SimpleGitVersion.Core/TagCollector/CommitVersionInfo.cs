@@ -144,7 +144,6 @@ namespace SimpleGitVersion
             }
         }
 
-
         void ComputePossibleVersions()
         {
             var allVersions = _tagCollector.ExistingVersions.Versions;
@@ -160,28 +159,29 @@ namespace SimpleGitVersion
             {
                 var versions = allVersions.Where( c => c != _thisCommit );
 
-                List<ReleaseTagVersion> resultLarge = new List<ReleaseTagVersion>();
-                List<ReleaseTagVersion> resultStrict = new List<ReleaseTagVersion>();
-                foreach( var b in GetBaseTags() )
+                List<ReleaseTagVersion> possible = new List<ReleaseTagVersion>();
+                List<ReleaseTagVersion> possibleStrict = new List<ReleaseTagVersion>();
+                foreach( ReleaseTagVersion b in GetBaseVersions() )
                 {
-                    // The base tag b can be null here: a null version tag correctly generates 
+                    // The base version b can be null here: a null version tag correctly generates 
                     // the very first possible versions (and the comparison operators handle null).
                     var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
                     var successors = ReleaseTagVersion.GetDirectSuccessors( false, b );
-                    foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer && (nextReleased == null || v < nextReleased.ThisTag) ) )
+                    foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer 
+                                                             && (nextReleased == null || v < nextReleased.ThisTag) ) )
                     {
-                        if( !resultLarge.Contains( v ) )
+                        if( !possible.Contains( v ) )
                         {
-                            resultLarge.Add( v );
+                            possible.Add( v );
                             if( nextReleased == null || v.IsPatch )
                             {
-                                resultStrict.Add( v );
+                                possibleStrict.Add( v );
                             }
                         }
                     }
                 }
-                _possibleVersions = resultLarge;
-                _possibleVersionsStrict = resultStrict;
+                _possibleVersions = possible;
+                _possibleVersionsStrict = possibleStrict;
             }
         }
 
@@ -191,7 +191,7 @@ namespace SimpleGitVersion
         /// Returns either { PreviousTag, PreviousMaxTag }, { PreviousTag }, { PreviousMaxTag } or { null }.
         /// </summary>
         /// <returns></returns>
-        IReadOnlyList<ReleaseTagVersion> GetBaseTags()
+        IReadOnlyList<ReleaseTagVersion> GetBaseVersions()
         {
             var tP = PreviousTag;
             var tM = PreviousMaxTag;
