@@ -57,7 +57,7 @@ namespace SimpleGitVersion
         public string StartingVersionForCSemVer { get; set; }
 
         /// <summary>
-        /// Gets or sets the set of possible versions that must be used to consider a version tag as a valid one
+        /// Gets or sets the set of possible versions that must be used to consider a version tag as a valid one.
         /// </summary>
         public PossibleVersionsMode PossibleVersionsMode { get; set; }
 
