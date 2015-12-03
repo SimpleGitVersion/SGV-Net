@@ -57,7 +57,7 @@ namespace SimpleGitVersion
             if( ciVersionMode == CIBranchVersionMode.ZeroTimed || actualBaseTag == null )
             {
                 string suffix = actualBaseTag != null ? '+' + actualBaseTag.ToString() : null;
-                var name = string.Format( "0.0.0--ci-{0}.{1:yyyyMMddHHmmss}", ciVersionName, commit.Committer.When );
+                var name = string.Format( "0.0.0--ci-{0}.{1:yyyy-MM-ddTHH-mm-ss-ff}", ciVersionName, commit.Committer.When );
                 ciBuildVersion = name + suffix;
 
                 TimeSpan delta200 = commit.Committer.When.ToUniversalTime() - new DateTime( 2015, 1, 1, 0, 0, 0, DateTimeKind.Utc );
@@ -65,7 +65,7 @@ namespace SimpleGitVersion
                 long second = (long)delta200.TotalSeconds;
                 string b62 = ToBase62( second );
                 string ver = new string( '0', 7 - b62.Length ) + b62;
-                ciBuildVersionNuGet = string.Format( "0.0.0-C{0}-{1}", ciVersionName, ver ) + suffix;
+                ciBuildVersionNuGet = string.Format( "0.0.0-C{0}-{1}", ciVersionName, ver );
             }
             else
             {
