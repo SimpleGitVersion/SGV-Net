@@ -97,6 +97,22 @@ namespace Code.Cake
             RunSuccessfullCmd( context, b.ToString() );
         }
 
+        /// <summary>
+        /// Runs dnu publish
+        /// </summary>
+        /// <param name="context">This cake context.</param>
+        /// <param name="config">The configuration to use.</param>
+        public static void DNUPublish( this ICakeContext context, Action<DNUPublishSettings> config )
+        {
+            var c = new DNUPublishSettings();
+            config( c );
+            var b = new StringBuilder();
+            b.Append( "dnu publish " );
+            c.ToString( b );
+            RunSuccessfullCmd( context, b.ToString() );
+        }
+
+
         public static void DNXRun( this ICakeContext context, Action<DNXRunSettings> config )
         {
             var c = new DNXRunSettings();

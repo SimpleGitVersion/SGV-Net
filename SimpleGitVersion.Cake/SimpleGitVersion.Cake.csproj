@@ -57,6 +57,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="DNUBuildSettings.cs" />
+    <Compile Include="DNUPublishSettings.cs" />
     <Compile Include="DNURestoreSettings.cs" />
     <Compile Include="DNXRunSettings.cs" />
     <Compile Include="DNXRuntimeInformation.cs" />
