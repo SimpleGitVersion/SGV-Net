@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,17 @@ namespace CK.Core
             {
                 PropertyName = propertyName;
                 Index = index;
+            }
+
+            /// <summary>
+            /// Overridden to return either <see cref="PropertyName"/> or [<see cref="Index"/>].
+            /// </summary>
+            /// <returns>Representation of the accessor.</returns>
+            public override string ToString()
+            {
+                return IsArrayCell 
+                        ? '[' + Index.ToString( CultureInfo.InvariantCulture ) + ']'
+                        : PropertyName;
             }
         }
 
