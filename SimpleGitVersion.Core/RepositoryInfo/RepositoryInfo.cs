@@ -27,11 +27,13 @@ namespace SimpleGitVersion
         /// Gets the repository level error if any: it is one line of text or null ('No Git repository.' or 'Unitialized Git repository.').
         /// </summary>
         public readonly string RepositoryError;
+
         /// <summary>
         /// Gets the errors related to the release tags as a list of lines.
         /// Null if no errors.
         /// </summary>
         public readonly IReadOnlyList<string> ReleaseTagErrorLines;
+
         /// <summary>
         /// Gets the errors related to the release tags as a text.
         /// Null if no errors.

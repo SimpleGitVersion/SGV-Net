@@ -15,6 +15,7 @@
     </summary>
     <description>
       This is a simple relay to acees SimpleGitVersion.Core.RepositoryInfo from Cake extension methods.
+      Please see https://github.com/SimpleGitVersion/SGV-Net/wiki.
     </description>
     <language>en-US</language>
     <tags>Git, Tag, Versioning, NuGet, SemVer, CSemVer, Cake</tags>
@@ -22,7 +23,7 @@
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
     <dependencies>
       <dependency id="SimpleGitVersion.Core" version="$version$" />
-      <dependency id="Cake.Core" version="0.6.2" />
+      <dependency id="Cake.Core" version="0.7.0" />
    </dependencies>
   </metadata>
   <files>

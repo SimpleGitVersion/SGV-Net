@@ -16,6 +16,7 @@
     <description>
       Extracts RepositoryInfo from a git repository that describes possible CSemVer and/or actual CSemVer version to use based on repository tags and topology.
       This assembly is bundled into SimpleGitVersionTask MSBuild extension but can be used independently.
+      Please see https://github.com/SimpleGitVersion/SGV-Net/wiki.
     </description>
     <language>en-US</language>
     <tags>Git, Tag, Versioning, NuGet, SemVer, CSemVer</tags>
