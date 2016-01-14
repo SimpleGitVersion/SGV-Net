@@ -12,8 +12,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>MSBuild task that stamps assembly with a Semantic Version based on Git repository ({{CSemVer}}).</summary>
     <description>
-      MSBuild task that implements 'Constrained Semantic Version' on Git and stamps produced assembly by 
+      MSBuild task that implements 'Constrained Semantic Version' on Git and stamps produced assembly by
       automatically generating AssemblyVersion, FileVersion and InformationalVersion attributes.
+      Please see https://github.com/SimpleGitVersion/SGV-Net/wiki.
     </description>
     <language>en-US</language>
     <tags>Git, Tag, Versioning, NuGet, SemVer, CSemVer, MSBuild</tags>

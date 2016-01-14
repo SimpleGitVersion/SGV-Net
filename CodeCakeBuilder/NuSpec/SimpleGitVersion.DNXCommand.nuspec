@@ -14,6 +14,7 @@
     <description>
       This allow DNX project to use 'Constrained Semantic Version' on Git.
       Stamps produced assembly by  automatically generating AssemblyVersion, FileVersion and InformationalVersion attributes.
+      Please see https://github.com/SimpleGitVersion/SGV-Net/wiki.
     </description>
     <language>en-US</language>
     <tags>Git, Tag, Versioning, NuGet, SemVer, CSemVer, DNX</tags>
