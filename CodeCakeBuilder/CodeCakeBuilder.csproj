@@ -35,8 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cake.Common, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cake.Common.0.6.2\lib\net45\Cake.Common.dll</HintPath>
+    <Reference Include="Cake.Common, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cake.Common.0.7.0\lib\net45\Cake.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Cake.Core, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -44,7 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Code.Cake, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Code.Cake.0.7.1\lib\net45\Code.Cake.dll</HintPath>
+      <HintPath>..\packages\Code.Cake.0.7.3\lib\net45\Code.Cake.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SimpleGitVersion.Cake, Version=0.12.0.0, Culture=neutral, processorArchitecture=MSIL">
