@@ -14,7 +14,7 @@
       Cake extension that enables Cake scripts to obtain the SimpleGitVersion.RepositoryInfo ({{CSemVer}}).
     </summary>
     <description>
-      This is a simple relay to acees SimpleGitVersion.Core.RepositoryInfo from Cake extension methods.
+      This is a simple relay to access SimpleGitVersion.Core.RepositoryInfo from Cake extension methods.
       Please see https://github.com/SimpleGitVersion/SGV-Net/wiki.
     </description>
     <language>en-US</language>
