@@ -8,6 +8,9 @@ using System.Collections.Generic;
 
 namespace Code.Cake
 {
+    /// <summary>
+    /// Provides extension methods for Cake context.
+    /// </summary>
     public static class DNXSupport
     {
         static DNXRuntimeInformation _dnxRTI;
@@ -87,6 +90,11 @@ namespace Code.Cake
             RunSuccessfullCmd( context, b.ToString() );
         }
 
+        /// <summary>
+        /// Runs dnu build.
+        /// </summary>
+        /// <param name="context">This cake context.</param>
+        /// <param name="config">The configuration to use.</param>
         public static void DNUBuild( this ICakeContext context, Action<DNUBuildSettings> config )
         {
             var c = new DNUBuildSettings();
@@ -112,7 +120,13 @@ namespace Code.Cake
             RunSuccessfullCmd( context, b.ToString() );
         }
 
-
+        /// <summary>
+        /// Runs a dnx command, automatically switching the runtime (ie. dnvm use) based on 
+        /// config.<see cref="DNXRunSettings.EstimatedRuntime"/> property if this estimated runtime is 
+        /// not the current one (see <see cref="GetDNXRuntimeInformation"/>).
+        /// </summary>
+        /// <param name="context">This cake context.</param>
+        /// <param name="config">The configuration to use.</param>
         public static void DNXRun( this ICakeContext context, Action<DNXRunSettings> config )
         {
             var c = new DNXRunSettings();

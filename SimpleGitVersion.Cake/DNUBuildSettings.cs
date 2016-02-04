@@ -7,12 +7,18 @@ using System.Threading.Tasks;
 
 namespace Code.Cake
 {
+    /// <summary>
+    /// Describes settings for <see cref="DNXSupport.DNUBuild"/> method.
+    /// </summary>
     public class DNUBuildSettings
     {
         readonly HashSet<string> _projectPaths;
         readonly HashSet<string> _configurations;
         readonly HashSet<string> _targetFrameworks;
 
+        /// <summary>
+        /// Initializes a new empty settings.
+        /// </summary>
         public DNUBuildSettings()
         {
             _projectPaths = new HashSet<string>();

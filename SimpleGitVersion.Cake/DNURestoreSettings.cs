@@ -7,10 +7,16 @@ using System.Threading.Tasks;
 
 namespace Code.Cake
 {
+    /// <summary>
+    /// Describes settings for <see cref="DNXSupport.DNURestore"/> method.
+    /// </summary>
     public class DNURestoreSettings
     {
         readonly HashSet<string> _projectPaths;
 
+        /// <summary>
+        /// Initializes a new empty settings.
+        /// </summary>
         public DNURestoreSettings()
         {
             _projectPaths = new HashSet<string>();
