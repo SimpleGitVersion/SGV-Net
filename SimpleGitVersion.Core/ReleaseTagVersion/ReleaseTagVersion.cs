@@ -21,10 +21,12 @@ namespace SimpleGitVersion
         /// When <see cref="IsValid"/> is true, necessarily greater or equal to 0.
         /// </summary>
         public readonly int Major;
+
         /// <summary>
         /// When <see cref="IsValid"/> is true, necessarily greater or equal to 0.
         /// </summary>
         public readonly int Minor;
+
         /// <summary>
         /// When <see cref="IsValid"/> is true, necessarily greater or equal to 0.
         /// </summary>
@@ -35,74 +37,89 @@ namespace SimpleGitVersion
         /// the actual, standardized, pre release name field is <see cref="PreReleaseName"/>.
         /// </summary>
         public readonly string PreReleaseNameFromTag;
+
         /// <summary>
         /// Gets the standard pre release name among <see cref="StandardPreReleaseNames"/>.
         /// <see cref="string.Empty"/> when this is not a pre release version.
         /// </summary>
-        public string PreReleaseName { get { return IsPreRelease ? _standardNames[PreReleaseNameIdx] : string.Empty; } }
+        public string PreReleaseName => IsPreRelease ? _standardNames[PreReleaseNameIdx] : string.Empty;
         /// <summary>
         /// Gets whether this is a pre release.
         /// </summary>
-        public bool IsPreRelease { get { return PreReleaseNameIdx >= 0; } }
+        public bool IsPreRelease => PreReleaseNameIdx >= 0;
+
         /// <summary>
         /// When <see cref="IsPreRelease"/> is true, the this is between 0 ('alpha') and <see cref="MaxPreReleaseNameIdx"/> ('rc')
         /// otherwise this is -1.
         /// </summary>
         public readonly int PreReleaseNameIdx;
+
         /// <summary>
         /// Gets whether the <see cref="PreReleaseNameFromTag"/> is a standard one (always false when <see cref="IsPreRelease"/> is false).
         /// </summary>
-        public bool IsPreReleaseNameStandard { get { return IsPreRelease && (PreReleaseNameIdx != MaxPreReleaseNameIdx - 1 || StringComparer.OrdinalIgnoreCase.Equals( PreReleaseNameFromTag, _standardNames[MaxPreReleaseNameIdx-1])); } }
+        public bool IsPreReleaseNameStandard => IsPreRelease && (PreReleaseNameIdx != MaxPreReleaseNameIdx - 1 || StringComparer.OrdinalIgnoreCase.Equals( PreReleaseNameFromTag, _standardNames[MaxPreReleaseNameIdx-1]));
+
         /// <summary>
         /// Meaningful only if <see cref="IsPreRelease"/> is true (0 when not in prerelease). Between 0 and <see cref="MaxPreReleaseNumber"/>. 
         /// </summary>
         public readonly int PreReleaseNumber;
+
         /// <summary>
         /// When <see cref="IsPreReleasePatch"/>, a number between 1 and <see cref="MaxPreReleaseFix"/>, otherwise 0. 
         /// </summary>
         public readonly int PreReleasePatch;
+
         /// <summary>
         /// Gets whether this is a pre release patch (<see cref="IsPreRelease"/> is necessarily true): <see cref="PreReleasePatch"/> number is greater than 0.
         /// </summary>
-        public bool IsPreReleasePatch { get { return PreReleasePatch > 0; } }
+        public bool IsPreReleasePatch => PreReleasePatch > 0;
+
         /// <summary>
         /// Gets whether this is a patch: either <see cref="Patch"/> or <see cref="PreReleasePatch"/> are greater than 0.
         /// </summary>
-        public bool IsPatch { get { return PreReleasePatch > 0 || Patch > 0; } }
+        public bool IsPatch => PreReleasePatch > 0 || Patch > 0;
+
         /// <summary>
         /// Gets the "+invalid" marker.
         /// Normalized in lowercase and <see cref="string.Empty"/> when <see cref="IsMarkedInvalid"/> is false.
         /// </summary>
         public readonly string Marker;
+
         /// <summary>
         /// Gets whether this <see cref="ReleaseTagVersion"/> is valid.
         /// When false, <see cref="IsMalformed"/> may be true if the <see cref="OriginalTagText"/> somehow looks like a release tag.
         /// </summary>
-        public bool IsValid { get { return PreReleaseNameFromTag != null; } }
+        public bool IsValid => PreReleaseNameFromTag != null;
+
         /// <summary>
         /// Gets whether this <see cref="ReleaseTagVersion"/> is marked with +invalid.
         /// This is the strongest form of tag.
         /// </summary>
-        public bool IsMarkedInvalid { get { return Kind.IsMarkedInvalid(); } }
+        public bool IsMarkedInvalid => Kind.IsMarkedInvalid();
+
         /// <summary>
         /// Gets the strength of this tag: an invalid tag has a strength of 0. For valid tags, the same release tag in 
         /// terms of <see cref="OrderedVersion"/> can be expressed with: a <see cref="IsPreReleaseNameStandard"/> (stronger than a non standard 'prerelease' one), 
         /// and ultimately, a <see cref="IsMarkedInvalid"/> wins.
         /// </summary>
         public readonly int DefinitionStrength;
+
         /// <summary>
         /// The kind of tag. 
         /// </summary>
         public readonly ReleaseTagKind Kind;
+
         /// <summary>
         /// Gets whether this <see cref="ReleaseTagVersion"/> looks like a release tag but is not syntaxically valid: 
         /// see <see cref="ParseErrorMessage"/> for more information.
         /// </summary>
-        public bool IsMalformed { get { return (Kind&ReleaseTagKind.Malformed) != 0; } }
+        public bool IsMalformed => (Kind&ReleaseTagKind.Malformed) != 0;
+
         /// <summary>
         /// An error message that describes the error if <see cref="IsValid"/> is false. Null otherwise.
         /// </summary>
         public readonly string ParseErrorMessage;
+
         /// <summary>
         /// The original text.
         /// Null when this release tag has been built from an ordered version number (new <see cref="ReleaseTagVersion(long)"/>).

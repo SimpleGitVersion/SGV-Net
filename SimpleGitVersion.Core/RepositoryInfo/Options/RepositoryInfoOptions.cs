@@ -21,6 +21,11 @@ namespace SimpleGitVersion
         public RepositoryInfoOptions()
         {
             IgnoreModifiedFiles = new HashSet<string>( PathComparer.Default );
+
+
+            IgnoreModifiedFileFullProcess = true;
+
+
         }
 
         /// <summary>

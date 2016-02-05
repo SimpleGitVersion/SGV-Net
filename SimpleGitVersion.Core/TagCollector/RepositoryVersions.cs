@@ -40,15 +40,9 @@ namespace SimpleGitVersion
                 }
             }
         }
-        internal IReadOnlyList<TagCommit> TagCommits
-        {
-            get { return _versions; }
-        }
 
+        internal IReadOnlyList<TagCommit> TagCommits => _versions;
 
-        public IReadOnlyList<IFullTagCommit> Versions
-        {
-            get { return _versions; }
-        }
+        public IReadOnlyList<IFullTagCommit> Versions => _versions; 
     }
 }

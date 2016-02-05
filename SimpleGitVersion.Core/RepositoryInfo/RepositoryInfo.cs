@@ -308,6 +308,7 @@ namespace SimpleGitVersion
             }
             else
             {
+                int fileCount = 0;
                 foreach( StatusEntry m in repositoryStatus.Modified )
                 {
                     string path = m.FilePath;
@@ -315,6 +316,7 @@ namespace SimpleGitVersion
                         && (options.IgnoreModifiedFilePredicate == null
                             || !options.IgnoreModifiedFilePredicate( new ModifiedFile( r, commit, m, path ) )) )
                     {
+                        ++fileCount;
                         if( !options.IgnoreModifiedFileFullProcess )
                         {
                             Debug.Assert( b == null );
@@ -327,9 +329,10 @@ namespace SimpleGitVersion
                             b = new StringBuilder( "Modified file(s) found: " );
                             b.Append( path );
                         }
-                        else b.Append( ", " ).Append( path );
+                        else if( fileCount <= 10 ) b.Append( ", " ).Append( path );
                     }
                 }
+                if( fileCount > 10 ) b.AppendFormat( ", and {0} other file(s)", fileCount - 10 );
             }
             if( b == null ) return null;
             b.Append( '.' );
@@ -390,7 +393,7 @@ namespace SimpleGitVersion
             return null;
         }
 
-        private static void SetError( StringBuilder errors, out IReadOnlyList<string> lines, out string text )
+        static void SetError( StringBuilder errors, out IReadOnlyList<string> lines, out string text )
         {
             Debug.Assert( errors.Length > 0 );
             text = errors.ToString();

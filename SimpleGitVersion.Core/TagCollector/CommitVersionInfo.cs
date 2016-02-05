@@ -68,53 +68,53 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets this commit sha.
         /// </summary>
-        public string CommitSha { get { return _commitSha; } }
+        public string CommitSha => _commitSha;
 
         /// <summary>
         /// Gets this release tag. Null if no tag is associated to this commit.
         /// </summary>
-        public ReleaseTagVersion ThisTag { get { return _thisCommit != null ? _thisCommit.ThisTag : null; } }
+        public ReleaseTagVersion ThisTag => _thisCommit != null ? _thisCommit.ThisTag : null; 
 
         /// <summary>
         /// Gets this <see cref="ITagCommit"/>. Null if no tag is associated to this commit.
         /// </summary>
-         public ITagCommit ThisCommit { get { return _thisCommit; } }
+         public ITagCommit ThisCommit => _thisCommit; 
 
         /// <summary>
         /// Gets the maximum release tag: it can be this tag, this content tag or a previous tag.
         /// </summary>
-        public ReleaseTagVersion MaxTag { get { return _maxCommit != null ? _maxCommit.ThisTag : null; } }
+        public ReleaseTagVersion MaxTag => _maxCommit != null ? _maxCommit.ThisTag : null;
 
         /// <summary>
         /// Gets the maximmum <see cref="ITagCommit"/>. It can be this commit or any previous commit.
         /// </summary>
-        public ITagCommit MaxCommit { get { return _maxCommit; } }
+        public ITagCommit MaxCommit => _maxCommit; 
 
         /// <summary>
         /// Gets the best previous release tag set among the parent commits.
         /// </summary>
-        public ReleaseTagVersion PreviousTag { get { return _prevCommit != null ? _prevCommit.ThisTag : null; } }
+        public ReleaseTagVersion PreviousTag => _prevCommit != null ? _prevCommit.ThisTag : null; 
 
         /// <summary>
         /// Gets the best previous <see cref="ITagCommit"/> set among the parent commits.
         /// </summary>
-        public ITagCommit PreviousCommit { get { return _prevCommit != null ? _prevCommit.ThisCommit : null; } }
+        public ITagCommit PreviousCommit => _prevCommit != null ? _prevCommit.ThisCommit : null;
 
         /// <summary>
         /// Gets the maximum release tag among parents (either explicit tags or tags on content).
         /// </summary>
-        public ReleaseTagVersion PreviousMaxTag { get { return _prevMaxCommit != null ? _prevMaxCommit.MaxTag : null; } }
+        public ReleaseTagVersion PreviousMaxTag => _prevMaxCommit != null ? _prevMaxCommit.MaxTag : null;
 
         /// <summary>
         /// Gets the maximum <see cref="ITagCommit"/> among parents (either explicit tags or tags on content).
         /// </summary>
-        public ITagCommit PreviousMaxCommit { get { return _prevMaxCommit != null ? _prevMaxCommit._maxCommit : null; } }
+        public ITagCommit PreviousMaxCommit => _prevMaxCommit != null ? _prevMaxCommit._maxCommit : null;
 
         /// <summary>
         /// Gets the number of commits between this commit (longest path) and the <see cref="PreviousMaxCommit"/>, including this one:
         /// this is the build index to use for post-releases.
         /// </summary>
-        public int PreviousMaxCommitDepth { get { return _maxCommitDepth; } }
+        public int PreviousMaxCommitDepth => _maxCommitDepth; 
 
         /// <summary>
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
