@@ -37,7 +37,7 @@ namespace CK.Core
             /// Initializes a new parent object.
             /// </summary>
             /// <param name="propertyName">Name of the property. Null for an array entry.</param>
-            /// <param name="arrayIndex">Index of the property or index in an array.</param>
+            /// <param name="index">Index of the property or index in an array.</param>
             public Parent( string propertyName, int index )
             {
                 PropertyName = propertyName;

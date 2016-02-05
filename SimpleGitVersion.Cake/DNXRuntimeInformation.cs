@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Code.Cake
 {
+    /// <summary>
+    /// Captures current DNX runtime information.
+    /// This is used by <see cref="DNXSupport.DNXRun"/> to switch to another runtime if needed.
+    /// </summary>
     public class DNXRuntimeInformation
     {
         readonly string _runtimePath;
@@ -18,7 +22,7 @@ namespace Code.Cake
 
         /// <summary>
         /// Initializes a new DNX information based on the current dnx path
-        /// from the ful path to dnx.exe application (can benull if not found: <see cref="IsValid"/> will 
+        /// from the ful path to dnx.exe application (can be null if not found: <see cref="IsValid"/> will 
         /// be false).
         /// </summary>
         /// <param name="dnxExeFullPath">Full path of the dnx.exe application.</param>

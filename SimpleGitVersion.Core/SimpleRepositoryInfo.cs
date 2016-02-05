@@ -185,6 +185,7 @@ namespace SimpleGitVersion
                 if( info.IsDirty && !info.Options.IgnoreDirtyWorkingFolder )
                 {
                     SetInvalidValuesAndLog( logger, "Working folder has non committed changes.", false );
+                    logger.Info( info.IsDirtyExplanations );
                 }
                 else
                 {
@@ -192,6 +193,7 @@ namespace SimpleGitVersion
                     if( info.IsDirty )
                     {
                         logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
+                        logger.Warn( info.IsDirtyExplanations );
                     }
                     if( info.PreviousRelease != null )
                     {

@@ -68,7 +68,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the standard <see cref="PreReleaseName"/>.
         /// </summary>
-        public static IReadOnlyList<string> StandardPreReleaseNames { get { return _standardNames; } }
+        public static IReadOnlyList<string> StandardPreReleaseNames => _standardNames;
 
         /// <summary>
         /// Gets the very first possible version (0.0.0-alpha).
@@ -190,24 +190,27 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the ordered version number.
         /// </summary>
-        public long OrderedVersion { get { return _orderedVersion.Number; } }
+        public long OrderedVersion => _orderedVersion.Number;
         
         /// <summary>
         /// Gets the Major (first, most significant) part of the <see cref="OrderedVersion"/>: between 0 and 32767.
         /// </summary>
-        public int OrderedVersionMajor { get { return _orderedVersion.Major; } }
+        public int OrderedVersionMajor => _orderedVersion.Major;
+
         /// <summary>
         /// Gets the Minor (second) part of the <see cref="OrderedVersion"/>: between 0 and 65535.
         /// </summary>
-        public int OrderedVersionMinor { get { return _orderedVersion.Minor; } }
+        public int OrderedVersionMinor => _orderedVersion.Minor;
+
         /// <summary>
         /// Gets the Build (third) part of the <see cref="OrderedVersion"/>: between 0 and 65535.
         /// </summary>
-        public int OrderedVersionBuild { get { return _orderedVersion.Build; } }
+        public int OrderedVersionBuild => _orderedVersion.Build;
+
         /// <summary>
         /// Gets the Revision (last, less significant) part of the <see cref="OrderedVersion"/>: between 0 and 65535.
         /// </summary>
-        public int OrderedVersionRevision { get { return _orderedVersion.Revision; } }
+        public int OrderedVersionRevision => _orderedVersion.Revision;
 
         /// <summary>
         /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
@@ -254,10 +257,7 @@ namespace SimpleGitVersion
         /// <param name="x">First tag.</param>
         /// <param name="y">Second tag.</param>
         /// <returns>True if they are not equal.</returns>
-        static public bool operator !=( ReleaseTagVersion x, ReleaseTagVersion y )
-        {
-            return !(x == y);
-        }
+        static public bool operator !=( ReleaseTagVersion x, ReleaseTagVersion y ) => !(x == y);
 
         /// <summary>
         /// Implements &gt; operator.
@@ -297,10 +297,7 @@ namespace SimpleGitVersion
         /// <param name="x">First tag.</param>
         /// <param name="y">Second tag.</param>
         /// <returns>True if x is lower than or equal to y.</returns>
-        static public bool operator <=( ReleaseTagVersion x, ReleaseTagVersion y )
-        {
-            return !(x > y);
-        }
+        static public bool operator <=( ReleaseTagVersion x, ReleaseTagVersion y ) => !(x > y);
 
         /// <summary>
         /// Implements &gt;= operator.
@@ -308,10 +305,7 @@ namespace SimpleGitVersion
         /// <param name="x">First tag.</param>
         /// <param name="y">Second tag.</param>
         /// <returns>True if x is greater than or equal to y.</returns>
-        static public bool operator >=( ReleaseTagVersion x, ReleaseTagVersion y )
-        {
-            return !(x < y);
-        }
+        static public bool operator >=( ReleaseTagVersion x, ReleaseTagVersion y ) => !(x < y);
 
         /// <summary>
         /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
@@ -332,9 +326,7 @@ namespace SimpleGitVersion
         /// No other members are used for equality and comparison.
         /// </summary>
         /// <returns>True if they have the same OrderedVersion.</returns>
-        public override int GetHashCode()
-        {
-            return _orderedVersion.Number.GetHashCode();
-        }
+        public override int GetHashCode() => _orderedVersion.Number.GetHashCode();
+
     }
 }

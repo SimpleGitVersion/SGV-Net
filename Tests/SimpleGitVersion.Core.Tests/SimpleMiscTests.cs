@@ -45,5 +45,12 @@ namespace SimpleGitVersion.Core.Tests
             var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), TestHelper.SolutionFolder );
             Console.WriteLine( "This repo's SemVer: {0}", info.SemVer );
         }
+
+        [Test]
+        public void testing_SimpleGitRepositoryInfo_on_other_repository()
+        {
+            var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), @"C:\Dev\CK-Database\CK-SqlServer-Parser" );
+            Console.WriteLine( "This repo's SemVer: {0}", info.SemVer );
+        }
     }
 }

@@ -23,7 +23,7 @@
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
     <dependencies>
       <dependency id="SimpleGitVersion.Core" version="$version$" />
-      <dependency id="Cake.Core" version="0.7.0" />
+      <dependency id="Cake.Core" version="0.8.0" />
    </dependencies>
   </metadata>
   <files>

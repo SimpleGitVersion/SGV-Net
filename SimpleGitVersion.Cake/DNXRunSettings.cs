@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace Code.Cake
 {
+    /// <summary>
+    /// Describes settings for <see cref="DNXSupport.DNXRun"/> method.
+    /// </summary>
     public class DNXRunSettings
     {
+        /// <summary>
+        /// Initializes a new empty settings.
+        /// </summary>
         public DNXRunSettings()
         {
         }

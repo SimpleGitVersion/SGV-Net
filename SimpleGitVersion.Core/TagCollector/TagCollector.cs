@@ -23,10 +23,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the minimal version to consider. When null, the whole repository must be valid in terms of release tags.
         /// </summary>
-        public ReleaseTagVersion StartingVersionForCSemVer
-        {
-            get { return _startingVersionForCSemVer; }
-        }
+        public ReleaseTagVersion StartingVersionForCSemVer => _startingVersionForCSemVer; 
 
         /// <summary>
         /// Gets a read only and ordered list of the existing versions in the repository. 
@@ -34,10 +31,7 @@ namespace SimpleGitVersion
         /// this existing versions does not contain any version smaller than StartingVersionForCSemVer.
         /// This existing versions must always be compact (ie. no "holes" must exist between them) otherwise an error is added to the collector.
         /// </summary>
-        public RepositoryVersions ExistingVersions
-        {
-            get { return _repoVersions; }
-        }
+        public RepositoryVersions ExistingVersions => _repoVersions; 
 
         /// <summary>
         /// Initializes a new <see cref="TagCollector"/>.

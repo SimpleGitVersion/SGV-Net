@@ -29,44 +29,29 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets this commit Sha.
         /// </summary>
-        public string CommitSha
-        {
-            get { return _commitSha; }
-        }
+        public string CommitSha => _commitSha; 
 
         /// <summary>
         /// Gets this commit content Sha.
         /// </summary>
-        public string ContentSha
-        {
-            get { return _contentSha; }
-        }
+        public string ContentSha => _contentSha; 
 
         /// <summary>
         /// Gets the valid tag, if any, directly associated to this <see cref="CommitSha"/>.
         /// It is necessarily not null once <see cref="TagCollector"/> exposes it: tags that are invalid are 
         /// removed.
         /// </summary>
-        public ReleaseTagVersion ThisTag
-        {
-            get { return _thisTag; }
-        }
+        public ReleaseTagVersion ThisTag => _thisTag; 
 
         /// <summary>
         /// Gets the best commit. This <see cref="IFullTagCommit"/> if no better version exists on the content.
         /// </summary>
-        public IFullTagCommit BestCommit
-        {
-            get { return _headSameTree != null ? _headSameTree._bestTagCommit : this; }
-        }
+        public IFullTagCommit BestCommit => _headSameTree != null ? _headSameTree._bestTagCommit : this; 
 
         /// <summary>
         /// Gets <see cref="ThisTag"/> or the best version from the content.
         /// </summary>
-        public ReleaseTagVersion BestTag
-        {
-            get { return _headSameTree != null ? _headSameTree._bestTagCommit.ThisTag : _thisTag; }
-        }
+        public ReleaseTagVersion BestTag => _headSameTree != null ? _headSameTree._bestTagCommit.ThisTag : _thisTag; 
 
 
         /// <summary>
@@ -88,10 +73,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets whether the content of this commit is the same as other exitsting tags.
         /// </summary>
-        public bool HasContentTagCommits
-        {
-            get { return _headSameTree != null; }
-        }
+        public bool HasContentTagCommits => _headSameTree != null; 
 
         #region Step 1: Collect
 

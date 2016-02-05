@@ -43,17 +43,22 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets a one line error text if <see cref="HasError"/> is true. Null otherwise.
         /// </summary>
-        public string ErrorHeaderText { get { return RepositoryError ?? (ReleaseTagErrorLines != null ? ReleaseTagErrorLines[0] : null); } }
+        public string ErrorHeaderText => RepositoryError ?? (ReleaseTagErrorLines != null ? ReleaseTagErrorLines[0] : null); 
 
         /// <summary>
         /// Gets a one line error text if <see cref="HasError"/> is true. Null otherwise.
         /// </summary>
-        public bool HasError { get { return RepositoryError != null || ReleaseTagErrorText != null; } }
+        public bool HasError => RepositoryError != null || ReleaseTagErrorText != null;
 
         /// <summary>
         /// Gets whether there are non committed files in the working directory.
         /// </summary>
-        public readonly bool IsDirty;
+        public bool IsDirty => IsDirtyExplanations != null;
+
+        /// <summary>
+        /// Gets detailed explanations about <see cref="IsDirty"/>.
+        /// </summary>
+        public readonly string IsDirtyExplanations;
 
         /// <summary>
         /// Gets the release tag. If there is error, this is null.
@@ -169,7 +174,7 @@ namespace SimpleGitVersion
                 {
                     CommitSha = commit.Sha;
                     CommitDateUtc = commit.Author.When.ToUniversalTime().DateTime;
-                    IsDirty = ComputeIsDirty( r, commit, options );
+                    IsDirtyExplanations = ComputeIsDirty( r, commit, options );
                     if( !IsDirty || options.IgnoreDirtyWorkingFolder )
                     {
                         StringBuilder errors = new StringBuilder();
@@ -237,33 +242,29 @@ namespace SimpleGitVersion
             Blob _committedBlob;
             string _committedText;
 
-            public ModifiedFile( Repository r, Commit commit, StatusEntry e )
+            public ModifiedFile( Repository r, Commit commit, StatusEntry e, string entryFilePath )
             {
+                Debug.Assert( entryFilePath == e.FilePath );
                 _r = r;
                 _commit = commit;
                 _entry = e;
+                Path = entryFilePath;
             }
 
             Blob GetBlob()
             {
                 if( _committedBlob == null )
                 {
-                    TreeEntry e = _commit[_entry.FilePath];
+                    TreeEntry e = _commit[Path];
                     Debug.Assert( e.TargetType == TreeEntryTargetType.Blob );
                     _committedBlob = (Blob)e.Target;
                 }
                 return _committedBlob;
             }
 
-            public long CommittedContentSize
-            {
-                get { return GetBlob().Size; }
-            }
+            public long CommittedContentSize => GetBlob().Size; 
 
-            public Stream GetCommittedContent()
-            {
-                return GetBlob().GetContentStream();
-            }
+            public Stream GetCommittedContent() => GetBlob().GetContentStream();
 
             public string CommittedText
             {
@@ -280,40 +281,62 @@ namespace SimpleGitVersion
                     return _committedText;
                 }
             }
-            public string Path
-            {
-                get { return _entry.FilePath; }
-            }
 
-            public string FullPath
-            {
-                get { return _r.Info.WorkingDirectory + _entry.FilePath; }
-            }
+            public string Path { get; }
 
-            public string RepositoryFullPath
-            {
-                get { return _r.Info.WorkingDirectory; }
-            }
+            public string FullPath => _r.Info.WorkingDirectory + Path; 
+
+            public string RepositoryFullPath => _r.Info.WorkingDirectory;
+
         }
 
-        bool ComputeIsDirty( Repository r, Commit commit, RepositoryInfoOptions options )
+        string ComputeIsDirty( Repository r, Commit commit, RepositoryInfoOptions options )
         {
-            bool isDirty = false;
             RepositoryStatus repositoryStatus = r.RetrieveStatus();
-            if( repositoryStatus.Added.Any()
-                || repositoryStatus.Missing.Any()
-                || repositoryStatus.Removed.Any()
-                || repositoryStatus.Staged.Any() ) return true;
-            foreach( StatusEntry m in repositoryStatus.Modified )
+            int addedCount = repositoryStatus.Added.Count();
+            int missingCount = repositoryStatus.Missing.Count();
+            int removedCount = repositoryStatus.Removed.Count();
+            int stagedCount = repositoryStatus.Staged.Count();
+            StringBuilder b = null;
+            if( addedCount > 0 || missingCount > 0 || removedCount > 0 || stagedCount > 0 )
             {
-                if( !options.IgnoreModifiedFiles.Contains( m.FilePath )
-                    && (options.IgnoreModifiedFilePredicate == null || !options.IgnoreModifiedFilePredicate( new ModifiedFile( r, commit, m ) )) )
-                {
-                    isDirty = true;
-                    if( !options.IgnoreModifiedFileFullProcess ) break;
-                }
+                b = new StringBuilder( "Found: " );
+                if( addedCount > 0 ) b.AppendFormat( "{0} file(s) added", addedCount );
+                if( missingCount > 0 ) b.AppendFormat( "{0}{1} file(s) missing", b.Length > 10 ? ", " : null, missingCount );
+                if( removedCount > 0 ) b.AppendFormat( "{0}{1} file(s) removed", b.Length > 10 ? ", " : null, removedCount );
+                if( stagedCount > 0 ) b.AppendFormat( "{0}{1} file(s) staged", b.Length > 10 ? ", " : null, removedCount );
             }
-            return isDirty;
+            else
+            {
+                int fileCount = 0;
+                foreach( StatusEntry m in repositoryStatus.Modified )
+                {
+                    string path = m.FilePath;
+                    if( !options.IgnoreModifiedFiles.Contains( path )
+                        && (options.IgnoreModifiedFilePredicate == null
+                            || !options.IgnoreModifiedFilePredicate( new ModifiedFile( r, commit, m, path ) )) )
+                    {
+                        ++fileCount;
+                        if( !options.IgnoreModifiedFileFullProcess )
+                        {
+                            Debug.Assert( b == null );
+                            b = new StringBuilder( "At least one Modified file found: " );
+                            b.Append( path );
+                            break;
+                        }
+                        if( b == null )
+                        {
+                            b = new StringBuilder( "Modified file(s) found: " );
+                            b.Append( path );
+                        }
+                        else if( fileCount <= 10 ) b.Append( ", " ).Append( path );
+                    }
+                }
+                if( fileCount > 10 ) b.AppendFormat( ", and {0} other file(s)", fileCount - 10 );
+            }
+            if( b == null ) return null;
+            b.Append( '.' );
+            return b.ToString();
         }
 
         string TryFindCommit( RepositoryInfoOptions options, Repository r, out Commit commit, out CIBranchVersionMode ciVersionMode, out string branchNameForCIVersion )
@@ -370,7 +393,7 @@ namespace SimpleGitVersion
             return null;
         }
 
-        private static void SetError( StringBuilder errors, out IReadOnlyList<string> lines, out string text )
+        static void SetError( StringBuilder errors, out IReadOnlyList<string> lines, out string text )
         {
             Debug.Assert( errors.Length > 0 );
             text = errors.ToString();

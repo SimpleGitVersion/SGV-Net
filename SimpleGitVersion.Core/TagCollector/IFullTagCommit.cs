@@ -2,7 +2,6 @@
 
 namespace SimpleGitVersion
 {
-
     /// <summary>
     /// Extends a <see cref="ITagCommit"/> with information related to the commit content.
     /// </summary>
