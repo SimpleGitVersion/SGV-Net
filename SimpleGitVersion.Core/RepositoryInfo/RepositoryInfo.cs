@@ -167,9 +167,9 @@ namespace SimpleGitVersion
                 GitSolutionDirectory = gitSolutionDir;
                 Commit commit;
                 CIBranchVersionMode ciVersionMode;
-                string ciVersionName;
-                RepositoryError = TryFindCommit( options, r, out commit, out ciVersionMode, out ciVersionName );
-                Debug.Assert( (ciVersionMode != CIBranchVersionMode.None) == (ciVersionName != null) );
+                string ciBuildName;
+                RepositoryError = TryFindCommit( options, r, out commit, out ciVersionMode, out ciBuildName );
+                Debug.Assert( (ciVersionMode != CIBranchVersionMode.None) == (ciBuildName != null) );
                 if( commit != null )
                 {
                     CommitSha = commit.Sha;
@@ -222,9 +222,9 @@ namespace SimpleGitVersion
                             }
                             else
                             {
-                                if( ciVersionName != null )
+                                if( ciBuildName != null )
                                 {
-                                    CIRelease = CIReleaseInfo.Create( commit, ciVersionMode, ciVersionName, errors, info );
+                                    CIRelease = CIReleaseInfo.Create( commit, ciVersionMode, ciBuildName, errors, info );
                                 }
                             }
                         }
