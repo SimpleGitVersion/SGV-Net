@@ -43,6 +43,7 @@ namespace CodeCake
                         configuration = "Debug";
                         Cake.Warning( "Repository is not ready to be published. Setting configuration to {0}.", configuration );
                     }
+                    else
                     {
                         configuration = gitInfo.IsValidRelease && gitInfo.PreReleaseName.Length == 0 ? "Release" : "Debug";
                         Cake.Information( "Publishing {0} in {1}.", gitInfo.SemVer, configuration );
