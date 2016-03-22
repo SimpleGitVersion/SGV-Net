@@ -17,7 +17,7 @@ namespace SimpleGitVersion
             Path = path;
             using( var r = new Repository( path ) )
             {
-                _commits = r.Commits.QueryBy( new CommitFilter { Since = r.Refs }).Select( c => new SimpleCommit() { Sha = c.Sha, Message = c.Message } ).ToList();
+                _commits = r.Commits.QueryBy( new CommitFilter { IncludeReachableFrom = r.Refs }).Select( c => new SimpleCommit() { Sha = c.Sha, Message = c.Message } ).ToList();
             }
         }
 

@@ -97,7 +97,7 @@ namespace SimpleGitVersion
             {
                 Commit tagCommit = tag.ResolveTarget() as Commit;
                 if( tagCommit == null ) continue;
-                RegisterOneTag( errors, tagCommit, tag.Name, analyseInvalidTagSyntax, ref startingVersionForCSemVerFound );
+                RegisterOneTag( errors, tagCommit, tag.FriendlyName, analyseInvalidTagSyntax, ref startingVersionForCSemVerFound );
             }
             // Applies overrides (if any) as if they exist in the repository.
             if( OverriddenTags != null )
