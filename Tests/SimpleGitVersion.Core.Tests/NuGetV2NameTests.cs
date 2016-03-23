@@ -11,8 +11,6 @@ namespace SimpleGitVersion.Core.Tests
     [TestFixture]
     public class NuGetV2NameTests
     {
-
-
         [Explicit]
         [TestCase( "0.0.0-alpha" )]
         [TestCase( "0.0.0-alpha.1" )]

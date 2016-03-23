@@ -359,13 +359,13 @@ namespace SimpleGitVersion
                     // By doing this, when we are in 'Detached Head' state (the head of the repository is on a commit and not on a branch: git checkout <sha>),
                     // we can detect that it is the head of a branch and hence apply possible options (mainly CI) for it.
                     // We take into account only the branches from options.RemoteName remote here.
-                    string branchName = r.Head.Name;
+                    string branchName = r.Head.FriendlyName;
                     if( branchName == "(no branch)" )
                     {
                         string remotePrefix = options.RemoteName + '/';
                         branchNames = r.Branches
-                                        .Where( b => b.Tip == locCommit && (!b.IsRemote || b.Name.StartsWith( remotePrefix )) )
-                                        .Select( b => b.IsRemote ? b.Name.Substring( remotePrefix.Length ) : b.Name );
+                                        .Where( b => b.Tip == locCommit && (!b.IsRemote || b.FriendlyName.StartsWith( remotePrefix )) )
+                                        .Select( b => b.IsRemote ? b.FriendlyName.Substring( remotePrefix.Length ) : b.FriendlyName );
                     }
                     else branchNames = new[] { branchName };
                 }
