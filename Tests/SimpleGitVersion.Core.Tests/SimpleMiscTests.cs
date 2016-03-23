@@ -1,18 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LibGit2Sharp;
+﻿using LibGit2Sharp;
 using NUnit.Framework;
-using Semver;
+using System;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SimpleGitVersion.Core.Tests
 {
     [TestFixture]
     public class SimpleMiscTests
     {
+
+        [Test]
+        public void checking_that_SimpleGitVersion_Core_props_file_reference_the_current_native_dll_name()
+        {
+            var binPath = Path.Combine( TestHelper.SolutionFolder, "SimpleGitVersion.Core", "bin" );
+            var allGit2Dll = Directory.EnumerateFiles( binPath, "git2-*.dll", SearchOption.AllDirectories );
+            Assert.That( allGit2Dll.Count(), Is.GreaterThan( 0 ), "There must be at least one git2-XXXXX.dll file inside SimpleGitVersion.Core/bin folder!" );
+            string firstFound = Path.GetFileName( allGit2Dll.First() );
+            Assert.That( allGit2Dll.All( p => Path.GetFileName( p ) == firstFound ), "All git2-XXXXX.dll inside SimpleGitVersion.Core/bin folder must be the same!" );
+
+            var propsPath = Path.Combine( TestHelper.SolutionFolder, "SimpleGitVersion.Core", "NuGetAssets", "SimpleGitVersion.Core.props" );
+            int countDllName = new Regex( Regex.Escape( firstFound ) ).Matches( File.ReadAllText( propsPath ) ).Count;
+            Assert.That( countDllName, Is.EqualTo( 4 ), "There must be exactly 4 references to {0} in SimpleGitVersion.Core/NuGetAssets/SimpleGitVersion.Core.props file.", firstFound );
+        }
+
+
         [Test]
         public void sha1_of_trees_rocks()
         {

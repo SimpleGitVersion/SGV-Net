@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NUnit.Framework;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using NUnit.Framework;
-using SimpleGitVersion;
 
 namespace SimpleGitVersion.Core.Tests
 {
     [TestFixture]
     public class RepositoryInfoXmlFileTests
     {
+
         [Test]
         public void reading_repository_info_xml_file_StartingVersionForCSemVer_and_IgnoreModifiedFiles()
         {
