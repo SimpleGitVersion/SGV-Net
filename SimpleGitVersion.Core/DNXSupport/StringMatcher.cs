@@ -14,6 +14,10 @@ namespace CK.Core
     /// On a failed match, the <see cref="SetError"/> method sets the <see cref="ErrorMessage"/>.
     /// On a successful match, the <see cref="StartIndex"/> is updated by a call to <see cref="Forward"/> so that 
     /// the <see cref="Head"/> is positioned after the match (and any existing error is cleared).
+    /// There are 2 main kind of methods: TryMatchXXX that when the match fails returns false but do not call 
+    /// <see cref="SetError"/>and MatchXXX that do set an error on failure.
+    /// This class does not actually hide/encapsulate a lot of things: it is designed to be extended through 
+    /// extension methods.
     /// </summary>
     sealed class StringMatcher
     {
@@ -254,17 +258,33 @@ namespace CK.Core
             return SetError( minCount + " whitespace(s)" );
         }
 
-        static readonly Regex _rDouble = new Regex( @"^-?(0|[1-9][0-9]*)(\.[0-9]+)((e|E)(\+|-)?\[0-9]+)?", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
+        /// <summary>
+        /// The <see cref="Regex"/> that <see cref="TryMatchDoubleValue()"/> uses to avoid
+        /// calling <see cref="double.TryParse(string, out double)"/> when resolving the value is 
+        /// useless.
+        /// </summary>
+        static public readonly Regex RegexDouble = new Regex( @"^-?(0|[1-9][0-9]*)(\.[0-9]+)?((e|E)(\+|-)?[0-9]+)?", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
 
         /// <summary>
         /// Matches a double without getting its value nor setting an error if match fails.
+        /// This uses <see cref="RegexDouble"/>.
         /// </summary>
         /// <returns><c>true</c> when matched, <c>false</c> otherwise.</returns>
         public bool TryMatchDoubleValue()
         {
-            Match m = _rDouble.Match( _text, _startIndex, _length );
+            Match m = RegexDouble.Match( _text, _startIndex, _length );
             if( !m.Success ) return false;
             return UncheckedMove( m.Length );
+        }
+
+        /// <summary>
+        /// Matches a double and gets its value. No error is set if match fails.
+        /// </summary>
+        /// <returns><c>true</c> when matched, <c>false</c> otherwise.</returns>
+        public bool TryMatchDoubleValue( out double value )
+        {
+            if( !double.TryParse( _text.Substring( _startIndex, _length ), out value ) ) return false;
+            return UncheckedMove( _length );
         }
 
         /// <summary>
@@ -361,6 +381,12 @@ namespace CK.Core
             return UncheckedMove( i - _startIndex );
         }
 
+        /// <summary>
+        /// Overridden to return a detailed string with <see cref="Error"/> (if any),
+        /// the <see cref="Head"/> character, <see cref="StartIndex"/> position and
+        /// whole <see cref="Text"/>.
+        /// </summary>
+        /// <returns>Detailed string.</returns>
         public override string ToString()
         {
             StringBuilder b = new StringBuilder();
