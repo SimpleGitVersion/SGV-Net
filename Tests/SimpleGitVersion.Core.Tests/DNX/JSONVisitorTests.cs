@@ -68,5 +68,28 @@ namespace SimpleGitVersion.DNX.Tests
                 "1=p2|0=p3|0=|1=p4 => 2=p7" }, p.Paths );
         }
 
+        [TestCase( @"null, true", null, ", true" )]
+        [TestCase( @"""""X", "", "X" )]
+        [TestCase( @"""a""X", "a", "X" )]
+        [TestCase( @"""\\""X", @"\", "X" )]
+        [TestCase( @"""A\\B""X", @"A\B", "X" )]
+        [TestCase( @"""A\\B\r""X", "A\\B\r", "X" )]
+        [TestCase( @"""A\\B\r\""""X", "A\\B\r\"", "X" )]
+        [TestCase( @"""\u8976""X", "\u8976", "X" )]
+        [TestCase( @"""\uABCD\u07FC""X", "\uABCD\u07FC", "X" )]
+        [TestCase( @"""\uabCd\u07fC""X", "\uABCD\u07FC", "X" )]
+        public void string_matcher_TryMatchJSONQuotedString( string s, string parsed, string textAfter )
+        {
+            var m = new StringMatcher( s );
+            string result;
+            Assert.That( m.TryMatchJSONQuotedString( out result, true ) );
+            Assert.That( result, Is.EqualTo( parsed ) );
+            Assert.That( m.TryMatchText( textAfter ), "Should be followed by: " + textAfter );
+            
+            m = new StringMatcher( s );
+            Assert.That( m.TryMatchJSONQuotedString( true ) );
+            Assert.That( m.TryMatchText( textAfter ), "Should be followed by: " + textAfter );
+        }
+
     }
 }
