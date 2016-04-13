@@ -56,6 +56,11 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="DotNetRestoreSettings.cs" />
+    <Compile Include="DotNetPackSettings.cs" />
+    <Compile Include="SimpleCommandExecutor.cs" />
+    <Compile Include="DotNetSupport.cs" />
+    <Compile Include="DotNetBuildSettings.cs" />
     <Compile Include="DNUBuildSettings.cs" />
     <Compile Include="DNUPublishSettings.cs" />
     <Compile Include="DNURestoreSettings.cs" />

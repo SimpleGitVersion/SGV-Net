@@ -22,11 +22,23 @@
     <StartWorkingDirectory>$(SolutionDir)Tests\TestProject\</StartWorkingDirectory>
     <StartArguments>&gt; BuildLog.txt</StartArguments>
   </PropertyGroup>
+   
+  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\SharedKey.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+ 
+
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -45,14 +57,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\SimpleGitVersion.Core.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
-    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\SharedKey.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
       <HintPath>..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>

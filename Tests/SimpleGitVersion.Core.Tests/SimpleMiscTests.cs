@@ -60,6 +60,7 @@ namespace SimpleGitVersion.Core.Tests
         }
 
         [Test]
+        [Explicit]
         public void testing_SimpleGitRepositoryInfo_on_other_repository()
         {
             var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), @"C:\Dev\CK-Database\CK-SqlServer-Parser" );

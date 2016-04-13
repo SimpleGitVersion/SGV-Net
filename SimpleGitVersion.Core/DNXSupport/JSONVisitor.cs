@@ -141,8 +141,8 @@ namespace CK.Core
             _m.MatchWhiteSpaces( 0 );
             return _m.TryMatchJSONQuotedString( true ) 
                     || _m.TryMatchDoubleValue() 
-                    || _m.TryMatchString( "true" )
-                    || _m.TryMatchString( "false" ) 
+                    || _m.TryMatchText( "true" )
+                    || _m.TryMatchText( "false" ) 
                     ? true 
                     : _m.SetError(); 
         }
