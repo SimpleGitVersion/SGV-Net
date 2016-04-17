@@ -109,6 +109,7 @@ namespace CK.Core
                 _m.MatchWhiteSpaces( 0 );
                 if( _m.TryMatchChar( ']' ) ) return true;
                 if( !VisitArrayCell( cellIndex ) ) return false;
+                _m.MatchWhiteSpaces( 0 );
                 _m.TryMatchChar( ',' );
                 ++cellIndex;
             }

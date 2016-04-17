@@ -42,7 +42,9 @@ namespace SimpleGitVersion.DNX.Tests
         ""p3"": 
         [ 
             {
-                ""p4Before"": [""zero"", ""one"", { ""pSub"": [] }, ""three"" ]
+                ""p4Before"": [""zero""  , ""one""
+                                , { ""pSub"": [] }, 
+                                ""three"" ]
                 ""p4"": 
                 { 
                     ""p5"" : 0.989, 
@@ -90,6 +92,5 @@ namespace SimpleGitVersion.DNX.Tests
             Assert.That( m.TryMatchJSONQuotedString( true ) );
             Assert.That( m.TryMatchText( textAfter ), "Should be followed by: " + textAfter );
         }
-
     }
 }
