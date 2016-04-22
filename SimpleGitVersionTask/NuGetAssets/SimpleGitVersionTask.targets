@@ -11,7 +11,9 @@
 
   <Target Name="SimpleGitVersionBeforeCompile" BeforeTargets="CoreCompile">
 
-    <SimpleGitVersion.GetGitRepositoryInfoTask>
+    <SimpleGitVersion.GetGitRepositoryInfoTask
+            ProjectFile="$(MSBuildProjectFile)"
+      >
       <Output TaskParameter="GitSolutionDirectory" PropertyName="SGVGitSolutionDirectory" />
       <Output TaskParameter="MajorMinor" PropertyName="SGVMajorMinor" />
       <Output TaskParameter="MajorMinorPatch" PropertyName="SGVMajorMinorPatch" />

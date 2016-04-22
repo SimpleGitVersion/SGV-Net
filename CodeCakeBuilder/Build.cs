@@ -153,7 +153,7 @@ namespace CodeCake
                     }
                 } );
 
-            Task( "Default" ).IsDependentOn( "Push-NuGet-Packages" );
+            Task( "Default" ).IsDependentOn( "Create-NuGet-Packages" );
         }
 
         private void TransformText( FilePath textFilePath, string configuration, SimpleRepositoryInfo gitInfo )
