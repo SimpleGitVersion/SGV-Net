@@ -13,6 +13,7 @@
 
     <SimpleGitVersion.GetGitRepositoryInfoTask
             ProjectFile="$(MSBuildProjectFile)"
+            ProjectDirectory="$(MSBuildProjectDirectory)"
       >
       <Output TaskParameter="GitSolutionDirectory" PropertyName="SGVGitSolutionDirectory" />
       <Output TaskParameter="MajorMinor" PropertyName="SGVMajorMinor" />

@@ -17,6 +17,9 @@ namespace SimpleGitVersion
         [Required]
         public string ProjectFile { get; set; }
 
+        [Required]
+        public string ProjectDirectory { get; set; }
+
         /// <summary>
         /// Gets the solution directory: the one that contains the .git folder.
         /// </summary>
@@ -145,10 +148,10 @@ namespace SimpleGitVersion
             {
                 var logger = new Logger( this );
 
-                logger.Info( "Project File: " + BuildEngine4.ProjectFileOfTaskNode );
-                logger.Info( "Project Directory: " + ProjectFile );
-                logger.Info( "Current Directory: " + Environment.CurrentDirectory );
-                var i = SimpleRepositoryInfo.LoadFromPath( logger, ProjectFile );
+                string project= Path.Combine( ProjectDirectory, ProjectFile );
+
+                logger.Info( "Project File: " + Path.Combine( ProjectDirectory, ProjectFile ) );
+                var i = SimpleRepositoryInfo.LoadFromPath( logger, project );
                 GitSolutionDirectory = i.Info.GitSolutionDirectory;
                 IsValidRelease = i.IsValidRelease;
                 IsValidCIBuild = i.IsValidCIBuild;
