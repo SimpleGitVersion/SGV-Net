@@ -43,22 +43,24 @@ namespace Code.Cake
             cmdStartInfo.UseShellExecute = false;
             cmdStartInfo.CreateNoWindow = true;
 
-            Process cmdProcess = new Process();
-            cmdProcess.StartInfo = cmdStartInfo;
-            cmdProcess.ErrorDataReceived += ( o, e ) => { if( !string.IsNullOrEmpty( e.Data ) ) context.Log.Error( e.Data ); };
-            cmdProcess.OutputDataReceived += ( o, e ) =>
+            using( Process cmdProcess = new Process() )
             {
-                if( e.Data != null )
+                cmdProcess.StartInfo = cmdStartInfo;
+                cmdProcess.ErrorDataReceived += ( o, e ) => { if( !string.IsNullOrEmpty( e.Data ) ) context.Log.Error( e.Data ); };
+                cmdProcess.OutputDataReceived += ( o, e ) =>
                 {
-                    context.Log.Information( e.Data );
-                    if( output != null ) output( e.Data );
-                }
-            };
-            cmdProcess.Start();
-            cmdProcess.BeginErrorReadLine();
-            cmdProcess.BeginOutputReadLine();
-            cmdProcess.WaitForExit();
-            return cmdProcess.ExitCode;
+                    if( e.Data != null )
+                    {
+                        context.Log.Information( e.Data );
+                        if( output != null ) output( e.Data );
+                    }
+                };
+                cmdProcess.Start();
+                cmdProcess.BeginErrorReadLine();
+                cmdProcess.BeginOutputReadLine();
+                cmdProcess.WaitForExit();
+                return cmdProcess.ExitCode;
+            }
         }
 
     }

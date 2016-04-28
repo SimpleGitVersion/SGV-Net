@@ -146,11 +146,13 @@ namespace SimpleGitVersion
         {
             try
             {
+                // We don't user BuildEngine.ProjectFileOfTaskNode because it references the path of the .targets, and we don't want that...
+                // So the project file is computed from both MSBuild variables.
+                string project = Path.Combine( ProjectDirectory, ProjectFile );
+
                 var logger = new Logger( this );
+                logger.Info( "Project File: " + project );
 
-                string project= Path.Combine( ProjectDirectory, ProjectFile );
-
-                logger.Info( "Project File: " + Path.Combine( ProjectDirectory, ProjectFile ) );
                 var i = SimpleRepositoryInfo.LoadFromPath( logger, project );
                 GitSolutionDirectory = i.Info.GitSolutionDirectory;
                 IsValidRelease = i.IsValidRelease;
