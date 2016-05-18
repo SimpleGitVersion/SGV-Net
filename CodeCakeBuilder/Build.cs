@@ -110,6 +110,7 @@ namespace CodeCake
                 .IsDependentOn( "Build" )
                 .Does( () => 
                 {
+                    Cake.CreateDirectory( releasesDir );
                     var testDlls = Cake.ParseSolution( solutionFileName )
                          .Projects
                              .Where( p => p.Name.EndsWith( ".Tests" ) && p.Name != "CSProjTestProject" )
