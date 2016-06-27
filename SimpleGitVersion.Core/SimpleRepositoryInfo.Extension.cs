@@ -30,7 +30,7 @@ using System.Reflection;
 [assembly: AssemblyVersion(@""{0}"")]
 [assembly: AssemblyFileVersion(@""{1}"")]
 [assembly: AssemblyInformationalVersion(@""{2}"")]
-
+#pragma warning disable 0436
 [assembly: SimpleGitVersionInfo( @""{3}"", ""{4}"", ""{5}"" )]
 
 /// <summary>
