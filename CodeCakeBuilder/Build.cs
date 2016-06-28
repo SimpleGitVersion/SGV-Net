@@ -30,24 +30,41 @@ namespace CodeCake
     {
         public Build()
         {
+            const string solutionName = "SGV-Net";
+            const string solutionFileName = solutionName + ".sln";
+
             var releasesDir = Cake.Directory( "CodeCakeBuilder/Releases" );
-            string configuration = null;
             SimpleRepositoryInfo gitInfo = null;
+            // Configuration is either "Debug" or "Release".
+            string configuration = null;
+
+            // We do not publish .Tests projects for this solution.
+            var projectsToPublish = Cake.ParseSolution( solutionFileName )
+                                        .Projects
+                                        .Where( p => p.Name != "CodeCakeBuilder"
+                                                     && !p.Path.Segments.Contains( "Tests" ) );
 
             Task( "Check-Repository" )
                 .Does( () =>
                 {
                     gitInfo = Cake.GetSimpleRepositoryInfo();
+
                     if( !gitInfo.IsValid )
                     {
-                        configuration = "Debug";
-                        Cake.Warning( "Repository is not ready to be published. Setting configuration to {0}.", configuration );
+                        if( Cake.IsInteractiveMode()
+                            && Cake.ReadInteractiveOption( "Repository is not ready to be published. Proceed anyway?", 'Y', 'N' ) == 'Y' )
+                        {
+                            Cake.Warning( "GitInfo is not valid, but you choose to continue..." );
+                        }
+                        else throw new Exception( "Repository is not ready to be published." );
                     }
-                    else
-                    {
-                        configuration = gitInfo.IsValidRelease && gitInfo.PreReleaseName.Length == 0 ? "Release" : "Debug";
-                        Cake.Information( "Publishing {0} in {1}.", gitInfo.SemVer, configuration );
-                    }
+                    configuration = gitInfo.IsValidRelease && gitInfo.PreReleaseName.Length == 0 ? "Release" : "Debug";
+
+                    Cake.Information( "Publishing {0} projects with version={1} and configuration={2}: {3}",
+                        projectsToPublish.Count(),
+                        gitInfo.SemVer,
+                        configuration,
+                        string.Join( ", ", projectsToPublish.Select( p => p.Name ) ) );
                 } );
 
             Task( "Clean" )
@@ -93,7 +110,19 @@ namespace CodeCake
                 .IsDependentOn( "Build" )
                 .Does( () => 
                 {
-                    Cake.NUnit( "Tests/*.Tests/bin/"+configuration+"/*.Tests.dll", new NUnitSettings() { Framework = "v4.5" } );
+                    Cake.CreateDirectory( releasesDir );
+                    var testDlls = Cake.ParseSolution( solutionFileName )
+                         .Projects
+                             .Where( p => p.Name.EndsWith( ".Tests" ) && p.Name != "CSProjTestProject" )
+                             .Select( p => p.Path.GetDirectory().CombineWithFilePath( "bin/" + configuration + "/" + p.Name + ".dll" ) );
+
+                    Cake.Information( "Testing: {0}", string.Join( ", ", testDlls.Select( p => p.GetFilename().ToString() ) ) );
+
+                    Cake.NUnit( testDlls, new NUnitSettings()
+                    {
+                        Framework = "v4.5",
+                        OutputFile = releasesDir.Path + "/TestResult.txt"
+                    } );
                 } );
 
             Task( "Create-NuGet-Packages" )
@@ -144,12 +173,22 @@ namespace CodeCake
                     }
                     if( gitInfo.IsValidRelease )
                     {
-                        PushNuGetPackages( "NUGET_API_KEY", "https://www.nuget.org/api/v2/package", nugetPackages );
+                        if( gitInfo.PreReleaseName == ""
+                            || gitInfo.PreReleaseName == "prerelease"
+                            || gitInfo.PreReleaseName == "rc" )
+                        {
+                            PushNuGetPackages( "NUGET_API_KEY", "https://www.nuget.org/api/v2/package", nugetPackages );
+                        }
+                        else
+                        {
+                            // An alpha, beta, delta, epsilon, gamma, kappa goes to invenietis-preview.
+                            PushNuGetPackages( "MYGET_PREVIEW_API_KEY", "https://www.myget.org/F/invenietis-preview/api/v2/package", nugetPackages );
+                        }
                     }
                     else
                     {
                         Debug.Assert( gitInfo.IsValidCIBuild );
-                        PushNuGetPackages( "MYGET_EXPLORE_API_KEY", "https://www.myget.org/F/invenietis-explore/api/v2/package", nugetPackages );
+                        PushNuGetPackages( "MYGET_CI_API_KEY", "https://www.myget.org/F/invenietis-ci/api/v2/package", nugetPackages );
                     }
                 } );
 

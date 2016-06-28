@@ -12,8 +12,14 @@ namespace SimpleGitVersion
     /// current head and computes relevant version information.
     /// The Repository.xml file is used to configure the process.
     /// </summary>
-    public class GetGitRepositoryInfoTask : Task 
+    public class GetGitRepositoryInfoTask : Task
     {
+        [Required]
+        public string ProjectFile { get; set; }
+
+        [Required]
+        public string ProjectDirectory { get; set; }
+
         /// <summary>
         /// Gets the solution directory: the one that contains the .git folder.
         /// </summary>
@@ -140,7 +146,14 @@ namespace SimpleGitVersion
         {
             try
             {
-                var i = SimpleRepositoryInfo.LoadFromPath( new Logger( this ), BuildEngine.ProjectFileOfTaskNode );
+                // We don't user BuildEngine.ProjectFileOfTaskNode because it references the path of the .targets, and we don't want that...
+                // So the project file is computed from both MSBuild variables.
+                string project = Path.Combine( ProjectDirectory, ProjectFile );
+
+                var logger = new Logger( this );
+                logger.Info( "Project File: " + project );
+
+                var i = SimpleRepositoryInfo.LoadFromPath( logger, project );
                 GitSolutionDirectory = i.Info.GitSolutionDirectory;
                 IsValidRelease = i.IsValidRelease;
                 IsValidCIBuild = i.IsValidCIBuild;

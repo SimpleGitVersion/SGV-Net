@@ -3,5 +3,5 @@
   <Branches>
     <Branch Name="develop" VersionName="explore" CIVersionMode="LastReleaseBased" />
   </Branches>
-   <!--<Debug IgnoreDirtyWorkingFolder="true"/>--> 
+   <!--<Debug IgnoreDirtyWorkingFolder="true"/>-->
 </RepositoryInfo>
