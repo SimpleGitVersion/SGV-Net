@@ -130,8 +130,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props'))" />
     <Error Condition="!Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets'))" />
-    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets'))" />
   </Target>
   <Import Project="..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets" Condition="Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" />
-  <Import Project="..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets')" />
+  <Import Project="..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets')" />
 </Project>
