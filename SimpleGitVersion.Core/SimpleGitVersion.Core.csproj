@@ -119,9 +119,6 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="SignUnsignedReferences" BeforeTargets="BeforeBuild">
-    <Exec Command="&quot;$(SolutionDir)packages\Brutal.Dev.StrongNameSigner.1.8.0\tools\StrongNameSigner.Console.exe&quot; -a &quot;$(SolutionDir)packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll&quot; -k &quot;$(SolutionDir)SharedKey.snk&quot;" />
-  </Target>
   <Target Name="AfterBuild">
     <Message Text="ILMerge LibGit2Sharp.dll into SimpleGitVersion.Core in directory: $(TargetDir)ILMerged\" Importance="high" />
     <MakeDir Directories="$(TargetDir)ILMerged\" />
@@ -132,7 +129,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props'))" />
-    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.18.0\build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.18.0\build\SimpleGitVersionTask.targets'))" />
+    <Error Condition="!Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets'))" />
+    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets'))" />
   </Target>
-  <Import Project="..\packages\SimpleGitVersionTask.0.18.0\build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.18.0\build\SimpleGitVersionTask.targets')" />
+  <Import Project="..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets" Condition="Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" />
+  <Import Project="..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.19.0\Build\SimpleGitVersionTask.targets')" />
 </Project>
