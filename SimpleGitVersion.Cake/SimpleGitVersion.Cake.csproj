@@ -58,7 +58,7 @@
     </Compile>
     <Compile Include="DotNetRestoreSettings.cs" />
     <Compile Include="DotNetPackSettings.cs" />
-    <Compile Include="SimpleCommandExecutor.cs" />
+    <Compile Include="RunCmdAliases.cs" />
     <Compile Include="DotNetSupport.cs" />
     <Compile Include="DotNetBuildSettings.cs" />
     <Compile Include="DNUBuildSettings.cs" />

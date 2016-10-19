@@ -9,17 +9,17 @@ using System.Collections.Generic;
 namespace Code.Cake
 {
     /// <summary>
-    /// Internal helpers.
+    /// Small helper that uses cmd.exe to execute commands.
     /// </summary>
-    internal static class SimpleCommandExecutor
+    public static class RunCmdAliases
     {
         /// <summary>
         /// Runs cmd.exe with a command line and throws an exception if the command exits with a result that is not 0.
-        /// This is currently private but may be exposed once.
+        /// The command line contains both the executable and its parameters.
         /// </summary>
         /// <param name="context">The cake context.</param>
         /// <param name="commandLine">The command line to execute.</param>
-        static public void RunSuccessfullCmd( this ICakeContext context, string commandLine )
+        static public void RunCmdSuccessful( this ICakeContext context, string commandLine )
         {
             int r = RunCmd( context, commandLine );
             if( r != 0 ) throw new Exception( "An error occured in command: " + commandLine );
@@ -27,11 +27,12 @@ namespace Code.Cake
 
         /// <summary>
         /// Runs cmd.exe with a command line and returns the process result value.
-        /// This is currently private but may be exposed once.
+        /// The command line contains both the executable and its parameters.
         /// </summary>
         /// <param name="context">The cake context.</param>
         /// <param name="commandLine">The command line to execute.</param>
         /// <param name="output">Optional standard output lines collector.</param>
+        /// <returns>The command exit code. Typically 0 on succes...</returns>
         static public int RunCmd( this ICakeContext context, string commandLine, Action<string> output = null )
         {
             ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
