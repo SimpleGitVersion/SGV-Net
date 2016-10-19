@@ -38,7 +38,7 @@ namespace Code.Cake
             var b = new StringBuilder();
             b.Append( "dnu " );
             c.ToString( b );
-            SimpleCommandExecutor.RunSuccessfullCmd( context, b.ToString() );
+            RunCmdAliases.RunCmdSuccessful( context, b.ToString() );
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Code.Cake
             var b = new StringBuilder();
             b.Append( "dnu " );
             c.ToString( b );
-            SimpleCommandExecutor.RunSuccessfullCmd( context, b.ToString() );
+            RunCmdAliases.RunCmdSuccessful( context, b.ToString() );
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Code.Cake
             var b = new StringBuilder();
             b.Append( "dnu publish " );
             c.ToString( b );
-            SimpleCommandExecutor.RunSuccessfullCmd( context, b.ToString() );
+            RunCmdAliases.RunCmdSuccessful( context, b.ToString() );
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Code.Cake
             }
             b.Append( "dnx " );
             c.ToString( b );
-            SimpleCommandExecutor.RunSuccessfullCmd( context, b.ToString() );
+            RunCmdAliases.RunCmdSuccessful( context, b.ToString() );
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Code.Cake
         static DNXRuntimeInformation LoadDNXRuntimeInformation( ICakeContext context )
         {
             var output = new List<string>();
-            if( SimpleCommandExecutor.RunCmd( context, "where dnx", output.Add ) != 0 ) return new DNXRuntimeInformation( null );
+            if( RunCmdAliases.RunCmd( context, "where dnx", output.Add ) != 0 ) return new DNXRuntimeInformation( null );
             return new DNXRuntimeInformation( output[0] );
         }
 

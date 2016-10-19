@@ -25,7 +25,7 @@ namespace Code.Cake
             var b = new StringBuilder();
             b.Append( "dotnet restore " );
             c.ToString( b );
-            SimpleCommandExecutor.RunSuccessfullCmd( context, b.ToString() );
+            RunCmdAliases.RunCmdSuccessful( context, b.ToString() );
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Code.Cake
             var b = new StringBuilder();
             b.Append( "dotnet build " );
             c.ToString( b );
-            SimpleCommandExecutor.RunSuccessfullCmd( context, b.ToString() );
+            RunCmdAliases.RunCmdSuccessful( context, b.ToString() );
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Code.Cake
             var b = new StringBuilder();
             b.Append( "dotnet pack " );
             c.ToString( b );
-            SimpleCommandExecutor.RunSuccessfullCmd( context, b.ToString() );
+            RunCmdAliases.RunCmdSuccessful( context, b.ToString() );
         }
 
     }

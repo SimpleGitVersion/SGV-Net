@@ -18,6 +18,10 @@ namespace Code.Cake
   //
   //-r|--runtime<RUNTIME_IDENTIFIER> Produce runtime-specific assets for the specified runtime
   //--version-suffix<VERSION_SUFFIX> Defines what `*` should be replaced with in version field in project.json
+  //--build-profile Set this flag to print the incremental safety checks that prevent incremental compilation
+  //--no-incremental Set this flag to turn off incremental build
+  //--no-dependencies Set this flag to ignore project to project references and only build the root project
+  //
   //-n|--native Compiles source to native machine code.
   //-a|--arch<ARCH> The architecture for which to compile.x64 only currently supported.
   //--ilcarg<ARG> Command line option to be passed directly to ILCompiler.
@@ -26,9 +30,6 @@ namespace Code.Cake
   //--appdepsdkpath<PATH> Path to the folder containing ILCompiler application dependencies.
   //--cpp Flag to do native compilation with C++ code generator.
   //--cppcompilerflags<flags> Additional flags to be passed to the native compiler.
-  //--build-profile Set this flag to print the incremental safety checks that prevent incremental compilation
-  //--no-incremental Set this flag to turn off incremental build
-  //--no-dependencies Set this flag to ignore project to project references and only build the root project
 
     public class DotNetBuildSettings
     {
