@@ -42,8 +42,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cake.Core, Version=0.16.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cake.Core.0.16.2\lib\net45\Cake.Core.dll</HintPath>
+    <Reference Include="Cake.Core, Version=0.17.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cake.Core.0.17.0\lib\net45\Cake.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -56,17 +56,8 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="DotNetRestoreSettings.cs" />
-    <Compile Include="DotNetPackSettings.cs" />
+    <Compile Include="CakeEnvironmentExtension.cs" />
     <Compile Include="RunCmdAliases.cs" />
-    <Compile Include="DotNetSupport.cs" />
-    <Compile Include="DotNetBuildSettings.cs" />
-    <Compile Include="DNUBuildSettings.cs" />
-    <Compile Include="DNUPublishSettings.cs" />
-    <Compile Include="DNURestoreSettings.cs" />
-    <Compile Include="DNXRunSettings.cs" />
-    <Compile Include="DNXRuntimeInformation.cs" />
-    <Compile Include="DNXSupport.cs" />
     <Compile Include="SimpleGitVersionAliases.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

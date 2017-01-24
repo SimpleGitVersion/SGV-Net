@@ -11,9 +11,9 @@ namespace SimpleGitVersion
     /// <summary>
     /// Simple project.json description.
     /// </summary>
-    public class DNXProjectFile
+    public class JsonProjectFile
     {
-        readonly DNXSolution _ctx;
+        readonly JsonSolution _ctx;
         readonly string _projectFile;
         readonly string _relativeProjectFile;
         readonly string _projectName;
@@ -22,7 +22,7 @@ namespace SimpleGitVersion
         string _projectLockFileCache;
         IReadOnlyList<string> _frameworks;
 
-        internal DNXProjectFile( DNXSolution ctx, string projectFile )
+        internal JsonProjectFile( JsonSolution ctx, string projectFile )
         {
             _ctx = ctx;
             Debug.Assert( projectFile != null && projectFile.EndsWith( "project.json" ) && File.Exists( projectFile ) );
@@ -68,7 +68,7 @@ namespace SimpleGitVersion
             {
                 if( _frameworks == null )
                 {
-                    _frameworks = JSONFrameworksFinder.GetFrameworks( File.ReadAllText( _projectFile ) );
+                    _frameworks = JsonFrameworksFinder.GetFrameworks( File.ReadAllText( _projectFile ) );
                 }
                 return _frameworks;
             }
@@ -130,7 +130,7 @@ namespace SimpleGitVersion
         public bool UpdateProjectJSONFile( string version )
         {
             string text = File.ReadAllText( _projectFile );
-            if( _frameworks == null ) _frameworks = JSONFrameworksFinder.GetFrameworks( text );
+            if( _frameworks == null ) _frameworks = JsonFrameworksFinder.GetFrameworks( text );
             ProjectFileContent content = new ProjectFileContent( text, _ctx.ContainsProject );
             if( content.Version == null ) _ctx.Logger.Warn( "Unable to update version in: " + _projectFile );
             else if( content.Version == version )

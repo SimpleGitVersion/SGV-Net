@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
-    class JSONFrameworksFinder : JSONVisitor
+    class JsonFrameworksFinder : JsonVisitor
     {
         readonly List<string> _frameworks;
 
-        JSONFrameworksFinder( StringMatcher m, List<string> frameworks )
+        JsonFrameworksFinder( StringMatcher m, List<string> frameworks )
             : base( m )
         {
             _frameworks = frameworks;
@@ -22,7 +22,7 @@ namespace SimpleGitVersion
         public static List<string> GetFrameworks( string project )
         {
             var result = new List<string>();
-            new JSONFrameworksFinder( new StringMatcher( project ), result );
+            new JsonFrameworksFinder( new StringMatcher( project ), result );
             return result;
         }
 

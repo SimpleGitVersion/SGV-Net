@@ -131,12 +131,6 @@ namespace CodeCake
                 .Does( () =>
                 {
                     Cake.CreateDirectory( releasesDir );
-                    // Preparing SimpleGitVersion.DNXCommands/app folder.
-                    var dnxAppPath = releasesDir.Path + "/SimpleGitVersion.DNXCommands/app";
-                    Cake.CreateDirectory( dnxAppPath );
-                    Cake.CopyFiles( "SimpleGitVersion.DNXCommands/NuGetAssets/app/*", dnxAppPath );
-                    TransformText( dnxAppPath + "/project.json", configuration, gitInfo );
-                    // 
                     var settings = new NuGetPackSettings()
                     {
                         Version = gitInfo.NuGetVersion,
@@ -150,7 +144,6 @@ namespace CodeCake
                         Cake.NuGetPack( nuspec, settings );
                     }
                     Cake.DeleteFiles( releasesDir.Path + "/*.nuspec" );
-                    Cake.DeleteDirectory( dnxAppPath, true );
                 } );
 
             Task( "Push-NuGet-Packages" )

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
-    class JSONVersionFinder : JSONVisitor
+    class JsonVersionFinder : JsonVisitor
     {
         int _objectStart;
         bool _hasTopLevelProperties;
@@ -17,7 +17,7 @@ namespace SimpleGitVersion
         readonly List<VersionOccurrence> _versions;
         readonly Func<string, bool> _projectNameFinder;
 
-        public JSONVersionFinder( StringMatcher m, Func<string,bool> projectNameFinder, List<VersionOccurrence> allVersions )
+        public JsonVersionFinder( StringMatcher m, Func<string,bool> projectNameFinder, List<VersionOccurrence> allVersions )
             : base( m )
         {
             _objectStart = -1;
@@ -69,7 +69,7 @@ namespace SimpleGitVersion
                 Matcher.MatchWhiteSpaces( 0 );
                 if( Matcher.Head == '{' )
                 {
-                    JSONVersionFinder f = new JSONVersionFinder( Matcher, null, null );
+                    JsonVersionFinder f = new JsonVersionFinder( Matcher, null, null );
                     if( f.ThisVersion == null ) return Matcher.SetError( "Property version expected." );
                     CollectVersion( f.ThisVersion );
                 }

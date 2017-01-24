@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleGitVersion.DNX.Tests
+namespace SimpleGitVersion.JsonProject.Tests
 {
     [TestFixture]
     public class ProjectFileTests
@@ -136,7 +136,7 @@ namespace SimpleGitVersion.DNX.Tests
             string r = f.GetReplacedText( "!TheVersion!" );
             Assert.That( r, Is.EqualTo( text.Replace( "VVVVVVVV", "!TheVersion!" ) ) );
 
-            var extractedFrameworks = JSONFrameworksFinder.GetFrameworks( text );
+            var extractedFrameworks = JsonFrameworksFinder.GetFrameworks( text );
             CollectionAssert.AreEqual( extractedFrameworks, frameworks.Split( '|' ) );
         }
     }

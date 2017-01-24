@@ -8,22 +8,23 @@ using System.Threading.Tasks;
 namespace SimpleGitVersion
 {
     /// <summary>
-    /// Simple DNX Solution: discovers and handles project.json files below the solution directory.
+    /// Simple Solution for <see cref="JsonProjectFile"/>: discovers and handles project.json files 
+    /// below the "solution" directory.
     /// </summary>
-    public class DNXSolution
+    public class JsonSolution
     {
         readonly string _solutionDir;
-        readonly DNXProjectFile[] _projects;
+        readonly JsonProjectFile[] _projects;
         readonly ILogger _logger;
         SimpleRepositoryInfo _info;
 
         /// <summary>
-        /// Initializes a new <see cref="DNXSolution"/>. 
+        /// Initializes a new <see cref="JsonSolution"/>. 
         /// </summary>
         /// <param name="path">Path of the directory that contains the project.json file.</param>
         /// <param name="logger">Logger to use. Must not be null.</param>
         /// <param name="projectFilter">Optional project filter.</param>
-        public DNXSolution( string path, ILogger logger, Func<DNXProjectFile, bool> projectFilter = null )
+        public JsonSolution( string path, ILogger logger, Func<JsonProjectFile, bool> projectFilter = null )
         {
             if( path == null ) throw new ArgumentNullException( nameof( path ) );
             if( logger == null ) throw new ArgumentNullException( nameof( logger ) );
@@ -36,7 +37,7 @@ namespace SimpleGitVersion
                 _solutionDir = _solutionDir.Remove( _solutionDir.Length - 4 );
                 _projects = Directory.EnumerateFiles( _solutionDir, "project.json", SearchOption.AllDirectories )
                                     .Where( p => p.IndexOf( @"\bin\", _solutionDir.Length ) < 0 )
-                                    .Select( p => new DNXProjectFile( this, p ) )
+                                    .Select( p => new JsonProjectFile( this, p ) )
                                     .Where( p => projectFilter == null || projectFilter( p ) )
                                     .ToArray();
                 var dup = _projects.GroupBy( p => p.ProjectName, StringComparer.OrdinalIgnoreCase )
@@ -54,33 +55,33 @@ namespace SimpleGitVersion
         /// This ends with a <see cref="Path.DirectorySeparatorChar"/>.
         /// </summary>
         /// <value>The solution directory.</value>
-        public string SolutionDir { get { return _solutionDir; } }
+        public string SolutionDir => _solutionDir; 
 
         /// <summary>
         /// Gets whether this solution is valid: <see cref="SolutionDir"/> exists (.git folder has been found)
         /// and there is no duplicate project name.
         /// </summary>
-        public bool IsValid { get { return _projects != null; } }
+        public bool IsValid => _projects != null;
 
         /// <summary>
         /// Gets the logger to use.
         /// </summary>
         /// <value>The logger.</value>
-        public ILogger Logger { get { return _logger; } }
+        public ILogger Logger => _logger;
 
         /// <summary>
         /// Gets all the DNX projects found in this solution.
         /// </summary>
-        public IReadOnlyList<DNXProjectFile> Projects { get { return _projects; } }
+        public IReadOnlyList<JsonProjectFile> Projects => _projects; 
 
 
         /// <summary>
-        /// Gets the <see cref="DNXProjectFile"/> from the project path (or from the path of the project.json file).
+        /// Gets the <see cref="JsonProjectFile"/> from the project path (or from the path of the project.json file).
         /// This serach is case insensitive.
         /// </summary>
         /// <param name="projectPath">Path of the project directory or project.json file.</param>
         /// <returns>The project or null if not found.</returns>
-        public DNXProjectFile FindFromPath( string projectPath )
+        public JsonProjectFile FindFromPath( string projectPath )
         {
             if( projectPath == null ) throw new ArgumentNullException( projectPath );
             string name = Path.GetFileName( projectPath );

@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleGitVersion.DNX.Tests
+namespace SimpleGitVersion.JsonProject.Tests
 {
     [TestFixture]
     public class JSONVisitorTests
     {
-        class JSONProperties : JSONVisitor
+        class JSONProperties : JsonVisitor
         {
             public List<string> Properties;
             public List<string> Paths;

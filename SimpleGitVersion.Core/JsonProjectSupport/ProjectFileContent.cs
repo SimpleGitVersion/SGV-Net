@@ -67,15 +67,12 @@ namespace SimpleGitVersion
         /// Gets the normalized text: line ends with <see cref="Environment.NewLine"/>.
         /// </summary>
         /// <value>The normalized text.</value>
-        public string Text
-        {
-            get { return _text; }
-        }
+        public string Text => _text; 
 
         /// <summary>
         /// Gets the error message whenever the project.json has not been parsed correctly.
         /// </summary>
-        public string ErrorMessage { get { return _parseError; } }
+        public string ErrorMessage => _parseError;
 
         /// <summary>
         /// Gets the version: null if this is not a valid json, can be the empty string 
@@ -150,7 +147,7 @@ namespace SimpleGitVersion
         {
             StringMatcher m = new StringMatcher( text );
             var allVersions = new List<VersionOccurrence>();
-            JSONVersionFinder finder = new JSONVersionFinder( m, _projectNameFinder, allVersions );
+            JsonVersionFinder finder = new JsonVersionFinder( m, _projectNameFinder, allVersions );
             _thisVersion = finder.ThisVersion;
             _allVersions = allVersions;
             _sameVersions = finder.SameVersions;

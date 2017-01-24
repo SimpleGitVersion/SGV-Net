@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CK.Core
 {
-    internal class JSONVisitor
+    internal class JsonVisitor
     {
         readonly StringMatcher _m;
         readonly List<Parent> _path;
@@ -56,7 +56,7 @@ namespace CK.Core
             }
         }
 
-        public JSONVisitor( StringMatcher m )
+        public JsonVisitor( StringMatcher m )
         {
             _m = m;
             _path = new List<Parent>();
