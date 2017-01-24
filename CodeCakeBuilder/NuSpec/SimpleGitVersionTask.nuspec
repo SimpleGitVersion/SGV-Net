@@ -25,8 +25,8 @@
     <file src="SimpleGitVersionTask\bin\{{configuration}}\ILMerged\SimpleGitVersionTask.dll" target="SimpleGitVersionTask.dll" />
     <file src="SimpleGitVersionTask\bin\{{configuration}}\ILMerged\SimpleGitVersionTask.pdb" target="SimpleGitVersionTask.pdb" />
 
-    <file src="SimpleGitVersion.Core\bin\{{configuration}}\lib\win32\x64\*.dll" target="NativeBinaries\x64" />
-    <file src="SimpleGitVersion.Core\bin\{{configuration}}\lib\win32\x86\*.dll" target="NativeBinaries\x86" />
+    <file src="SimpleGitVersion.Core\bin\{{configuration}}\lib\win32\x64\*.dll" target="win32\x64" />
+    <file src="SimpleGitVersion.Core\bin\{{configuration}}\lib\win32\x86\*.dll" target="win32\x86" />
 
     <file src="SimpleGitVersionTask\NuGetAssets\SimpleGitVersionTask.targets" target="Build" />
     <file src="SimpleGitVersionTask\NuGetAssets\RepositoryInfo.xsd" target="RepositoryInfo.xsd" />

@@ -31,7 +31,7 @@ namespace SimpleGitVersion
         /// It is either a release or a CI build (see <see cref="IsValidRelease"/> and <see cref="IsValidCIBuild"/>).
         /// </summary>
         [Output]
-        public bool IsValid { get { return OrderedVersion != 0m; } }
+        public bool IsValid => OrderedVersion != 0m;
 
         /// <summary>
         /// Gets whether this is a valid, normal, release (not a CI build).

@@ -59,7 +59,10 @@
   <UsingTask TaskName="SimpleGitVersion.CreateAssemblyInfoTask" AssemblyFile="$(SolutionDir)..\..\SimpleGitVersionTask\bin\Debug\SimpleGitVersionTask.dll" />
   
   <Target Name="BeforeBuild">
-    <SimpleGitVersion.GetGitRepositoryInfoTask>
+    <SimpleGitVersion.GetGitRepositoryInfoTask
+            ProjectFile="$(MSBuildProjectFile)"
+            ProjectDirectory="$(MSBuildProjectDirectory)"
+            >
       <Output TaskParameter="GitSolutionDirectory" PropertyName="SGVGitSolutionDirectory" />
       <Output TaskParameter="MajorMinor" PropertyName="SGVMajorMinor" />
       <Output TaskParameter="MajorMinorPatch" PropertyName="SGVMajorMinorPatch" />

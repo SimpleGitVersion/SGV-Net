@@ -2,17 +2,17 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<ItemGroup>
-		<None Include="$(MSBuildThisFileDirectory)\..\NativeBinaries\x64\git2-a5cf255.dll">
+		<None Include="$(MSBuildThisFileDirectory)\..\win32\x64\git2-a5cf255.dll">
 
-			<Link>NativeBinaries\x64\git2-a5cf255.dll</Link>
+			<Link>lib\win32\x64\git2-a5cf255.dll</Link>
 
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 
 		</None>
 
-		<None Include="$(MSBuildThisFileDirectory)\..\NativeBinaries\x86\git2-a5cf255.dll">
+		<None Include="$(MSBuildThisFileDirectory)\..\win32\x86\git2-a5cf255.dll">
 
-			<Link>NativeBinaries\x86\git2-a5cf255.dll</Link>
+			<Link>lib\win32\x86\git2-a5cf255.dll</Link>
 
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 
