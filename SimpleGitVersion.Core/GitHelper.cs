@@ -27,7 +27,7 @@ namespace SimpleGitVersion
             public DllPath()
             {
                 // SimpleGitVersion.Core.dll is in a lib/net45/
-                // The native dlls are in NativeBinaries/(amd64|x86)/
+                // The native dlls are in NativeBinaries/(x64|x86)/
                 string sgvPackagepath = Path.GetDirectoryName( new Uri( typeof( SimpleRepositoryInfo ).Assembly.CodeBase ).LocalPath );
                 sgvPackagepath = Path.GetDirectoryName( Path.GetDirectoryName( sgvPackagepath ) );
                 string currentArchSubPath = @"NativeBinaries\" + (IntPtr.Size == 8 ? "x64" : "x86");
