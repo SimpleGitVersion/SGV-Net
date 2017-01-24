@@ -70,7 +70,7 @@ namespace SimpleGitVersion
         public ILogger Logger => _logger;
 
         /// <summary>
-        /// Gets all the DNX projects found in this solution.
+        /// Gets all the Json projects found in this solution.
         /// </summary>
         public IReadOnlyList<JsonProjectFile> Projects => _projects; 
 

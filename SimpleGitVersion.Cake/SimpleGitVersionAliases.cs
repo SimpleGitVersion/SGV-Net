@@ -59,8 +59,9 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets a <see cref="SimpleRepositoryInfo"/> immutable object computed from the current head of the Git repository.
-        /// Do NOT use this in a solution with DNX projects since this does not handle differences between project.json without 
-        /// taking versions properties inot account. Use the <see cref="JsonSolution.RepositoryInfo"/> property instead.
+        /// Do NOT use this in a solution with Json projects since this does not handle differences between project.json without 
+        /// taking versions properties into account. 
+        /// Use <see cref="GetSimpleJsonSolution"/> and then <see cref="JsonSolution.RepositoryInfo"/> property instead.
         /// </summary>
         /// <param name="context">The Cake context.</param>
         /// <returns>A SimpleRepositoryInfo object.</returns>
@@ -80,9 +81,9 @@ namespace SimpleGitVersion
         /// </summary>
         /// <param name="context">The Cake context.</param>
         /// <param name="projectFilter">Optionally filters returned projects.</param>
-        /// <returns>A DNXSolution object.</returns>
+        /// <returns>A JsonSolution object.</returns>
         [CakeMethodAlias]
-        public static JsonSolution GetDNXSolution( this ICakeContext context, Func<JsonProjectFile, bool> projectFilter = null )
+        public static JsonSolution GetSimpleJsonSolution( this ICakeContext context, Func<JsonProjectFile, bool> projectFilter = null )
         {
             return new JsonSolution( context.Environment.WorkingDirectory.FullPath, new Logger( context ), projectFilter );
         }
