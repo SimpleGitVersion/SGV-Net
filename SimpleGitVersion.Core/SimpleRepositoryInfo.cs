@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSemVer;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -62,7 +63,7 @@ namespace SimpleGitVersion
         public int Patch { get; private set; }
 
         /// <summary>
-        /// Gets the standard pre release name among <see cref="ReleaseTagVersion.StandardPreReleaseNames"/>.
+        /// Gets the standard pre release name among <see cref="CSVersion.StandardPreReleaseNames"/>.
         /// <see cref="string.Empty"/> when this is not a pre release version or <see cref="IsValid"/> is false.
         /// </summary>
         public string PreReleaseName { get; private set; }
@@ -118,7 +119,7 @@ namespace SimpleGitVersion
         public DateTime CommitDateUtc { get; private set; }
 
         /// <summary>
-        /// Gets the version in <see cref="ReleaseTagFormat.SemVer"/> format.
+        /// Gets the version in <see cref="CSVersionFormat.SemVer"/> format.
         /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
         /// any attempt to use this to actually package something will fail.
         /// </summary>
@@ -229,8 +230,8 @@ namespace SimpleGitVersion
                             IsValidRelease = true;
                             OriginalTagText = t.OriginalTagText;
                             SetNumericalVersionValues( t, false );
-                            NuGetVersion = t.ToString( ReleaseTagFormat.NuGetPackage );
-                            SemVer = t.ToString( ReleaseTagFormat.SemVerWithMarker );
+                            NuGetVersion = t.ToString( CSVersionFormat.NuGetPackage );
+                            SemVer = t.ToString( CSVersionFormat.SemVerWithMarker );
                             logger.Info( "Release: '{0}'.", SemVer );
                         }
                     }
@@ -259,7 +260,7 @@ namespace SimpleGitVersion
             }
         }
 
-        void SetNumericalVersionValues( ReleaseTagVersion t, bool isCIBuild )
+        void SetNumericalVersionValues( CSVersion t, bool isCIBuild )
         {
             Major = t.Major;
             Minor = t.Minor;

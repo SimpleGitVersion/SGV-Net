@@ -17,6 +17,10 @@ using Cake.Common.Tools.NuGet.Push;
 using Cake.Core.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
+using Cake.Common.Tools.DotNetCore.Restore;
+using Cake.Common.Tools.DotNetCore;
+using Cake.Common.Tools.DotNetCore.Build;
+using Cake.Common.Tools.DotNetCore.Pack;
 
 namespace CodeCake
 {
@@ -82,7 +86,7 @@ namespace CodeCake
                     Cake.NuGetRestore( "SGV-Net.sln" );
                 } );
 
-            Task( "Build" )
+            Task( "Build-Old-CSProj" )
                 .IsDependentOn( "Clean" )
                 .IsDependentOn( "Restore-NuGet-Packages" )
                 .IsDependentOn( "Check-Repository" )
@@ -91,7 +95,8 @@ namespace CodeCake
                     using( var tempSln = Cake.CreateTemporarySolutionFile( "SGV-Net.sln" ) )
                     {
                         tempSln.ExcludeProjectsFromBuild( "CodeCakeBuilder" );
-                        Cake.MSBuild( tempSln.FullPath, settings => 
+                        tempSln.ExcludeProjectsFromBuild( "CSemVer" );
+                        Cake.MSBuild( tempSln.FullPath, settings =>
                         {
                             settings.Configuration = configuration;
                             settings.Verbosity = Verbosity.Minimal;
@@ -106,8 +111,30 @@ namespace CodeCake
                     }
                 } );
 
+            Task( "Restore-Build-And-Pack-CSemVer" )
+                .IsDependentOn( "Clean" )
+                .IsDependentOn( "Restore-NuGet-Packages" )
+                .IsDependentOn( "Check-Repository" )
+                .Does( () =>
+                {
+                    Cake.CreateDirectory( releasesDir );
+                    Cake.DotNetCoreRestore( new DotNetCoreRestoreSettings().AddVersionArguments( gitInfo ) );
+                    Cake.DotNetCoreBuild( "CSemVer/CSemVer.csproj",
+                        new DotNetCoreBuildSettings().AddVersionArguments( gitInfo, s =>
+                        {
+                            s.Configuration = configuration;
+                        } ) );
+                    var settings = new DotNetCorePackSettings();
+                    settings.ArgumentCustomization = args => args.Append( "--include-symbols" );
+                    settings.NoBuild = true;
+                    settings.Configuration = configuration;
+                    settings.OutputDirectory = releasesDir;
+                    settings.AddVersionArguments( gitInfo );
+                    Cake.DotNetCorePack( "CSemVer/CSemVer.csproj", settings );
+                } );
+
             Task( "Unit-Testing" )
-                .IsDependentOn( "Build" )
+                .IsDependentOn( "Build-Old-CSProj" )
                 .Does( () => 
                 {
                     Cake.CreateDirectory( releasesDir );
@@ -127,6 +154,7 @@ namespace CodeCake
 
             Task( "Create-NuGet-Packages" )
                 .IsDependentOn( "Unit-Testing" )
+                .IsDependentOn( "Restore-Build-And-Pack-CSemVer" )
                 .WithCriteria( () => gitInfo.IsValid )
                 .Does( () =>
                 {

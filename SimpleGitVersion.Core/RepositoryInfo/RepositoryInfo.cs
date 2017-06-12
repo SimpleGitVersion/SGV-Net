@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using LibGit2Sharp;
 using System.IO;
+using CSemVer;
 
 namespace SimpleGitVersion
 {
@@ -64,7 +65,7 @@ namespace SimpleGitVersion
         /// Gets the release tag. If there is error, this is null.
         /// It is also null if there is actually no release tag on the current commit.
         /// </summary>
-        public readonly ReleaseTagVersion ValidReleaseTag;
+        public readonly CSVersion ValidReleaseTag;
 
         /// <summary>
         /// Gets whether the error is the fact that the release tag on the current commit point
@@ -83,7 +84,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
-        /// Can also be null if there is simply no previous release: the <see cref="PossibleVersions"/> are then based on <see cref="ReleaseTagVersion.FirstPossibleVersions"/>.
+        /// Can also be null if there is simply no previous release: the <see cref="PossibleVersions"/> are then based on <see cref="CSVersion.FirstPossibleVersions"/>.
         /// </summary>
         public readonly ITagCommit PreviousMaxRelease;
 
@@ -99,17 +100,17 @@ namespace SimpleGitVersion
         /// prevented its computation.
         /// When empty, this means that there can not be a valid release tag on the current commit point.
         /// </summary>
-        public readonly IReadOnlyList<ReleaseTagVersion> PossibleVersions;
+        public readonly IReadOnlyList<CSVersion> PossibleVersions;
 
         /// <summary>
         /// Gets the possible versions on this commit in a strict sense: this is a subset 
         /// of the <see cref="PossibleVersions"/>.
-        /// A possible versions that is not a <see cref="ReleaseTagVersion.IsPatch"/> do not appear here 
+        /// A possible versions that is not a <see cref="CSVersion.IsPatch"/> do not appear here 
         /// if a greater version exists in the repository.
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
         /// </summary>
-        public readonly IReadOnlyList<ReleaseTagVersion> PossibleVersionsStrict;
+        public readonly IReadOnlyList<CSVersion> PossibleVersionsStrict;
 
         /// <summary>
         /// Gets CI informations if a CI release must be done.
@@ -125,7 +126,7 @@ namespace SimpleGitVersion
         /// </summary>
         public string FinalNuGetVersion
         {
-            get { return CIRelease != null ? CIRelease.BuildVersionNuGet : (ValidReleaseTag != null ? ValidReleaseTag.ToString( ReleaseTagFormat.NuGetPackage ) : null); }
+            get { return CIRelease != null ? CIRelease.BuildVersionNuGet : (ValidReleaseTag != null ? ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ) : null); }
         }
 
         /// <summary>
@@ -158,8 +159,7 @@ namespace SimpleGitVersion
         RepositoryInfo( Repository r, RepositoryInfoOptions options, string gitSolutionDir )
             : this()
         {
-            if( options == null ) options = new RepositoryInfoOptions();
-            Options = options;
+            Options = options ?? new RepositoryInfoOptions();
             if( r == null ) RepositoryError = "No Git repository.";
             else
             {

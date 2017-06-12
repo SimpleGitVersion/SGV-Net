@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimpleGitVersion
+﻿namespace CSemVer
 {
     /// <summary>
-    /// Format description for <see cref="ReleaseTagVersion.ToString(ReleaseTagFormat,CIBuildDescriptor,bool)"/>.
+    /// Format description for <see cref="CSVersion.ToString(CSVersionFormat,CIBuildDescriptor,bool)"/>.
     /// </summary>
-    public enum ReleaseTagFormat
+    public enum CSVersionFormat
     {
         /// <summary>
         /// Normalized format is 'v' + <see cref="SemVerWithMarker"/>.
@@ -33,13 +27,13 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// The file version (see https://msdn.microsoft.com/en-us/library/system.diagnostics.fileversioninfo.fileversion.aspx)
-        /// uses the whole 64 bits: it is the <see cref="ReleaseTagVersion.OrderedVersion"/> left shifted by 1 bit with 
+        /// uses the whole 64 bits: it is the <see cref="CSVersion.OrderedVersion"/> left shifted by 1 bit with 
         /// the less significant bit set to 0 for release and 1 CI builds.
         /// </summary>
         FileVersion,
 
         /// <summary>
-        /// NuGet version 2. If the <see cref="ReleaseTagVersion.IsMarkedInvalid"/> the "+invalid" build meta data is added.
+        /// NuGet version 2. If the <see cref="CSVersion.IsMarkedInvalid"/> the "+invalid" build meta data is added.
         /// This includes <see cref="CIBuildDescriptor"/> if an applicable one is provided.
         /// </summary>
         NugetPackageV2,

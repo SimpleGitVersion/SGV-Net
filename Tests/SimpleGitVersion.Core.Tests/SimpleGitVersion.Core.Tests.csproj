@@ -59,8 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
-    <Compile Include="JsonProject\JSONVisitorTests.cs" />
-    <Compile Include="JsonProject\ProjectFileTests.cs" />
     <Compile Include="NuGetV2NameTests.cs" />
     <Compile Include="RepositoryInfoXmlFileTests.cs" />
     <Compile Include="CIBuildNameTests.cs" />

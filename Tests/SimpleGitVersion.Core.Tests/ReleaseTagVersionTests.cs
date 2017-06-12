@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Semver;
+using CSemVer;
 
 namespace SimpleGitVersion.Core.Tests
 {
     [TestFixture]
-    public class ReleaseTagVersionTests
+    public class CSVersionTests
     {
 
         [Explicit]
@@ -28,7 +29,7 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "v1.2.3-rc" )]
         public void display_successors_samples( string v )
         {
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
+            CSVersion t = CSVersion.TryParse( v );
             var succ = t.GetDirectSuccessors( false );
 
             Console.WriteLine( " -> - found {0} successors for '{1}' (Ordered Version = {2}, File = {3}):",
@@ -46,9 +47,9 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "v0.0.0-alpha.0.999" )]
         public void fix_parsing_syntax_error_helper_max_prerelease_fix( string tag )
         {
-            var error = string.Format( "Fix Number must be between 1 and {0}.", ReleaseTagVersion.MaxPreReleaseFix );
+            var error = string.Format( "Fix Number must be between 1 and {0}.", CSVersion.MaxPreReleaseFix );
 
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag, true );
+            CSVersion t = CSVersion.TryParse( tag, true );
             Assert.That( t.ParseErrorMessage, Contains.Substring( error ) );
         }
 
@@ -58,12 +59,12 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "99999.49999.9999" )]
         public void parsing_valid_release( string tag )
         {
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
+            CSVersion t = CSVersion.TryParse( tag );
             Assert.That( t.IsValid );
             Assert.That( t.IsPreRelease, Is.False );
             Assert.That( t.IsPreReleasePatch, Is.False );
-            Assert.That( t.ToString( ReleaseTagFormat.SemVer ), Is.EqualTo( tag ) );
-            Assert.That( t.ToString( ReleaseTagFormat.NuGetPackage ), Is.EqualTo( tag ) );
+            Assert.That( t.ToString( CSVersionFormat.SemVer ), Is.EqualTo( tag ) );
+            Assert.That( t.ToString( CSVersionFormat.NuGetPackage ), Is.EqualTo( tag ) );
         }
 
         [TestCase( "", -1 )]
@@ -81,21 +82,21 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "rc", 7 )]
         public void handling_pre_release_name_index( string n, int idx )
         {
-            Assert.That( ReleaseTagVersion.GetPreReleaseNameIdx( n ), Is.EqualTo( idx ), n );
+            Assert.That( CSVersion.GetPreReleaseNameIdx( n ), Is.EqualTo( idx ), n );
         }
 
         [TestCase( "3.0.1-ready.0.1" )]
         [TestCase( "99999.49999.9999-nonstandard.99.99" )]
         public void to_string_pre_release_with_nonstandard_names_works_for_SemVer_but_throws_for_NuGetV2( string tag )
         {
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
+            CSVersion t = CSVersion.TryParse( tag );
             Assert.That( t.IsValid );
             Assert.That( t.IsPreRelease );
             Assert.That( !t.IsPreReleaseNameStandard );
             Assert.That( t.IsPreReleasePatch );
             Assert.That( t.PreReleasePatch, Is.GreaterThan( 0 ) );
-            Assert.That( t.ToString( ReleaseTagFormat.SemVer, null, true ), Is.EqualTo( tag ) );
-            Assert.Throws<ArgumentException>( () => t.ToString( ReleaseTagFormat.NugetPackageV2, null, true ) );
+            Assert.That( t.ToString( CSVersionFormat.SemVer, null, true ), Is.EqualTo( tag ) );
+            Assert.Throws<ArgumentException>( () => t.ToString( CSVersionFormat.NugetPackageV2, null, true ) );
         }
 
 
@@ -106,7 +107,7 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "v0.0.0-beta", 0, 0, 0, 100 * 99 + 101 )]
         public void version_ordering_starts_at_1_for_the_very_first_possible_version( string tag, int oMajor, int oMinor, int oBuild, int oRevision )
         {
-            var t = ReleaseTagVersion.TryParse( tag, true );
+            var t = CSVersion.TryParse( tag, true );
             Assert.That( t.IsValid );
             Assert.That( t.OrderedVersionMajor, Is.EqualTo( oMajor ) );
             Assert.That( t.OrderedVersionMinor, Is.EqualTo( oMinor ) );
@@ -137,7 +138,7 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "v0.0.0-alpha+nop", true )]
         public void when_parsing_invalid_tags_can_detect_malformed_ones( string tag, bool isMalformed )
         {
-            var t = ReleaseTagVersion.TryParse( tag, true );
+            var t = CSVersion.TryParse( tag, true );
             Assert.That( !t.IsValid );
             Assert.That( t.IsMalformed, Is.EqualTo( isMalformed ) );
             //Console.WriteLine( t.ParseErrorMessage );
@@ -152,7 +153,7 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "88.88.88+Invalid", 5, "Marked Invalid = 5" )]
         public void equal_release_tags_can_have_different_definition_strengths( string tag, int level, string message )
         {
-            var t = ReleaseTagVersion.TryParse( tag, true );
+            var t = CSVersion.TryParse( tag, true );
             Assert.That( t.DefinitionStrength, Is.EqualTo( level ), message );
         }
 
@@ -186,16 +187,16 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "99999.49999.9999", true, 0 )]
         public void checking_extreme_version_ordering( string tag, bool atEnd, int expectedRank )
         {
-            var t = ReleaseTagVersion.TryParse( tag );
+            var t = CSVersion.TryParse( tag );
             if( atEnd )
             {
-                Assert.That( t.OrderedVersion - (ReleaseTagVersion.VeryLastVersion.OrderedVersion - expectedRank), Is.EqualTo( 0 ) );
+                Assert.That( t.OrderedVersion - (CSVersion.VeryLastVersion.OrderedVersion - expectedRank), Is.EqualTo( 0 ) );
             }
             else
             {
-                Assert.That( t.OrderedVersion - (ReleaseTagVersion.VeryFirstVersion.OrderedVersion + expectedRank), Is.EqualTo( 0 ) );
+                Assert.That( t.OrderedVersion - (CSVersion.VeryFirstVersion.OrderedVersion + expectedRank), Is.EqualTo( 0 ) );
             }
-            var t2 = new ReleaseTagVersion( t.OrderedVersion );
+            var t2 = new CSVersion( t.OrderedVersion );
             Assert.That( t2.ToString(), Is.EqualTo( t.ToString() ) );
             Assert.That( t.Equals( t2 ) );
         }
@@ -243,7 +244,7 @@ namespace SimpleGitVersion.Core.Tests
                     "99999.49999.9999"
                 };
             var releasedTags = orderedTags
-                                        .Select( ( tag, idx ) => new { Tag = tag, Index = idx, ReleasedTag = ReleaseTagVersion.TryParse( tag ) } )
+                                        .Select( ( tag, idx ) => new { Tag = tag, Index = idx, ReleasedTag = CSVersion.TryParse( tag ) } )
                                         .Select( s => { Assert.That( s.ReleasedTag.IsValid, s.Tag ); return s; } );
             var orderedByFileVersion = releasedTags
                                         .OrderBy( s => s.ReleasedTag.OrderedVersion );
@@ -274,11 +275,11 @@ namespace SimpleGitVersion.Core.Tests
             var targ = targets.Split( ',' )
                                     .Select( v => v.Trim() )
                                     .Where( v => v.Length > 0 )
-                                    .Select( v => ReleaseTagVersion.TryParse( v ) );
+                                    .Select( v => CSVersion.TryParse( v ) );
             var prev = candidates.Split( ',' )
                                     .Select( v => v.Trim() )
                                     .Where( v => v.Length > 0 )
-                                    .Select( v => ReleaseTagVersion.TryParse( v ) );
+                                    .Select( v => CSVersion.TryParse( v ) );
             foreach( var vTarget in targ )
             {
                 foreach( var p in prev )
@@ -300,7 +301,7 @@ namespace SimpleGitVersion.Core.Tests
                                     .Select( v => v.Trim() )
                                     .Where( v => v.Length > 0 )
                                     .ToArray();
-            var rStart = ReleaseTagVersion.TryParse( start );
+            var rStart = CSVersion.TryParse( start );
             Assert.That( rStart != null && rStart.IsValid );
             // Checks successors (and that they are ordered).
             var cNext = rStart.GetDirectSuccessors( true ).Select( v => v.ToString() ).ToArray();
@@ -321,10 +322,10 @@ namespace SimpleGitVersion.Core.Tests
             Random r = seed >= 0 ? new Random( seed ) : new Random();
             while( --count > 0 )
             {
-                long start = (long)decimal.Ceiling( r.NextDecimal() * (ReleaseTagVersion.VeryLastVersion.OrderedVersion + 1) + 1 );
-                ReleaseTagVersion rStart = CheckMapping( start );
+                long start = (long)decimal.Ceiling( r.NextDecimal() * (CSVersion.VeryLastVersion.OrderedVersion + 1) + 1 );
+                CSVersion rStart = CheckMapping( start );
                 Assert.That( rStart, Is.Not.Null );
-                ReleaseTagVersion rCurrent;
+                CSVersion rCurrent;
                 for( int i = 1; i < span; ++i )
                 {
                     rCurrent = CheckMapping( start + i );
@@ -343,19 +344,19 @@ namespace SimpleGitVersion.Core.Tests
 
         //static int _greatersuccessorCount = 0;
 
-        ReleaseTagVersion CheckMapping( long v )
+        CSVersion CheckMapping( long v )
         {
-            if( v < 0 || v > ReleaseTagVersion.VeryLastVersion.OrderedVersion )
+            if( v < 0 || v > CSVersion.VeryLastVersion.OrderedVersion )
             {
-                Assert.Throws<ArgumentException>( () => new ReleaseTagVersion( v ) );
+                Assert.Throws<ArgumentException>( () => new CSVersion( v ) );
                 return null;
             }
-            var t = new ReleaseTagVersion( v );
+            var t = new CSVersion( v );
             Assert.That( (v == 0) == !t.IsValid );
             Assert.That( t.OrderedVersion, Is.EqualTo( v ) );
-            var sSemVer = t.ToString( ReleaseTagFormat.SemVer );
-            var tSemVer = ReleaseTagVersion.TryParse( sSemVer );
-            var tNormalized = ReleaseTagVersion.TryParse( t.ToString( ReleaseTagFormat.Normalized ) );
+            var sSemVer = t.ToString( CSVersionFormat.SemVer );
+            var tSemVer = CSVersion.TryParse( sSemVer );
+            var tNormalized = CSVersion.TryParse( t.ToString( CSVersionFormat.Normalized ) );
             Assert.That( tSemVer.OrderedVersion, Is.EqualTo( v ) );
             Assert.That( tNormalized.OrderedVersion, Is.EqualTo( v ) );
             Assert.That( tNormalized.Equals( t ) );
@@ -373,7 +374,7 @@ namespace SimpleGitVersion.Core.Tests
             {
                 ++count;
                 Assert.That( succ.IsDirectPredecessor( t ) );
-                var vSemVerSucc = SemVersion.Parse( succ.ToString( ReleaseTagFormat.SemVer ) );
+                var vSemVerSucc = SemVersion.Parse( succ.ToString( CSVersionFormat.SemVer ) );
                 Assert.That( vSemVer < vSemVerSucc, "{0} < {1}", vSemVer, vSemVerSucc );
             }
             //if( count > _greatersuccessorCount )
@@ -402,15 +403,15 @@ namespace SimpleGitVersion.Core.Tests
                                     .Select( v => v.Trim() )
                                     .Where( v => v.Length > 0 )
                                     .ToArray();
-            CollectionAssert.AreEqual( next, ReleaseTagVersion.FirstPossibleVersions.Select( v => v.ToString() ).ToArray() );
+            CollectionAssert.AreEqual( next, CSVersion.FirstPossibleVersions.Select( v => v.ToString() ).ToArray() );
         }
 
         [Test]
         public void operators_overloads()
         {
             // Two variables to avoid Compiler Warning (level 3) CS1718
-            ReleaseTagVersion null2 = null;
-            ReleaseTagVersion null1 = null;
+            CSVersion null2 = null;
+            CSVersion null1 = null;
 
             Assert.That( null1 == null2 );
             Assert.That( null1 >= null2 );
@@ -420,12 +421,12 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( null1 > null2, Is.False );
             Assert.That( null1 < null2, Is.False );
 
-            NullIsAlwaysSmaller( ReleaseTagVersion.VeryFirstVersion );
-            NullIsAlwaysSmaller( ReleaseTagVersion.TryParse( "1.0.0" ) );
-            NullIsAlwaysSmaller( ReleaseTagVersion.TryParse( "bug" ) );
+            NullIsAlwaysSmaller( CSVersion.VeryFirstVersion );
+            NullIsAlwaysSmaller( CSVersion.TryParse( "1.0.0" ) );
+            NullIsAlwaysSmaller( CSVersion.TryParse( "bug" ) );
         }
 
-        private static void NullIsAlwaysSmaller( ReleaseTagVersion v )
+        private static void NullIsAlwaysSmaller( CSVersion v )
         {
             Assert.That( null != v );
             Assert.That( null == v, Is.False );

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSemVer;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,8 +21,8 @@ namespace SimpleGitVersion
         readonly CommitVersionInfo _prevMaxCommit;
         readonly IFullTagCommit _maxCommit;
         readonly int _maxCommitDepth;
-        IReadOnlyList<ReleaseTagVersion> _possibleVersions;
-        IReadOnlyList<ReleaseTagVersion> _possibleVersionsStrict;
+        IReadOnlyList<CSVersion> _possibleVersions;
+        IReadOnlyList<CSVersion> _possibleVersionsStrict;
 
         internal CommitVersionInfo( 
             TagCollector tagCollector, 
@@ -73,7 +74,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets this release tag. Null if no tag is associated to this commit.
         /// </summary>
-        public ReleaseTagVersion ThisTag => _thisCommit != null ? _thisCommit.ThisTag : null; 
+        public CSVersion ThisTag => _thisCommit != null ? _thisCommit.ThisTag : null; 
 
         /// <summary>
         /// Gets this <see cref="ITagCommit"/>. Null if no tag is associated to this commit.
@@ -83,7 +84,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the maximum release tag: it can be this tag, this content tag or a previous tag.
         /// </summary>
-        public ReleaseTagVersion MaxTag => _maxCommit != null ? _maxCommit.ThisTag : null;
+        public CSVersion MaxTag => _maxCommit != null ? _maxCommit.ThisTag : null;
 
         /// <summary>
         /// Gets the maximmum <see cref="ITagCommit"/>. It can be this commit or any previous commit.
@@ -93,7 +94,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the best previous release tag set among the parent commits.
         /// </summary>
-        public ReleaseTagVersion PreviousTag => _prevCommit != null ? _prevCommit.ThisTag : null; 
+        public CSVersion PreviousTag => _prevCommit != null ? _prevCommit.ThisTag : null; 
 
         /// <summary>
         /// Gets the best previous <see cref="ITagCommit"/> set among the parent commits.
@@ -103,7 +104,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the maximum release tag among parents (either explicit tags or tags on content).
         /// </summary>
-        public ReleaseTagVersion PreviousMaxTag => _prevMaxCommit != null ? _prevMaxCommit.MaxTag : null;
+        public CSVersion PreviousMaxTag => _prevMaxCommit != null ? _prevMaxCommit.MaxTag : null;
 
         /// <summary>
         /// Gets the maximum <see cref="ITagCommit"/> among parents (either explicit tags or tags on content).
@@ -120,7 +121,7 @@ namespace SimpleGitVersion
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
         /// These possible versions are not necessarily valid.
         /// </summary>
-        public IReadOnlyList<ReleaseTagVersion> PossibleVersions
+        public IReadOnlyList<CSVersion> PossibleVersions
         {
             get
             {
@@ -132,10 +133,10 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the possible versions on this commit in a strict sense: this is a subset 
         /// of the <see cref="PossibleVersions"/>.
-        /// A possible versions that is not a <see cref="ReleaseTagVersion.IsPatch"/> do not appear here 
+        /// A possible versions that is not a <see cref="CSVersion.IsPatch"/> do not appear here 
         /// if a greater version exists in the repository.
         /// </summary>
-        public IReadOnlyList<ReleaseTagVersion> PossibleVersionsStrict
+        public IReadOnlyList<CSVersion> PossibleVersionsStrict
         {
             get
             {
@@ -159,14 +160,14 @@ namespace SimpleGitVersion
             {
                 var versions = allVersions.Where( c => c != _thisCommit );
 
-                List<ReleaseTagVersion> possible = new List<ReleaseTagVersion>();
-                List<ReleaseTagVersion> possibleStrict = new List<ReleaseTagVersion>();
-                foreach( ReleaseTagVersion b in GetBaseVersions() )
+                List<CSVersion> possible = new List<CSVersion>();
+                List<CSVersion> possibleStrict = new List<CSVersion>();
+                foreach( CSVersion b in GetBaseVersions() )
                 {
                     // The base version b can be null here: a null version tag correctly generates 
                     // the very first possible versions (and the comparison operators handle null).
                     var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
-                    var successors = ReleaseTagVersion.GetDirectSuccessors( false, b );
+                    var successors = CSVersion.GetDirectSuccessors( false, b );
                     foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer 
                                                              && (nextReleased == null || v < nextReleased.ThisTag) ) )
                     {
@@ -185,13 +186,13 @@ namespace SimpleGitVersion
             }
         }
 
-        ReleaseTagVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }
+        CSVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }
 
         /// <summary>
         /// Returns either { PreviousTag, PreviousMaxTag }, { PreviousTag }, { PreviousMaxTag } or { null }.
         /// </summary>
         /// <returns></returns>
-        IReadOnlyList<ReleaseTagVersion> GetBaseVersions()
+        IReadOnlyList<CSVersion> GetBaseVersions()
         {
             var tP = PreviousTag;
             var tM = PreviousMaxTag;

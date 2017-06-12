@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <Import Project="..\Common\Shared.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Xml documentation is generated in Release or during Cake builds. -->
+  <PropertyGroup Condition=" '$(GenerateDocumentation)' == 'true' Or '$(Configuration)' == 'Release' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

@@ -31,6 +31,30 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\CSemVer\CIBuildDescriptor.cs">
+      <Link>CSemVer\CIBuildDescriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\CSVersion.cs">
+      <Link>CSemVer\CSVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\CSVersion.OrderedVersion.cs">
+      <Link>CSemVer\CSVersion.OrderedVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\CSVersion.Parse.cs">
+      <Link>CSemVer\CSVersion.Parse.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\CSVersion.ToString.cs">
+      <Link>CSemVer\CSVersion.ToString.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\CSVersionFormat.cs">
+      <Link>CSemVer\CSVersionFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\CSVersionKind.cs">
+      <Link>CSemVer\CSVersionKind.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\CSVersionKindExtensions.cs">
+      <Link>CSemVer\CSVersionKindExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -67,14 +91,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonProjectSupport\JsonProjectFile.cs" />
-    <Compile Include="JsonProjectSupport\JsonSolution.cs" />
-    <Compile Include="JsonProjectSupport\JsonFrameworksFinder.cs" />
-    <Compile Include="JsonProjectSupport\JsonVersionFinder.cs" />
-    <Compile Include="JsonProjectSupport\JsonVisitor.cs" />
-    <Compile Include="JsonProjectSupport\ProjectFileContent.cs" />
-    <Compile Include="JsonProjectSupport\StringMatcher.cs" />
-    <Compile Include="JsonProjectSupport\VersionOccurrence.cs" />
     <Compile Include="EmptyLogger.cs" />
     <Compile Include="PathComparer.cs" />
     <Compile Include="RepositoryInfo\CIReleaseInfo.cs" />
@@ -88,21 +104,14 @@
     <Compile Include="TagCollector\RepositoryVersions.cs" />
     <Compile Include="TagCollector\TagCollector.VersionReader.cs" />
     <Compile Include="SimpleRepositoryInfo.cs" />
-    <Compile Include="ReleaseTagVersion\CIBuildDescriptor.cs" />
-    <Compile Include="ReleaseTagVersion\ReleaseTagFormat.cs" />
     <Compile Include="RepositoryInfo\Options\CIBranchVersionMode.cs" />
     <Compile Include="UsefulExtensions.cs" />
     <Compile Include="GitExtensions.cs" />
     <Compile Include="GitHelper.cs" />
-    <Compile Include="ReleaseTagVersion\ReleaseTagKind.cs" />
-    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.OrderedVersion.cs" />
-    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.Parse.cs" />
-    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.ToString.cs" />
     <Compile Include="RepositoryInfo\Options\RepositoryInfoOptionsBranch.cs" />
     <Compile Include="RepositoryInfo\ReleaseTagParsingMode.cs" />
     <Compile Include="TagCollector\TagCollector.cs" />
     <Compile Include="RepositoryInfo\RepositoryInfo.cs" />
-    <Compile Include="ReleaseTagVersion\ReleaseTagVersion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepositoryInfo\Options\RepositoryInfoOptions.cs" />
     <Compile Include="TagCollector\TagCommit.cs" />
@@ -128,10 +137,10 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets'))" />
     <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets'))" />
     <Error Condition="!Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets'))" />
   </Target>
-  <Import Project="..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets" Condition="Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" />
   <Import Project="..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets')" />
+  <Import Project="..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets" Condition="Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" />
 </Project>

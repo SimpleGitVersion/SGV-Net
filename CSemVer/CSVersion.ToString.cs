@@ -1,27 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SimpleGitVersion
+namespace CSemVer
 {
-    public sealed partial class ReleaseTagVersion
+    public sealed partial class CSVersion
     {
 
         /// <summary>
-        /// Gets the string version in <see cref="ReleaseTagFormat.Normalized"/> format.
+        /// Gets the string version in <see cref="CSVersionFormat.Normalized"/> format.
         /// </summary>
         /// <returns>Formated string (or <see cref="ParseErrorMessage"/> if any).</returns>
         public override string ToString()
         {
-            return ToString( ReleaseTagFormat.Normalized );
+            return ToString( CSVersionFormat.Normalized );
         }
 
         /// <summary>
-        /// Gets this version in a <see cref="ReleaseTagFormat.FileVersion"/> format.
+        /// Gets this version in a <see cref="CSVersionFormat.FileVersion"/> format.
         /// </summary>
         /// <param name="isCIBuild">True to indicate a CI build: the revision part (last part) is odd.</param>
         /// <returns>The Major.Minor.Build.Revision number where each part are between 0 and 65535.</returns>
@@ -40,11 +36,11 @@ namespace SimpleGitVersion
         /// <param name="buildInfo">Not null to generate a post-release version.</param>
         /// <param name="usePreReleaseNameFromTag">True to use <see cref="PreReleaseNameFromTag"/> instead of standardized <see cref="PreReleaseName"/>.</param>
         /// <returns>Formated string (or <see cref="ParseErrorMessage"/> if any).</returns>
-        public string ToString( ReleaseTagFormat f, CIBuildDescriptor buildInfo = null, bool usePreReleaseNameFromTag = false )
+        public string ToString( CSVersionFormat f, CIBuildDescriptor buildInfo = null, bool usePreReleaseNameFromTag = false )
         {
             if( ParseErrorMessage != null ) return ParseErrorMessage;
             if( buildInfo != null && !buildInfo.IsValid ) throw new ArgumentException( "buildInfo must be valid." );
-            if( f == ReleaseTagFormat.FileVersion )
+            if( f == CSVersionFormat.FileVersion )
             {
                 return ToStringFileVersion( buildInfo != null );
             }
@@ -52,10 +48,10 @@ namespace SimpleGitVersion
             string prName = usePreReleaseNameFromTag ? PreReleaseNameFromTag : PreReleaseName;
             switch( f )
             {
-                case ReleaseTagFormat.NugetPackageV2:
+                case CSVersionFormat.NugetPackageV2:
                     {
                         // For NuGetV2, we are obliged to use the initial otherwise the special part for a pre release fix is too long for CI-Build LastReleasedBased.
-                        if( usePreReleaseNameFromTag ) throw new ArgumentException( "ReleaseTagFormat.NugetPackageV2 can not use PreReleaseNameFromTag." );
+                        if( usePreReleaseNameFromTag ) throw new ArgumentException( "VersionFormat.NugetPackageV2 can not use PreReleaseNameFromTag." );
                         prName = PreReleaseNameIdx >= 0 ? _standardNames[PreReleaseNameIdx][0].ToString() : String.Empty;
 
                         string suffix = IsMarkedInvalid ? Marker : null;
@@ -95,10 +91,10 @@ namespace SimpleGitVersion
                         }
                         return string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}{3}", Major, Minor, Patch, suffix );
                     }
-                case ReleaseTagFormat.SemVer:
-                case ReleaseTagFormat.SemVerWithMarker:
+                case CSVersionFormat.SemVer:
+                case CSVersionFormat.SemVerWithMarker:
                     {
-                        string suffix = f == ReleaseTagFormat.SemVerWithMarker ? Marker : string.Empty;
+                        string suffix = f == CSVersionFormat.SemVerWithMarker ? Marker : string.Empty;
                         bool isCIBuild = buildInfo != null;
                         if( isCIBuild )
                         {
@@ -136,7 +132,7 @@ namespace SimpleGitVersion
                     }
                 default:
                     {
-                        Debug.Assert( f == ReleaseTagFormat.Normalized );
+                        Debug.Assert( f == CSVersionFormat.Normalized );
                         if( IsPreRelease )
                         {
                             if( IsPreReleasePatch )

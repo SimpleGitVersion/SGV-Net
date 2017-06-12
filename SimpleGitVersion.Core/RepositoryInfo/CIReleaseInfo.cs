@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using CSemVer;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +14,7 @@ namespace SimpleGitVersion
     /// </summary>
     public class CIReleaseInfo
     {
-        internal CIReleaseInfo( ReleaseTagVersion ciBaseTag, int ciBaseDepth, string ciBuildVersion, string ciBuildVersionNuGet )
+        internal CIReleaseInfo( CSVersion ciBaseTag, int ciBaseDepth, string ciBuildVersion, string ciBuildVersionNuGet )
         {
             BaseTag = ciBaseTag;
             Depth = ciBaseDepth;
@@ -22,11 +23,11 @@ namespace SimpleGitVersion
         }
 
         /// <summary>
-        /// The base <see cref="ReleaseTagVersion"/> from which <see cref="BuildVersion"/> is built.
-        /// It is either the the previous release or the <see cref="ReleaseTagVersion.VeryFirstVersion"/>.
+        /// The base <see cref="CSVersion"/> from which <see cref="BuildVersion"/> is built.
+        /// It is either the the previous release or the <see cref="CSVersion.VeryFirstVersion"/>.
         /// Null if and only if CIBuildVersion is null.
         /// </summary>
-        public readonly ReleaseTagVersion BaseTag;
+        public readonly CSVersion BaseTag;
 
         /// <summary>
         /// The greatest number of commits between the current commit and the deepest occurence 
@@ -38,19 +39,19 @@ namespace SimpleGitVersion
         /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either because it is the current branch 
         /// or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it), the <see cref="RepositoryInfoOptions.StartingCommitSha"/> is null or 
         /// empty and there is no <see cref="RepositoryInfo.ValidReleaseTag"/> on the commit.
-        /// The format is based on <see cref="ReleaseTagFormat.SemVer"/>
+        /// The format is based on <see cref="CSVersionFormat.SemVer"/>
         /// </summary>
         public readonly string BuildVersion;
 
         /// <summary>
-        /// Same as <see cref="BuildVersion"/> instead that the format is based on <see cref="ReleaseTagFormat.NuGetPackage"/>
+        /// Same as <see cref="BuildVersion"/> instead that the format is based on <see cref="CSVersionFormat.NuGetPackage"/>
         /// </summary>
         public readonly string BuildVersionNuGet;
 
         internal static CIReleaseInfo Create( Commit commit, CIBranchVersionMode ciVersionMode, string ciBuildName, StringBuilder errors, CommitVersionInfo info )
         {
             var actualBaseTag = info.PreviousMaxTag;
-            ReleaseTagVersion ciBaseTag = actualBaseTag ?? ReleaseTagVersion.VeryFirstVersion;
+            CSVersion ciBaseTag = actualBaseTag ?? CSVersion.VeryFirstVersion;
             string ciBuildVersionNuGet = null, ciBuildVersion = null;
 
             // If there is no base release found, we fall back to ZeroTimedBased mode.
@@ -73,8 +74,8 @@ namespace SimpleGitVersion
                 }
                 else
                 {
-                    ciBuildVersion = actualBaseTag.ToString( ReleaseTagFormat.SemVer, ci );
-                    ciBuildVersionNuGet = actualBaseTag.ToString( ReleaseTagFormat.NuGetPackage, ci );
+                    ciBuildVersion = actualBaseTag.ToString( CSVersionFormat.SemVer, ci );
+                    ciBuildVersionNuGet = actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci );
                 }
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );

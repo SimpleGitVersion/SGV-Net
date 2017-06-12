@@ -7,6 +7,7 @@ using LibGit2Sharp;
 using NUnit.Framework;
 using Semver;
 using System.IO;
+using CSemVer;
 
 namespace SimpleGitVersion.Core.Tests
 {
@@ -22,15 +23,15 @@ namespace SimpleGitVersion.Core.Tests
         public void display_versions_and_CI_version( string version, string after )
         {
             var buildInfo = new CIBuildDescriptor() { BranchName = "develop", BuildIndex = 15 };
-            ReleaseTagVersion v = ReleaseTagVersion.TryParse( version );
-            string vCI = v.ToString( ReleaseTagFormat.SemVer, buildInfo );
-            ReleaseTagVersion vNext = new ReleaseTagVersion( v.OrderedVersion + 1 );
+            CSVersion v = CSVersion.TryParse( version );
+            string vCI = v.ToString( CSVersionFormat.SemVer, buildInfo );
+            CSVersion vNext = new CSVersion( v.OrderedVersion + 1 );
 
             Console.WriteLine( "Version = {0}, CI = {1}, Next = {2}", v, vCI, vNext );
 
-            var vSemVer = SemVersion.Parse( v.ToString( ReleaseTagFormat.SemVer ) );
+            var vSemVer = SemVersion.Parse( v.ToString( CSVersionFormat.SemVer ) );
             var vCISemVer = SemVersion.Parse( vCI );
-            var vNextSemVer = SemVersion.Parse( vNext.ToString( ReleaseTagFormat.SemVer ) );
+            var vNextSemVer = SemVersion.Parse( vNext.ToString( CSVersionFormat.SemVer ) );
             Assert.That( vSemVer < vCISemVer, "{0} < {1}", vSemVer, vCISemVer );
             Assert.That( vCISemVer < vNextSemVer, "{0} < {1}", vCISemVer, vNextSemVer );
 
@@ -53,14 +54,14 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "1.0.9999" )]
         public void CIBuildVersion_LastReleaseBased_are_correctely_ordered( string tag )
         {
-            ReleaseTagFormat formatV2 = ReleaseTagFormat.NugetPackageV2;
+            CSVersionFormat formatV2 = CSVersionFormat.NugetPackageV2;
 
-            var t = ReleaseTagVersion.TryParse( tag );
-            var v = SemVersion.Parse( t.ToString( ReleaseTagFormat.SemVer ), true );
-            var tNext = new ReleaseTagVersion( t.OrderedVersion + 1 );
-            var vNext = SemVersion.Parse( tNext.ToString( ReleaseTagFormat.SemVer ), true );
-            var tPrev = new ReleaseTagVersion( t.OrderedVersion - 1 );
-            var vPrev = SemVersion.Parse( tPrev.ToString( ReleaseTagFormat.SemVer ), true );
+            var t = CSVersion.TryParse( tag );
+            var v = SemVersion.Parse( t.ToString( CSVersionFormat.SemVer ), true );
+            var tNext = new CSVersion( t.OrderedVersion + 1 );
+            var vNext = SemVersion.Parse( tNext.ToString( CSVersionFormat.SemVer ), true );
+            var tPrev = new CSVersion( t.OrderedVersion - 1 );
+            var vPrev = SemVersion.Parse( tPrev.ToString( CSVersionFormat.SemVer ), true );
             Assert.That( vPrev < v, "{0} < {1}", vPrev, v );
             Assert.That( v < vNext, "{0} < {1}", v, vNext );
             
@@ -73,7 +74,7 @@ namespace SimpleGitVersion.Core.Tests
 
             CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = "dev", BuildIndex = 1 };
 
-            string sCI =  t.ToString( ReleaseTagFormat.SemVer, ci );
+            string sCI =  t.ToString( CSVersionFormat.SemVer, ci );
             SemVersion vCi = SemVersion.Parse( sCI, true );
             Assert.That( v < vCi, "{0} < {1}", v, vCi );
             Assert.That( vCi < vNext, "{0} < {1}", vCi, vNext );
@@ -82,7 +83,7 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGet, sNuGetCI ) < 0, "{0} < {1}", sNuGet, sNuGetCI );
             Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCI, sNuGetNext ) < 0, "{0} < {1}", sNuGetCI, sNuGetNext );
             
-            string sCiNext = tNext.ToString( ReleaseTagFormat.SemVer, ci );
+            string sCiNext = tNext.ToString( CSVersionFormat.SemVer, ci );
             SemVersion vCiNext = SemVersion.Parse( sCiNext, true );
             Assert.That( vCiNext > vCi, "{0} > {1}", vCiNext, vCi );
             Assert.That( vCiNext > vNext, "{0} > {1}", vCiNext, vNext );
@@ -91,7 +92,7 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCINext, sNuGetCI ) > 0, "{0} > {1}", sNuGetCINext, sNuGetCI );
             Assert.That( NuGetV2StringComparer.DefaultComparer.Compare( sNuGetCINext, sNuGetNext ) > 0, "{0} > {1}", sNuGetCINext, sNuGetNext );
 
-            string sCiPrev = tPrev.ToString( ReleaseTagFormat.SemVer, ci );
+            string sCiPrev = tPrev.ToString( CSVersionFormat.SemVer, ci );
             SemVersion vCiPrev = SemVersion.Parse( sCiPrev, true );
             Assert.That( vCiPrev > vPrev, "{0} > {1}", vCiPrev, vPrev );
             Assert.That( vCiPrev < v, "{0} < {1}", vCiPrev, v );

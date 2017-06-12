@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using NUnit.Framework;
+using CSemVer;
 
 namespace SimpleGitVersion.Core.Tests
 {
@@ -25,7 +26,7 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 Assert.That( i.PreviousRelease, Is.Null );
                 Assert.That( i.PreviousMaxRelease, Is.Null );
-                CollectionAssert.AreEqual( ReleaseTagVersion.FirstPossibleVersions, i.PossibleVersions );
+                CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersions );
             }
         }
 
@@ -35,7 +36,7 @@ namespace SimpleGitVersion.Core.Tests
             var repoTest = TestHelper.TestGitRepository;
             var tagged = repoTest.Commits.First( sc => sc.Message.StartsWith( "Second b/b1" ) );
 
-            var bb1Tag = ReleaseTagVersion.VeryFirstVersion;
+            var bb1Tag = CSVersion.VeryFirstVersion;
             var overrides = new TagsOverride().MutableAdd( tagged.Sha, bb1Tag.ToString() );
 
             Action<SimpleCommit> checkOK = sc =>
@@ -69,7 +70,7 @@ namespace SimpleGitVersion.Core.Tests
             {
                 var i = repoTest.GetRepositoryInfo( tagged.Sha, overrides );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( bb1Tag ) );
-                CollectionAssert.AreEqual( ReleaseTagVersion.FirstPossibleVersions, i.PossibleVersionsStrict );
+                CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersionsStrict );
             };
 
             // Checking possible versions before: none.
@@ -172,7 +173,7 @@ namespace SimpleGitVersion.Core.Tests
             // cReleased is "Merge branch 'gamma' into parallel-world" but there are two of them...
             // This is the head of parallel-world branch.
             var cReleased = repoTest.Commits.First( sc => sc.Sha == "fc9802013c23398978744de1618fb01638f7347e" );
-            var v1beta = ReleaseTagVersion.TryParse( "1.0.0-beta" );
+            var v1beta = CSVersion.TryParse( "1.0.0-beta" );
             var overrides = new TagsOverride().MutableAdd( cAlpha.Sha, "1.0.0-beta" );
 
             // cReleased
@@ -222,19 +223,19 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = cAlphaContinue.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                var tagged = ReleaseTagVersion.TryParse( "2.1.0-beta" );
+                var tagged = CSVersion.TryParse( "2.1.0-beta" );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( tagged ) );
                 CollectionAssert.AreEqual( 
-                    new[] { ReleaseTagVersion.TryParse( "1.0.0-beta.0.1" ) }
-                            .Concat( ReleaseTagVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
+                    new[] { CSVersion.TryParse( "1.0.0-beta.0.1" ) }
+                            .Concat( CSVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
                     i.PossibleVersionsStrict );
                 // In no strict mode, alpha branch can continue with any successors of
                 // the 1.0.0-beta except the v2.0.0 of course.
                 CollectionAssert.AreEqual( 
-                            ReleaseTagVersion.TryParse( "1.0.0-beta" ).GetDirectSuccessors()
-                            .Where( v => v != ReleaseTagVersion.TryParse( "2.0.0" ) )
-                            .Concat( ReleaseTagVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
+                            CSVersion.TryParse( "1.0.0-beta" ).GetDirectSuccessors()
+                            .Where( v => v != CSVersion.TryParse( "2.0.0" ) )
+                            .Concat( CSVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
                     i.PossibleVersions );
             }
         }
@@ -254,8 +255,8 @@ namespace SimpleGitVersion.Core.Tests
             var cDevInGamma = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Dev in Gamma." ) );
             var cMergeAll = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Merge branch 'parallel-world' into alpha" ) );
 
-            var v1 = ReleaseTagVersion.TryParse( "1.0.0" );
-            var v2 = ReleaseTagVersion.TryParse( "2.0.0" );
+            var v1 = CSVersion.TryParse( "1.0.0" );
+            var v2 = CSVersion.TryParse( "2.0.0" );
             var overrides = new TagsOverride()
                 .MutableAdd( cRoot.Sha, v1.ToString() )
                 .MutableAdd( cChange.Sha, v2.ToString() );
@@ -360,7 +361,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = cDevInAlpha.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                Assert.That( i.ValidReleaseTag, Is.EqualTo( ReleaseTagVersion.TryParse( "v2.0.0" ) ) );
+                Assert.That( i.ValidReleaseTag, Is.EqualTo( CSVersion.TryParse( "v2.0.0" ) ) );
             }
 
             overrides.MutableAdd( cDevInBeta.Sha, "v1.0.1-beta" );
@@ -378,7 +379,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = cDevInBeta.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                Assert.That( i.ValidReleaseTag, Is.EqualTo( ReleaseTagVersion.TryParse( "v1.0.1-beta" ) ) );
+                Assert.That( i.ValidReleaseTag, Is.EqualTo( CSVersion.TryParse( "v1.0.1-beta" ) ) );
             }
 
             overrides.MutableAdd( cDevInGamma.Sha, "v1.0.1-alpha" );
@@ -396,7 +397,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = cDevInGamma.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                Assert.That( i.ValidReleaseTag, Is.EqualTo( ReleaseTagVersion.TryParse( "v1.0.1-alpha" ) ) );
+                Assert.That( i.ValidReleaseTag, Is.EqualTo( CSVersion.TryParse( "v1.0.1-alpha" ) ) );
             }
             // On "gamma" branch, the head is 7 commits ahead of the v2.0.0 tag: this is the longest path. 
             {
@@ -695,10 +696,10 @@ namespace SimpleGitVersion.Core.Tests
                 .MutableAdd( cC.Sha, "v4.4.0-alpha" )
                 .MutableAdd( cB.Sha, "v5.0.0-rc" )
                 .MutableAdd( cA.Sha, "v5.0.0" );
-            var v5 = ReleaseTagVersion.TryParse( "v5.0.0" );
-            var v5rc = ReleaseTagVersion.TryParse( "v5.0.0-rc" );
-            var v5rc01 = ReleaseTagVersion.TryParse( "v5.0.0-rc.0.1" );
-            var v5rc1 = ReleaseTagVersion.TryParse( "v5.0.0-rc.1" );
+            var v5 = CSVersion.TryParse( "v5.0.0" );
+            var v5rc = CSVersion.TryParse( "v5.0.0-rc" );
+            var v5rc01 = CSVersion.TryParse( "v5.0.0-rc.0.1" );
+            var v5rc1 = CSVersion.TryParse( "v5.0.0-rc.1" );
             {
                 // On the fix of the fumble commit, only v5.0.0-rc.0.1 is possible in Restricted mode.
                 // Restricted mode disallow rc.1 (next version below the first already released next one).  
@@ -723,11 +724,11 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v5 ) );
 
-                var possible = new List<ReleaseTagVersion>() { v5rc01, v5rc1 };
+                var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v5.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
 
-                var possibleStrict = new List<ReleaseTagVersion>() { v5rc01 };
+                var possibleStrict = new List<CSVersion>() { v5rc01 };
                 possibleStrict.AddRange( v5.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
             }
@@ -751,11 +752,11 @@ namespace SimpleGitVersion.Core.Tests
                 .MutableAdd( cB.Sha, "v5.0.0-rc" )
                 .MutableAdd( cA.Sha, "v5.0.0" )
                 .MutableAdd( cExtra.Sha, "v10.0.0" );
-            var v5 = ReleaseTagVersion.TryParse( "v5.0.0" );
-            var v5rc = ReleaseTagVersion.TryParse( "v5.0.0-rc" );
-            var v5rc01 = ReleaseTagVersion.TryParse( "v5.0.0-rc.0.1" );
-            var v5rc1 = ReleaseTagVersion.TryParse( "v5.0.0-rc.1" );
-            var v10 = ReleaseTagVersion.TryParse( "v10.0.0" );
+            var v5 = CSVersion.TryParse( "v5.0.0" );
+            var v5rc = CSVersion.TryParse( "v5.0.0-rc" );
+            var v5rc01 = CSVersion.TryParse( "v5.0.0-rc.0.1" );
+            var v5rc1 = CSVersion.TryParse( "v5.0.0-rc.1" );
+            var v10 = CSVersion.TryParse( "v10.0.0" );
             {
                 // The injected v10 overrides everything except the possibilty to release the v5.0.0-rc.0.1.
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
@@ -766,11 +767,11 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
 
-                var possibleStrict = new List<ReleaseTagVersion>() { v5rc01 };
+                var possibleStrict = new List<CSVersion>() { v5rc01 };
                 possibleStrict.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
 
-                var possible = new List<ReleaseTagVersion>() { v5rc01, v5rc1 };
+                var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
             }
@@ -778,10 +779,10 @@ namespace SimpleGitVersion.Core.Tests
                 // On B-Commit:
                 // Restricted Mode: it is the same, v4.4.0-alpha.0.1 and successors of v10.
                 // AllSuccessors Mode: all successors of v4.4.0-alpha (except the v5.0.0) are allowed and successors of v10.
-                var v44a = ReleaseTagVersion.TryParse( "v4.4.0-alpha" );
-                var v44a01 = ReleaseTagVersion.TryParse( "v4.4.0-alpha.0.1" );
-                var v44a1 = ReleaseTagVersion.TryParse( "v4.4.0-alpha.1" );
-                var v500 = ReleaseTagVersion.TryParse( "v5.0.0" );
+                var v44a = CSVersion.TryParse( "v4.4.0-alpha" );
+                var v44a01 = CSVersion.TryParse( "v4.4.0-alpha.0.1" );
+                var v44a1 = CSVersion.TryParse( "v4.4.0-alpha.1" );
+                var v500 = CSVersion.TryParse( "v5.0.0" );
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     OverriddenTags = overrides.Overrides,
@@ -790,11 +791,11 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v44a ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
 
-                var possibleStrict = new List<ReleaseTagVersion>() { v44a01 };
+                var possibleStrict = new List<CSVersion>() { v44a01 };
                 possibleStrict.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
 
-                var possible = new List<ReleaseTagVersion>();
+                var possible = new List<CSVersion>();
                 possible.AddRange( v44a.GetDirectSuccessors().Where( v => v != v500 ) );
                 possible.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );

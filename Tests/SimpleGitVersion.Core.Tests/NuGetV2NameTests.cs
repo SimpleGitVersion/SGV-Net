@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Semver;
+using CSemVer;
 
 namespace SimpleGitVersion.Core.Tests
 {
@@ -20,13 +21,13 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "99999.49999.9999" )]
         public void display_name_and_successors_samples( string v )
         {
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
+            CSVersion t = CSVersion.TryParse( v );
             var succ = t.GetDirectSuccessors( false );
 
             Console.WriteLine( " -> - found {0} successors for '{1}' (NuGetV2 = {2}, Ordered Version = {3}, File = {4}.{5}.{6}.{7}):",
                                 succ.Count(),
                                 t,
-                                t.ToString( ReleaseTagFormat.NugetPackageV2 ),
+                                t.ToString( CSVersionFormat.NugetPackageV2 ),
                                 t.OrderedVersion,
                                 t.OrderedVersionMajor,
                                 t.OrderedVersionMinor,
@@ -44,28 +45,28 @@ namespace SimpleGitVersion.Core.Tests
             var buildInfo = new CIBuildDescriptor() { BranchName = "develop", BuildIndex = 21 };
             foreach( var v in versions.Split( ',' ).Select( s => s.Trim() ) )
             {
-                ReleaseTagVersion t = ReleaseTagVersion.TryParse( v );
+                CSVersion t = CSVersion.TryParse( v );
                 Console.WriteLine( t );
                 for( int i = -range; i <= range; ++i )
                 {
                     var num = t.OrderedVersion + i;
-                    if( num > 0m && num <= ReleaseTagVersion.VeryLastVersion.OrderedVersion )
+                    if( num > 0m && num <= CSVersion.VeryLastVersion.OrderedVersion )
                     {
-                        ReleaseTagVersion tD = new ReleaseTagVersion( num );
+                        CSVersion tD = new CSVersion( num );
                         DumpVersionInfo( buildInfo, tD );
                     }
                 }
             }
         }
 
-        static void DumpVersionInfo( CIBuildDescriptor buildInfo, ReleaseTagVersion t )
+        static void DumpVersionInfo( CIBuildDescriptor buildInfo, CSVersion t )
         {
-            var nugetV2Build = t.ToString( ReleaseTagFormat.NugetPackageV2, buildInfo );
+            var nugetV2Build = t.ToString( CSVersionFormat.NugetPackageV2, buildInfo );
             int nugetV2BuildSNLen = SemVersion.Parse( nugetV2Build ).Prerelease.Length;
             Console.WriteLine( "{0}, CI = {1}, NuGet = {2}, NuGet CI = {3}, NugetV2Build.SpecialName.Length = {4}",
                                 t,
-                                t.ToString( ReleaseTagFormat.SemVer, buildInfo ),
-                                t.ToString( ReleaseTagFormat.NugetPackageV2 ),
+                                t.ToString( CSVersionFormat.SemVer, buildInfo ),
+                                t.ToString( CSVersionFormat.NugetPackageV2 ),
                                 nugetV2Build,
                                 nugetV2BuildSNLen
                                 );
@@ -82,13 +83,13 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "99999.49999.9999-rc.99", "99999.49999.9999-r99" )]
         public void pre_release_with_standard_names_nugetV2_mappings( string tag, string nuget )
         {
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
+            CSVersion t = CSVersion.TryParse( tag );
             Assert.That( t.IsValid );
             Assert.That( t.IsPreRelease );
             Assert.That( t.IsPreReleaseNameStandard );
             Assert.That( t.IsPreReleasePatch, Is.False );
-            Assert.That( t.ToString( ReleaseTagFormat.SemVer ), Is.EqualTo( tag ) );
-            Assert.That( t.ToString( ReleaseTagFormat.NuGetPackage ), Is.EqualTo( nuget ) );
+            Assert.That( t.ToString( CSVersionFormat.SemVer ), Is.EqualTo( tag ) );
+            Assert.That( t.ToString( CSVersionFormat.NuGetPackage ), Is.EqualTo( nuget ) );
             Assert.That( SemVersion.Parse( nuget ).Prerelease.Length, Is.LessThanOrEqualTo( 20 ) );
         }
 
@@ -102,14 +103,14 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "99999.49999.9999-rc.99.99", "99999.49999.9999-r99-99" )]
         public void pre_release_with_standard_names_and_fix_number_nugetV2_mappings( string tag, string nuget )
         {
-            ReleaseTagVersion t = ReleaseTagVersion.TryParse( tag );
+            CSVersion t = CSVersion.TryParse( tag );
             Assert.That( t.IsValid );
             Assert.That( t.IsPreRelease );
             Assert.That( t.IsPreReleaseNameStandard );
             Assert.That( t.IsPreReleasePatch );
             Assert.That( t.PreReleasePatch, Is.GreaterThan( 0 ) );
-            Assert.That( t.ToString( ReleaseTagFormat.SemVer ), Is.EqualTo( tag ) );
-            Assert.That( t.ToString( ReleaseTagFormat.NugetPackageV2 ), Is.EqualTo( nuget ) );
+            Assert.That( t.ToString( CSVersionFormat.SemVer ), Is.EqualTo( tag ) );
+            Assert.That( t.ToString( CSVersionFormat.NugetPackageV2 ), Is.EqualTo( nuget ) );
             Assert.That( SemVersion.Parse( nuget ).Prerelease.Length, Is.LessThanOrEqualTo( 20 ) );
         }
 
