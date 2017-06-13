@@ -15,9 +15,9 @@ namespace SimpleGitVersion
     public static class ToolSettingsSettingsVersionExtension
     {
         /// <summary>
-        /// Version used when the repository information is invald is "0.0.0-AbsolutelyInvalid".
+        /// Version used when the repository information is invald is "0.0.0-0".
         /// </summary>
-        public const string VersionWhenInvalid = "0.0.0-AbsolutelyInvalid";
+        public const string VersionWhenInvalid = "0.0.0-0";
 
         /// <summary>
         /// Adds standard version information on <see cref="DotNetCoreSettings"/> objects.
@@ -49,7 +49,10 @@ namespace SimpleGitVersion
         }
         static void AddVersionToolArguments( Cake.Core.Tooling.ToolSettings t, SimpleRepositoryInfo info )
         {
-            string version = VersionWhenInvalid, assemblyVersion = "0.0", fileVersion = "0.0.0.0", informationalVersion = "";
+            string version = VersionWhenInvalid,
+                   assemblyVersion = "0.0",
+                   fileVersion = "0.0.0.0",
+                   informationalVersion = "0.0.0-0 (0.0.0-0) - SHA1: 0000000000000000000000000000000000000000 - CommitDate: 0001-01-01 00:00:00Z";
             if( info.IsValid )
             {
                 version = info.NuGetVersion;
