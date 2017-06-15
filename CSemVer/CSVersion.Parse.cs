@@ -29,8 +29,8 @@ namespace CSemVer
         }
 
         const string _noTagParseErrorMessage = "Not a release tag.";
-        static Regex _regexStrict = new Regex(@"^v?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)\.(?<3>0|[1-9][0-9]*)(-(?<4>[a-z]+)(\.(?<5>0|[1-9][0-9]?)(\.(?<6>[1-9][0-9]?))?)?)?(\+(?<7>Invalid)?)?$", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
-        static Regex _regexApprox = new Regex(@"^(v|V)?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)(\.(?<3>0|[1-9][0-9]*))?(?<4>.*)?$", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+        static Regex _regexStrict = new Regex(@"^v?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)\.(?<3>0|[1-9][0-9]*)(-(?<4>[a-z]+)(\.(?<5>0|[1-9][0-9]?)(\.(?<6>[1-9][0-9]?))?)?)?(\+(?<7>Invalid)?)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
+        static Regex _regexApprox = new Regex(@"^(v|V)?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)(\.(?<3>0|[1-9][0-9]*))?(?<4>.*)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
         /// <summary>
         /// Attempts to parse a string like "4.0.0", "1.0-5-alpha.0", "1.0-5-rc.12.87".
