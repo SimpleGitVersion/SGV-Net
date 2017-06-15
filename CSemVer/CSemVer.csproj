@@ -3,7 +3,7 @@
   <Import Project="..\Common\Shared.props" />
   
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFrameworks>netstandard1.3;net461</TargetFrameworks>
   </PropertyGroup>
 
   <!-- Xml documentation is generated in Release or during Cake builds. -->
