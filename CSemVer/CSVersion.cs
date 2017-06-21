@@ -93,7 +93,7 @@ namespace CSemVer
         /// <summary>
         /// Gets whether this <see cref="CSVersion"/> is marked with +invalid.
         /// This is the strongest form for a version: a +invalid marked version MUST annihilate any same version
-        /// when the both appear on a commit.
+        /// when they both appear on a commit.
         /// </summary>
         public bool IsMarkedInvalid => Kind.IsMarkedInvalid();
 

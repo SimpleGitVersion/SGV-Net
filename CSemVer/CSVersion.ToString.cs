@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 
 namespace CSemVer
 {
     public sealed partial class CSVersion
     {
-
         /// <summary>
-        /// Gets the string version in <see cref="CSVersionFormat.Normalized"/> format.
+        /// Gets the string version in <see cref="CSVersionFormat.Normalized"/> format ('v' + <see cref="CSVersionFormat.SemVerWithMarker"/>).
         /// </summary>
         /// <returns>Formated string (or <see cref="ParseErrorMessage"/> if any).</returns>
         public override string ToString()
@@ -150,5 +150,26 @@ namespace CSemVer
             }
         }
 
+        /// <summary>
+        /// Gets the standard Informational version string.
+        /// If <see cref="IsValid"/> is false this throws an <see cref="InvalidOperationException"/>: 
+        /// the constant <see cref="InvalidInformationalVersion"/> should be used when IsValid is false.
+        /// </summary>
+        /// <param name="commitSha">The SHA1 of the commit (40 hex digits).</param>
+        /// <param name="commitDateUtc">The commit date in UTC.</param>
+        /// <returns>The informational version.</returns>
+        public string GetInformationalVersion( string commitSha, DateTime commitDateUtc )
+        {
+            if( !IsValid ) throw new InvalidOperationException( "IsValid must be true. Use CSVersion.InvalidInformationalVersion when IsValid is false." );
+            if( string.IsNullOrWhiteSpace( commitSha ) || !commitSha.All( IsHexDigit ) ) throw new ArgumentException( "Must be a 40 hex digits string.", nameof( commitSha ) );
+            if( commitDateUtc.Kind != DateTimeKind.Utc ) throw new ArgumentException( "Must be a UTC date.", nameof( commitDateUtc ) );
+            var semVer = ToString( CSVersionFormat.SemVer );
+            var nugetVer = ToString( CSVersionFormat.NugetPackageV2 );
+            return $"{semVer} ({nugetVer}) - SHA1: {commitSha} - CommitDate: {commitDateUtc.ToString( "u" )}";
+        }
+
+        static bool IsHexDigit( char c ) => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
     }
 }
+
+

@@ -4,6 +4,7 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net461</TargetFrameworks>
+    <Description>Implements CSVersion class that handles all aspects of a CSemVer version and InformationaVersion to help analyzing standard InformationalVersionAttribute value.</Description>
   </PropertyGroup>
 
   <!-- Xml documentation is generated in Release or during Cake builds. -->

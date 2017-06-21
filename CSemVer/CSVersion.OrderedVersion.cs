@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace CSemVer
@@ -93,13 +94,13 @@ namespace CSemVer
         /// <summary>
         /// Gets the very last possible version.
         /// </summary>
-        public static readonly CSVersion VeryLastVersion = new CSVersion(string.Format("{0}.{1}.{2}", MaxMajor, MaxMinor, MaxPatch), MaxMajor, MaxMinor, MaxPatch, string.Empty, -1, 0, 0, CSVersionKind.OfficialRelease);
+        public static readonly CSVersion VeryLastVersion = new CSVersion(string.Format( CultureInfo.InvariantCulture, "{0}.{1}.{2}", MaxMajor, MaxMinor, MaxPatch), MaxMajor, MaxMinor, MaxPatch, string.Empty, -1, 0, 0, CSVersionKind.OfficialRelease);
 
         /// <summary>
         /// Initializes a new tag from an ordered version that must be between 0 (invalid tag) and <see cref="VeryLastVersion"/>.<see cref="OrderedVersion"/>.
         /// </summary>
         /// <param name="v">The ordered version.</param>
-        public CSVersion(long v)
+        public CSVersion( long v )
             : this( ValidateCtorArgument( v ), true )
         {
         }

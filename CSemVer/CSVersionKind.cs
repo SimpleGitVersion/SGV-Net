@@ -29,7 +29,7 @@ namespace CSemVer
         PreRelease = 4,
 
         /// <summary>
-        /// This version is +Invalid.
+        /// This version is marked with +Invalid.
         /// </summary>
         MarkedInvalid = 8
     }
