@@ -60,7 +60,7 @@ namespace CodeCake
 
                     Cake.Information( "Publishing {0} projects with version={1} and configuration={2}: {3}",
                         projectsToPublish.Count(),
-                        gitInfo.SemVer,
+                        gitInfo.Info.FinalNuGetVersion.Text,
                         configuration,
                         string.Join( ", ", projectsToPublish.Select( p => p.Name ) ) );
                 } );
@@ -132,7 +132,7 @@ namespace CodeCake
                     Cake.CreateDirectory( releasesDir );
                     var settings = new NuGetPackSettings()
                     {
-                        Version = gitInfo.NuGetVersion,
+                        Version = gitInfo.Info.FinalNuGetVersion.Text,
                         BasePath = Cake.Environment.WorkingDirectory,
                         OutputDirectory = releasesDir
                     };
@@ -191,8 +191,8 @@ namespace CodeCake
         {
             Cake.TransformTextFile( textFilePath, "{{", "}}" )
                     .WithToken( "configuration", configuration )
-                    .WithToken( "NuGetVersion", gitInfo.NuGetVersion )
-                    .WithToken( "CSemVer", gitInfo.SemVer )
+                    .WithToken( "NuGetVersion", gitInfo.Info.FinalNuGetVersion.Text )
+                    .WithToken( "CSemVer", gitInfo.Info.FinalSemVersion )
                     .Save( textFilePath );
         }
 
