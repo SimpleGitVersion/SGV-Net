@@ -98,7 +98,7 @@
   <Target Name="AfterBuild">
     <Message Text="ILMerge LibGit2Sharp.dll into SimpleGitVersion.Core in directory: $(TargetDir)ILMerged\" Importance="high" />
     <MakeDir Directories="$(TargetDir)ILMerged\" />
-    <Exec Command="&quot;$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILmerge.exe&quot;  /allowDup /ndebug /keyfile:&quot;$(SolutionDir)SharedKey.snk&quot; /out:&quot;$(TargetDir)ILMerged\$(TargetFileName)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)LibGit2Sharp.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot; /internalize " />
+    <Exec Command="&quot;$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILmerge.exe&quot; /allowDup /keyfile:&quot;$(SolutionDir)SharedKey.snk&quot; /out:&quot;$(TargetDir)ILMerged\$(TargetFileName)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)LibGit2Sharp.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot; /internalize " />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
