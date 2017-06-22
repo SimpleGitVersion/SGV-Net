@@ -182,7 +182,7 @@ namespace SimpleGitVersion
                 if( commit != null )
                 {
                     CommitSha = commit.Sha;
-                    CommitDateUtc = commit.Author.When.ToUniversalTime().DateTime;
+                    CommitDateUtc = commit.Author.When.UtcDateTime;
                     IsDirtyExplanations = ComputeIsDirty( r, commit, options );
                     if( !IsDirty || options.IgnoreDirtyWorkingFolder )
                     {
