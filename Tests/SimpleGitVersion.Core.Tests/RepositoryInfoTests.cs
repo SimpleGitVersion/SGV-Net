@@ -411,7 +411,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "2.0.1--ci-gamma.7" ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( "2.0.1--ci-gamma.7" ) );
             }
             // Testing "gamma" branch in ZeroTimed mode. 
             {
@@ -424,8 +424,8 @@ namespace SimpleGitVersion.Core.Tests
                         new RepositoryInfoOptionsBranch() { Name = "gamma", CIVersionMode = CIBranchVersionMode.ZeroTimed }
                     }
                 } );
-                Assert.That( i.CIRelease.BuildVersionNuGet, Is.EqualTo( "0.0.0-Cgamma-00185gh" ) );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "0.0.0--ci-gamma.2015-07-13T07-46-29-00+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.Text, Is.EqualTo( "0.0.0-Cgamma-00185gh" ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( "0.0.0--ci-gamma.2015-07-13T07-46-29-00+v2.0.0" ) );
             }
             // On "alpha" branch, the head is 6 commits ahead of the v2.0.0 tag (always the take the longest path). 
             {
@@ -439,7 +439,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "2.0.1--ci-ALPHAAAA.6" ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( "2.0.1--ci-ALPHAAAA.6" ) );
             }
             // Testing "alpha" branch in ZeroTimed mode.  
             {
@@ -452,8 +452,8 @@ namespace SimpleGitVersion.Core.Tests
                         new RepositoryInfoOptionsBranch() { Name = "alpha", VersionName="ALPH", CIVersionMode = CIBranchVersionMode.ZeroTimed }
                     }
                 } );
-                Assert.That( i.CIRelease.BuildVersionNuGet, Is.EqualTo( "0.0.0-CALPH-00187mq" ) );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "0.0.0--ci-ALPH.2015-07-13T10-00-58-00+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.Text, Is.EqualTo( "0.0.0-CALPH-00187mq" ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( "0.0.0--ci-ALPH.2015-07-13T10-00-58-00+v2.0.0" ) );
             }
             // On "beta" branch, the head is 6 commits ahead of the v2.0.0 tag. 
             {
@@ -467,7 +467,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "2.0.1--ci-BBBBBB.6" ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( "2.0.1--ci-BBBBBB.6" ) );
             }
             // Testing ZeroTimed mode on "beta" branch. 
             {
@@ -480,8 +480,8 @@ namespace SimpleGitVersion.Core.Tests
                         new RepositoryInfoOptionsBranch() { Name = "beta", VersionName="beta", CIVersionMode = CIBranchVersionMode.ZeroTimed }
                     }
                 } );
-                Assert.That( i.CIRelease.BuildVersionNuGet, Is.EqualTo( "0.0.0-Cbeta-00185fx" ) );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( "0.0.0--ci-beta.2015-07-13T07-45-43-00+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.Text, Is.EqualTo( "0.0.0-Cbeta-00185fx" ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( "0.0.0--ci-beta.2015-07-13T07-45-43-00+v2.0.0" ) );
             }
 
         }
@@ -508,8 +508,8 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( ciBuildVersion ) );
-                Assert.That( i.CIRelease.BuildVersionNuGet, Is.EqualTo( ciBuildVersionNuGet ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( ciBuildVersion ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.Text, Is.EqualTo( ciBuildVersionNuGet ) );
             }
         }
 
@@ -550,8 +550,8 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion, Is.EqualTo( ciBuildVersion ) );
-                Assert.That( i.CIRelease.BuildVersionNuGet, Is.EqualTo( ciBuildVersionNuGet ) );
+                Assert.That( i.CIRelease.BuildVersion.Text, Is.EqualTo( ciBuildVersion ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.Text, Is.EqualTo( ciBuildVersionNuGet ) );
             }
         }
 

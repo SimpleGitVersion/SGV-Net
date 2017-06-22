@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimpleGitVersion.Core</RootNamespace>
     <AssemblyName>SimpleGitVersion.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -55,6 +55,12 @@
     <Compile Include="..\CSemVer\CSVersionKindExtensions.cs">
       <Link>CSemVer\CSVersionKindExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\CSemVer\InformationalVersion.cs">
+      <Link>CSemVer\InformationalVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\CSemVer\SVersion.cs">
+      <Link>CSemVer\SVersion.cs</Link>
+    </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -85,9 +91,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

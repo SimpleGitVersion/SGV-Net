@@ -9,36 +9,52 @@ namespace CSemVer
         /// <summary>
         /// Initializes a new invalid Version from a failed parsing.
         /// </summary>
-        /// <param name="tag">The syntaxically invalid tag.</param>
-        /// <param name="isMalformed">True if it looks like a tag but is actually not one. False if the text does not look like a tag.</param>
+        /// <param name="s">The syntaxically invalid version.</param>
+        /// <param name="isMalformed">True if it looks like a version but is actually not one. False if the text does not look like a version.</param>
         /// <param name="errorMessage">Required error message.</param>
-        CSVersion(string tag, bool isMalformed, string errorMessage)
+        CSVersion( string s, bool isMalformed, string errorMessage )
         {
-            Debug.Assert(tag != null);
-            Debug.Assert(!string.IsNullOrWhiteSpace(errorMessage));
-            OriginalTagText = tag;
+            Debug.Assert( !isMalformed || s != null, "isMalformed => s != null" );
+            Debug.Assert( !string.IsNullOrWhiteSpace( errorMessage ) );
+            OriginalParsedText = s;
             Kind = CSVersionKind.None;
-            if (isMalformed)
+            if( isMalformed )
             {
                 Kind = CSVersionKind.Malformed;
                 DefinitionStrength = 1;
             }
-            ParseErrorMessage = isMalformed ? string.Format("Tag '{0}': {1}", tag, errorMessage) : errorMessage;
+            ParseErrorMessage = isMalformed ? $"Version '{s}': {errorMessage}" : errorMessage;
             PreReleaseNameIdx = -1;
             PreReleasePatch = 0;
         }
 
-        const string _noTagParseErrorMessage = "Not a release tag.";
+        const string _nullOrEmptyErrorMessage = "Null or empty version.";
+        const string _noTagParseErrorMessage = "Not a version.";
         static Regex _regexStrict = new Regex(@"^v?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)\.(?<3>0|[1-9][0-9]*)(-(?<4>[a-z]+)(\.(?<5>0|[1-9][0-9]?)(\.(?<6>[1-9][0-9]?))?)?)?(\+(?<7>Invalid)?)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         static Regex _regexApprox = new Regex(@"^(v|V)?(?<1>0|[1-9][0-9]*)\.(?<2>0|[1-9][0-9]*)(\.(?<3>0|[1-9][0-9]*))?(?<4>.*)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
+
         /// <summary>
-        /// Attempts to parse a string like "4.0.0", "1.0-5-alpha.0", "1.0-5-rc.12.87".
+        /// Parses the specified string to a constrained semantic version and throws an <see cref="ArgumentException"/> 
+        /// it the resulting <see cref="SVersion"/> is not <see cref="IsValidSyntax"/>.
+        /// </summary>
+        /// <param name="s">The string to parse.</param>
+        /// <returns>The SVersion object.</returns>
+        public static CSVersion Parse( string s )
+        {
+            CSVersion v = TryParse( s );
+            if( !v.IsValidSyntax ) throw new ArgumentException( nameof( s ) );
+            return v;
+        }
+
+        /// <summary>
+        /// Attempts to parse a string like "4.0.0", "1.0-5-alpha.0", "1.0-5-rc.12.87" and returns a <see cref="CSVersion"/>
+        /// that may not be <see cref="IsValidSyntax"/>.
         /// Initial 'v' (or 'V') is optional (GitHub convention).
         /// Numbers can not start with a 0 (except if it is 0).
         /// The pre release name (alpha, beta, gamma, ..., rc) must be any number of a-z (all lower case, no digit nor underscore).
         /// The pre release name can be followed by ".0" or a greater number (not greater than <see cref="MaxPreReleaseNumber"/>). 
-        /// Returns a Version where <see cref="CSVersion.IsValid"/> is false if the string is not valid: <see cref="ParseErrorMessage"/>
+        /// Returns a Version where <see cref="CSVersion.IsValidSyntax"/> is false if the string is not valid: <see cref="ParseErrorMessage"/>
         /// gives more information.
         /// </summary>
         /// <param name="s">String to parse.</param>
@@ -49,7 +65,7 @@ namespace CSemVer
         /// <returns>Resulting version (can be invalid).</returns>
         public static CSVersion TryParse(string s, bool analyseInvalidTag = false)
         {
-            if (s == null) throw new ArgumentNullException();
+            if (string.IsNullOrEmpty(s)) return new CSVersion( s, false, _nullOrEmptyErrorMessage );
             Match m = _regexStrict.Match(s);
             if (!m.Success)
             {
@@ -72,7 +88,7 @@ namespace CSemVer
             string sPRName = m.Groups[4].Value;
             string sPRNum = m.Groups[5].Value;
             string sPRFix = m.Groups[6].Value;
-            string sBuldMetaData = m.Groups[7].Value;
+            string sBuildMetaData = m.Groups[7].Value;
 
             int prNameIdx = GetPreReleaseNameIdx(sPRName);
             int prNum = 0;
@@ -84,7 +100,7 @@ namespace CSemVer
                 if (prFix == 0 && prNum == 0 && sPRNum.Length > 0) return new CSVersion(s, true, string.Format("Incorrect '.0' Release Number version. 0 can appear only to fix the first pre release (ie. '.0.F' where F is between 1 and {0}).", MaxPreReleaseFix));
             }
             CSVersionKind kind = prNameIdx >= 0 ? CSVersionKind.PreRelease : CSVersionKind.OfficialRelease;
-            if (sBuldMetaData.Length > 0) kind |= CSVersionKind.MarkedInvalid;
+            if (sBuildMetaData.Length > 0) kind |= CSVersionKind.MarkedInvalid;
             return new CSVersion(s, major, minor, patch, sPRName, prNameIdx, prNum, prFix, kind);
         }
 
@@ -156,7 +172,7 @@ namespace CSemVer
         public static bool TryParse(string s, out CSVersion v)
         {
             v = TryParse(s, analyseInvalidTag: false);
-            return v.IsValid;
+            return v.IsValidSyntax;
         }
 
     }

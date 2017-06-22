@@ -1,6 +1,7 @@
 ﻿using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.MSBuild;
 using Cake.Core;
+using CSemVer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,6 @@ namespace SimpleGitVersion
     /// </summary>
     public static class ToolSettingsSettingsVersionExtension
     {
-        /// <summary>
-        /// Version used when the repository information is invald is "0.0.0-0".
-        /// </summary>
-        public const string VersionWhenInvalid = "0.0.0-0";
-
         /// <summary>
         /// Adds standard version information on <see cref="DotNetCoreSettings"/> objects.
         /// </summary>
@@ -49,22 +45,15 @@ namespace SimpleGitVersion
         }
         static void AddVersionToolArguments( Cake.Core.Tooling.ToolSettings t, SimpleRepositoryInfo info )
         {
-            string version = VersionWhenInvalid,
-                   assemblyVersion = "0.0",
-                   fileVersion = "0.0.0.0",
-                   informationalVersion = "0.0.0-0 (0.0.0-0) - SHA1: 0000000000000000000000000000000000000000 - CommitDate: 0001-01-01 00:00:00Z";
-            if( info.IsValid )
-            {
-                version = info.NuGetVersion;
-                assemblyVersion = info.MajorMinor;
-                fileVersion = info.FileVersion;
-                informationalVersion = $"{info.SemVer} ({info.NuGetVersion}) - SHA1: {info.CommitSha} - CommitDate: {info.CommitDateUtc.ToString( "u" )}";
-            }
+            string version = info.Info.FinalNuGetVersion.Text;
+            string assemblyVersion = info.MajorMinorPatch;
+            string fileVersion = info.FileVersion;
+            string informationalVersion = info.Info.FinalInformationalVersion;
             var prev = t.ArgumentCustomization;
             t.ArgumentCustomization = args => (prev?.Invoke( args ) ?? args)
                             .Append( $@"/p:CakeBuild=""true""" )
                             .Append( $@"/p:Version=""{version}""" )
-                            .Append( $@"/p:AssemblyVersion=""{assemblyVersion}.0""" )
+                            .Append( $@"/p:AssemblyVersion=""{assemblyVersion}""" )
                             .Append( $@"/p:FileVersion=""{fileVersion}""" )
                             .Append( $@"/p:InformationalVersion=""{informationalVersion}""" );
         }

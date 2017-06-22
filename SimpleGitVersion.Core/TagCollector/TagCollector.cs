@@ -66,7 +66,7 @@ namespace SimpleGitVersion
             if( startingVersionForCSemVer != null )
             {
                 _startingVersionForCSemVer = CSVersion.TryParse( startingVersionForCSemVer, true );
-                if( !_startingVersionForCSemVer.IsValid )
+                if( !_startingVersionForCSemVer.IsValidSyntax )
                 {
                     errors.Append( "Invalid StartingVersionForCSemVer. " ).Append( _startingVersionForCSemVer.ParseErrorMessage ).AppendLine();
                     return;
@@ -134,7 +134,7 @@ namespace SimpleGitVersion
             }
             if( !startingVersionForCSemVerFound )
             {
-                Debug.Assert( _startingVersionForCSemVer != null && _startingVersionForCSemVer.IsValid );
+                Debug.Assert( _startingVersionForCSemVer != null && _startingVersionForCSemVer.IsValidSyntax );
                 errors.AppendFormat( "Unable to find StartingVersionForCSemVer = '{0}'. A commit must be tagged with it.", _startingVersionForCSemVer ).AppendLine();
             }
         }
@@ -153,7 +153,7 @@ namespace SimpleGitVersion
                 }
                 return;
             }
-            if( v.IsValid )
+            if( v.IsValidSyntax )
             {
                 if( _startingVersionForCSemVer != null )
                 {
@@ -168,7 +168,7 @@ namespace SimpleGitVersion
                 }
                 if( mode == ReleaseTagParsingMode.RaiseErrorOnMalformedTagAndNonStandardPreReleaseName && v.IsPreRelease && !v.IsPreReleaseNameStandard )
                 {
-                    errors.AppendFormat( "Invalid PreRelease name in '{0}' on commit '{1}'.", v.OriginalTagText, c.Sha ).AppendLine();
+                    errors.AppendFormat( "Invalid PreRelease name in '{0}' on commit '{1}'.", v.OriginalParsedText, c.Sha ).AppendLine();
                     return;
                 }
                 TagCommit tagCommit;

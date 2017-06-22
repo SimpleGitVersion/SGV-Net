@@ -149,6 +149,9 @@ namespace CSemVer
                 v -= Minor * MulMinor;
                 Patch = (int)(v / MulPatch);
             }
+            // Systematically checks that a CSVersion in SemVer or NuGetV2 is a syntaxically valid SemVer version.
+            Debug.Assert( !IsValidSyntax || SVersion.TryParse( ToString( CSVersionFormat.SemVerWithMarker ) ).IsValidSyntax );
+            Debug.Assert( !IsValidSyntax || SVersion.TryParse( ToString( CSVersionFormat.NugetPackageV2 ) ).IsValidSyntax );
         }
 
         static long ComputeOrderedVersion(int major, int minor, int patch, int preReleaseNameIdx = -1, int preReleaseNumber = 0, int preReleaseFix = 0)
@@ -176,7 +179,7 @@ namespace CSemVer
 
         int ComputeDefinitionStrength()
         {
-            Debug.Assert(IsValid && !IsMalformed);
+            Debug.Assert(IsValidSyntax);
             int d = 3;
             if (IsPreRelease && !IsPreReleaseNameStandard) d -= 1;
             if (IsMarkedInvalid) d += 2;
@@ -209,7 +212,7 @@ namespace CSemVer
         public int OrderedVersionRevision => _orderedVersion.Revision;
 
         /// <summary>
-        /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
+        /// Versions are equal it their <see cref="OrderedVersion"/> are equals.
         /// No other members are used for equality and comparison.
         /// </summary>
         /// <param name="other">Other release tag.</param>
@@ -234,8 +237,8 @@ namespace CSemVer
         /// <summary>
         /// Implements == operator.
         /// </summary>
-        /// <param name="x">First tag.</param>
-        /// <param name="y">Second tag.</param>
+        /// <param name="x">First version.</param>
+        /// <param name="y">Second version.</param>
         /// <returns>True if they are equal.</returns>
         static public bool operator ==(CSVersion x, CSVersion y)
         {
@@ -248,77 +251,73 @@ namespace CSemVer
         }
 
         /// <summary>
-        /// Implements != operator.
-        /// </summary>
-        /// <param name="x">First tag.</param>
-        /// <param name="y">Second tag.</param>
-        /// <returns>True if they are not equal.</returns>
-        static public bool operator !=(CSVersion x, CSVersion y) => !(x == y);
-
-        /// <summary>
         /// Implements &gt; operator.
         /// </summary>
-        /// <param name="x">First tag.</param>
-        /// <param name="y">Second tag.</param>
+        /// <param name="x">First version.</param>
+        /// <param name="y">Second version.</param>
         /// <returns>True if x is greater than y.</returns>
-        static public bool operator >(CSVersion x, CSVersion y)
+        static public bool operator >( CSVersion x, CSVersion y )
         {
-            if (ReferenceEquals(x, y)) return false;
-            if (!ReferenceEquals(x, null) && !ReferenceEquals(y, null))
+            if( ReferenceEquals( x, y ) ) return false;
+            if( !ReferenceEquals( x, null ) )
             {
+                if( ReferenceEquals( y, null ) ) return true;
                 return x._orderedVersion.Number > y._orderedVersion.Number;
             }
-            return x != null;
+            return false;
         }
-
-        /// <summary>
-        /// Implements &lt; operator.
-        /// </summary>
-        /// <param name="x">First tag.</param>
-        /// <param name="y">Second tag.</param>
-        /// <returns>True if x is lower than y.</returns>
-        static public bool operator <(CSVersion x, CSVersion y)
-        {
-            if (ReferenceEquals(x, y)) return false;
-            if (!ReferenceEquals(x, null) && !ReferenceEquals(y, null))
-            {
-                return x._orderedVersion.Number < y._orderedVersion.Number;
-            }
-            return y != null;
-        }
-
-        /// <summary>
-        /// Implements &lt;= operator.
-        /// </summary>
-        /// <param name="x">First tag.</param>
-        /// <param name="y">Second tag.</param>
-        /// <returns>True if x is lower than or equal to y.</returns>
-        static public bool operator <=(CSVersion x, CSVersion y) => !(x > y);
 
         /// <summary>
         /// Implements &gt;= operator.
         /// </summary>
-        /// <param name="x">First tag.</param>
-        /// <param name="y">Second tag.</param>
+        /// <param name="x">First version.</param>
+        /// <param name="y">Second version.</param>
         /// <returns>True if x is greater than or equal to y.</returns>
-        static public bool operator >=(CSVersion x, CSVersion y) => !(x < y);
-
-        /// <summary>
-        /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
-        /// No other members are used for equality and comparison.
-        /// </summary>
-        /// <param name="obj">Other release tag.</param>
-        /// <returns>True if obj is a tag that has the same OrderedVersion as this.</returns>
-        public override bool Equals(object obj)
+        static public bool operator >=(CSVersion x, CSVersion y)
         {
-            if (obj == null) return false;
-            CSVersion other = obj as CSVersion;
-            if (other == null) throw new ArgumentException();
-            return Equals(other);
+            if (ReferenceEquals(x, y)) return true;
+            if (!ReferenceEquals(x, null) )
+            {
+                if( ReferenceEquals( y, null ) ) return true;
+                return x._orderedVersion.Number >= y._orderedVersion.Number;
+            }
+            return false;
         }
 
         /// <summary>
-        /// Tags are equal it their <see cref="OrderedVersion"/> are equals.
+        /// Implements != operator.
+        /// </summary>
+        /// <param name="x">First version.</param>
+        /// <param name="y">Second version.</param>
+        /// <returns>True if they are not equal.</returns>
+        static public bool operator !=( CSVersion x, CSVersion y ) => !(x == y);
+
+        /// <summary>
+        /// Implements &lt;= operator.
+        /// </summary>
+        /// <param name="x">First version.</param>
+        /// <param name="y">Second version.</param>
+        /// <returns>True if x is lower than or equal to y.</returns>
+        static public bool operator <=(CSVersion x, CSVersion y) => !(x > y);
+
+        /// <summary>
+        /// Implements &lt; operator.
+        /// </summary>
+        /// <param name="x">First version.</param>
+        /// <param name="y">Second version.</param>
+        /// <returns>True if x is lower than y.</returns>
+        static public bool operator <(CSVersion x, CSVersion y) => !(x >= y);
+
+        /// <summary>
+        /// Version are equal it their <see cref="OrderedVersion"/> are equals.
+        /// No other members are used for equality and comparison.
+        /// </summary>
+        /// <param name="obj">Other release version.</param>
+        /// <returns>True if obj is a version that has the same OrderedVersion as this.</returns>
+        public override bool Equals( object obj ) => Equals( obj as CSVersion );
+
+        /// <summary>
+        /// Versions are equal it their <see cref="OrderedVersion"/> are equals.
         /// No other members are used for equality and comparison.
         /// </summary>
         /// <returns>True if they have the same OrderedVersion.</returns>

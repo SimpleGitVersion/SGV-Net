@@ -68,14 +68,14 @@ class SimpleGitVersionInfoAttribute : Attribute
         {
             if( assemblyInformationalVersionInfo == null )
             {
-                assemblyInformationalVersionInfo = FomatStandardAssemblyInformationalVersionInfo( NuGetVersion, CommitSha, CurrentUserName );
+                assemblyInformationalVersionInfo = FomatStandardAssemblyInformationalVersionInfo( SafeNuGetVersion, CommitSha, CurrentUserName );
             }
-            string text = FormatAssemblyVersionAttributesFile( MajorMinor, FileVersion, SemVer, toolName, assemblyInformationalVersionInfo );
+            string text = FormatAssemblyVersionAttributesFile( MajorMinor, FileVersion, SafeSemVersion, toolName, assemblyInformationalVersionInfo );
             return text;
         }
 
         /// <summary>
-        /// Fomats the standard assembly informational version information: "<see cref="NuGetVersion"/> Sha:... User:..."
+        /// Fomats the standard assembly informational version information: "<see cref="SafeNuGetVersion"/> Sha:... User:..."
         /// </summary>
         /// <param name="nuGetVersion">The NuGet version.</param>
         /// <param name="commitSha">The commit sha.</param>

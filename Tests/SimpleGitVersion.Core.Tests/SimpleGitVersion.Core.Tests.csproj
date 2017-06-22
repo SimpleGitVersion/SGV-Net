@@ -10,10 +10,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimpleGitVersion.Core.Tests</RootNamespace>
     <AssemblyName>SimpleGitVersion.Core.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,14 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
-    <Compile Include="NuGetV2NameTests.cs" />
     <Compile Include="RepositoryInfoXmlFileTests.cs" />
-    <Compile Include="CIBuildNameTests.cs" />
-    <Compile Include="Tools\NuGetV2StringComparer.cs" />
-    <Compile Include="Tools\RandomExtensions.cs" />
-    <Compile Include="ReleaseTagVersionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tools\SemVersion.cs" />
     <Compile Include="SimpleMiscTests.cs" />
     <Compile Include="RepositoryInfoTests.cs" />
     <Compile Include="Tools\RepositoryTester.cs" />

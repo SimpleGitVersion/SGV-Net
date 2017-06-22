@@ -13,23 +13,24 @@ namespace CSemVer
     /// </summary>
     public sealed partial class CSVersion : IEquatable<CSVersion>, IComparable<CSVersion>
     {
+
         /// <summary>
-        /// When <see cref="IsValid"/> is true, necessarily greater or equal to 0.
+        /// When <see cref="IsValidSyntax"/> is true, necessarily greater or equal to 0.
         /// </summary>
         public readonly int Major;
 
         /// <summary>
-        /// When <see cref="IsValid"/> is true, necessarily greater or equal to 0.
+        /// When <see cref="IsValidSyntax"/> is true, necessarily greater or equal to 0.
         /// </summary>
         public readonly int Minor;
 
         /// <summary>
-        /// When <see cref="IsValid"/> is true, necessarily greater or equal to 0.
+        /// When <see cref="IsValidSyntax"/> is true, necessarily greater or equal to 0.
         /// </summary>
         public readonly int Patch;
 
         /// <summary>
-        /// When <see cref="IsValid"/> is true, necessarily not null: empty string for a release.
+        /// When <see cref="IsValidSyntax"/> is true, necessarily not null: empty string for a release.
         /// This is the pre release name directly extracted from the text. This field does not participate to equality or comparison: 
         /// the actual, standardized, pre release name field is <see cref="PreReleaseName"/>.
         /// </summary>
@@ -84,11 +85,16 @@ namespace CSemVer
         public readonly string Marker;
 
         /// <summary>
-        /// Gets whether this <see cref="CSVersion"/> is valid.
-        /// When false, <see cref="IsMalformed"/> may be true if the <see cref="OriginalTagText"/> somehow looks 
+        /// Gets whether this <see cref="CSVersion"/> is syntaxically valid.
+        /// When false, <see cref="IsMalformed"/> may be true if the <see cref="OriginalParsedText"/> somehow looks 
         /// like a version.
         /// </summary>
-        public bool IsValid => PreReleaseNameFromTag != null;
+        public bool IsValidSyntax => PreReleaseNameFromTag != null;
+
+        /// Gets whether this <see cref="CSVersion"/> looks like a release tag but is not syntaxically valid: 
+        /// see <see cref="ParseErrorMessage"/> for more information.
+        /// </summary>
+        public bool IsMalformed => (Kind & CSVersionKind.Malformed) != 0;
 
         /// <summary>
         /// Gets whether this <see cref="CSVersion"/> is marked with +invalid.
@@ -111,21 +117,16 @@ namespace CSemVer
         public readonly CSVersionKind Kind;
 
         /// <summary>
-        /// Gets whether this <see cref="CSVersion"/> looks like a release tag but is not syntaxically valid: 
-        /// see <see cref="ParseErrorMessage"/> for more information.
-        /// </summary>
-        public bool IsMalformed => (Kind & CSVersionKind.Malformed) != 0;
-
-        /// <summary>
-        /// An error message that describes the error if <see cref="IsValid"/> is false. Null otherwise.
+        /// An error message that describes the error if <see cref="IsValidSyntax"/> is false. Null otherwise.
         /// </summary>
         public readonly string ParseErrorMessage;
 
         /// <summary>
         /// The original text.
-        /// Null when this release tag has been built from an ordered version number (new <see cref="CSVersion(long)"/>).
+        /// Null when this has been not been built from parsing (via <see cref="CSVersion(long)"/> constructor or
+        /// from a successor or a predecessor).
         /// </summary>
-        public readonly string OriginalTagText;
+        public readonly string OriginalParsedText;
 
         /// <summary>
         /// Gets the empty array singleton.
@@ -135,7 +136,7 @@ namespace CSemVer
         /// <summary>
         /// Private full constructor. Used by <see cref="TryParse(string, bool)"/> and methods like <see cref="GetDirectSuccessors(bool, CSVersion)"/>.
         /// </summary>
-        /// <param name="tag">Original text version. Can be null: the <see cref="CSVersionFormat.Normalized"/> is automatically used to compute <see cref="OriginalTagText"/>.</param>
+        /// <param name="s">Original text version. Can be null.</param>
         /// <param name="major">Major (between 0 and 99999).</param>
         /// <param name="minor">Minor (between 0 and 99999).</param>
         /// <param name="patch">Patch (between 0 and 9999).</param>
@@ -144,7 +145,7 @@ namespace CSemVer
         /// <param name="preReleaseNumber">Number between 0 (for release or first prerelease) and 99.</param>
         /// <param name="preReleaseFix">Number between 0 (not a fix, first actual fix starts at 1) and 99.</param>
         /// <param name="kind">One of the <see cref="CSVersionKind"/> value. Must be coherent with the other parameters.</param>
-        CSVersion(string tag, int major, int minor, int patch, string preReleaseName, int preReleaseNameIdx, int preReleaseNumber, int preReleaseFix, CSVersionKind kind)
+        CSVersion(string s, int major, int minor, int patch, string preReleaseName, int preReleaseNameIdx, int preReleaseNumber, int preReleaseFix, CSVersionKind kind)
         {
             Debug.Assert(_standardNames.Length == MaxPreReleaseNameIdx + 1);
             Debug.Assert(major >= 0 && major <= MaxMajor);
@@ -158,7 +159,7 @@ namespace CSemVer
                           (preReleaseName.Length > 0 && preReleaseNameIdx >= 0 && preReleaseNameIdx <= MaxPreReleaseNameIdx));
             Debug.Assert(preReleaseNumber >= 0 && preReleaseNumber <= MaxPreReleaseNumber);
             Debug.Assert(PreReleasePatch >= 0 && PreReleasePatch <= MaxPreReleaseNumber);
-            Debug.Assert(kind != CSVersionKind.Malformed);
+            Debug.Assert( kind != CSVersionKind.Malformed );
             Major = major;
             Minor = minor;
             Patch = patch;
@@ -168,16 +169,19 @@ namespace CSemVer
             PreReleasePatch = preReleaseFix;
             Kind = kind;
             Marker = kind.ToStringMarker();
-            OriginalTagText = tag ?? ToString();
+            OriginalParsedText = s;
             //
             Debug.Assert(((Kind & CSVersionKind.PreRelease) != 0) == IsPreRelease);
             _orderedVersion = new SOrderedVersion() { Number = ComputeOrderedVersion(major, minor, patch, preReleaseNameIdx, preReleaseNumber, preReleaseFix) };
             DefinitionStrength = ComputeDefinitionStrength();
+            // Systematically checks that a CSVersion in SemVer or NuGetV2 is a syntaxically valid SemVer version.
+            Debug.Assert( !IsValidSyntax || SVersion.TryParse( ToString( CSVersionFormat.SemVerWithMarker ) ).IsValidSyntax );
+            Debug.Assert( !IsValidSyntax || SVersion.TryParse( ToString( CSVersionFormat.NugetPackageV2 ) ).IsValidSyntax );
         }
 
         /// <summary>
         /// Creates a clone of this tag, except that it is marked with "+invalid".
-        /// This tag must be valid (<see cref="IsValid"/> is true), otherwise an <see cref="InvalidOperationException"/> is thrown.
+        /// This tag must be valid (<see cref="IsValidSyntax"/> is true), otherwise an <see cref="InvalidOperationException"/> is thrown.
         /// </summary>
         /// <returns>The "+valid" tag.</returns>
         public CSVersion MarkInvalid()
@@ -187,14 +191,14 @@ namespace CSemVer
 
         /// <summary>
         /// Computes the next possible ordered versions, from the closest one to the biggest possible bump.
-        /// If <see cref="IsValid"/> is false, the list is empty.
+        /// If <see cref="IsValidSyntax"/> is false, the list is empty.
         /// </summary>
         /// <param name="patchesOnly">True to obtain only patches to this version. False to generate the full list of valid successors (up to 43 successors).</param>
         /// <returns>Next possible versions.</returns>
         public IEnumerable<CSVersion> GetDirectSuccessors(bool patchesOnly = false)
         {
             Debug.Assert(_standardNames[0] == "alpha");
-            if (IsValid)
+            if (IsValidSyntax)
             {
                 if (IsPreRelease)
                 {
@@ -274,7 +278,7 @@ namespace CSemVer
         /// <returns>True if previous is actually a direct predecessor.</returns>
         public bool IsDirectPredecessor(CSVersion previous)
         {
-            if (!IsValid) return false;
+            if (!IsValidSyntax) return false;
             long num = _orderedVersion.Number;
             if (previous == null) return FirstPossibleVersions.Contains(this);
             if (previous._orderedVersion.Number >= num) return false;

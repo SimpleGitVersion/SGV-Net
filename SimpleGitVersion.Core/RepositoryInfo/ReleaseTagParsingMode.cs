@@ -17,7 +17,7 @@ namespace SimpleGitVersion
         /// </summary>
         IgnoreMalformedTag,
         /// <summary>
-        /// If the tag is malformed (<see cref="CSVersion.IsValid"/> is false and <see cref="CSVersion.IsMalformed"/> is true), an error is raised.
+        /// If the tag is malformed (<see cref="CSVersion.IsValidSyntax"/> is false and <see cref="CSVersion.IsMalformed"/> is true), an error is raised.
         /// </summary>
         RaiseErrorOnMalformedTag,
         /// <summary>

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Semver;
 using CSemVer;
 
-namespace SimpleGitVersion.Core.Tests
+namespace CSemVer.Tests
 {
     [TestFixture]
     public class NuGetV2NameTests
@@ -62,7 +61,7 @@ namespace SimpleGitVersion.Core.Tests
         static void DumpVersionInfo( CIBuildDescriptor buildInfo, CSVersion t )
         {
             var nugetV2Build = t.ToString( CSVersionFormat.NugetPackageV2, buildInfo );
-            int nugetV2BuildSNLen = SemVersion.Parse( nugetV2Build ).Prerelease.Length;
+            int nugetV2BuildSNLen = SVersion.Parse( nugetV2Build ).Prerelease.Length;
             Console.WriteLine( "{0}, CI = {1}, NuGet = {2}, NuGet CI = {3}, NugetV2Build.SpecialName.Length = {4}",
                                 t,
                                 t.ToString( CSVersionFormat.SemVer, buildInfo ),
@@ -84,13 +83,13 @@ namespace SimpleGitVersion.Core.Tests
         public void pre_release_with_standard_names_nugetV2_mappings( string tag, string nuget )
         {
             CSVersion t = CSVersion.TryParse( tag );
-            Assert.That( t.IsValid );
+            Assert.That( t.IsValidSyntax );
             Assert.That( t.IsPreRelease );
             Assert.That( t.IsPreReleaseNameStandard );
             Assert.That( t.IsPreReleasePatch, Is.False );
             Assert.That( t.ToString( CSVersionFormat.SemVer ), Is.EqualTo( tag ) );
             Assert.That( t.ToString( CSVersionFormat.NuGetPackage ), Is.EqualTo( nuget ) );
-            Assert.That( SemVersion.Parse( nuget ).Prerelease.Length, Is.LessThanOrEqualTo( 20 ) );
+            Assert.That( SVersion.Parse( nuget ).Prerelease.Length, Is.LessThanOrEqualTo( 20 ) );
         }
 
         [TestCase( "0.0.0-alpha.0.1", "0.0.0-a00-01" )]
@@ -104,14 +103,14 @@ namespace SimpleGitVersion.Core.Tests
         public void pre_release_with_standard_names_and_fix_number_nugetV2_mappings( string tag, string nuget )
         {
             CSVersion t = CSVersion.TryParse( tag );
-            Assert.That( t.IsValid );
+            Assert.That( t.IsValidSyntax );
             Assert.That( t.IsPreRelease );
             Assert.That( t.IsPreReleaseNameStandard );
             Assert.That( t.IsPreReleasePatch );
             Assert.That( t.PreReleasePatch, Is.GreaterThan( 0 ) );
             Assert.That( t.ToString( CSVersionFormat.SemVer ), Is.EqualTo( tag ) );
             Assert.That( t.ToString( CSVersionFormat.NugetPackageV2 ), Is.EqualTo( nuget ) );
-            Assert.That( SemVersion.Parse( nuget ).Prerelease.Length, Is.LessThanOrEqualTo( 20 ) );
+            Assert.That( SVersion.Parse( nuget ).Prerelease.Length, Is.LessThanOrEqualTo( 20 ) );
         }
 
     }

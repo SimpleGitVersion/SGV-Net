@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Semver;
+//using Semver;
 using CSemVer;
 
-namespace SimpleGitVersion.Core.Tests
+namespace CSemVer.Tests
 {
     [TestFixture]
     public class CSVersionTests
@@ -60,7 +60,7 @@ namespace SimpleGitVersion.Core.Tests
         public void parsing_valid_release( string tag )
         {
             CSVersion t = CSVersion.TryParse( tag );
-            Assert.That( t.IsValid );
+            Assert.That( t.IsValidSyntax );
             Assert.That( t.IsPreRelease, Is.False );
             Assert.That( t.IsPreReleasePatch, Is.False );
             Assert.That( t.ToString( CSVersionFormat.SemVer ), Is.EqualTo( tag ) );
@@ -90,7 +90,7 @@ namespace SimpleGitVersion.Core.Tests
         public void to_string_pre_release_with_nonstandard_names_works_for_SemVer_but_throws_for_NuGetV2( string tag )
         {
             CSVersion t = CSVersion.TryParse( tag );
-            Assert.That( t.IsValid );
+            Assert.That( t.IsValidSyntax );
             Assert.That( t.IsPreRelease );
             Assert.That( !t.IsPreReleaseNameStandard );
             Assert.That( t.IsPreReleasePatch );
@@ -108,7 +108,7 @@ namespace SimpleGitVersion.Core.Tests
         public void version_ordering_starts_at_1_for_the_very_first_possible_version( string tag, int oMajor, int oMinor, int oBuild, int oRevision )
         {
             var t = CSVersion.TryParse( tag, true );
-            Assert.That( t.IsValid );
+            Assert.That( t.IsValidSyntax );
             Assert.That( t.OrderedVersionMajor, Is.EqualTo( oMajor ) );
             Assert.That( t.OrderedVersionMinor, Is.EqualTo( oMinor ) );
             Assert.That( t.OrderedVersionBuild, Is.EqualTo( oBuild ) );
@@ -136,10 +136,10 @@ namespace SimpleGitVersion.Core.Tests
         [TestCase( "v0.0.0-alpha.5.0", true )]
         [TestCase( "v0.0.0+nop", true )]
         [TestCase( "v0.0.0-alpha+nop", true )]
-        public void when_parsing_invalid_tags_can_detect_malformed_ones( string tag, bool isMalformed )
+        public void when_parsing_invalid_versions_can_be_detected_as_malformed_ones( string tag, bool isMalformed )
         {
             var t = CSVersion.TryParse( tag, true );
-            Assert.That( !t.IsValid );
+            Assert.That( !t.IsValidSyntax );
             Assert.That( t.IsMalformed, Is.EqualTo( isMalformed ) );
             //Console.WriteLine( t.ParseErrorMessage );
         }
@@ -245,7 +245,7 @@ namespace SimpleGitVersion.Core.Tests
                 };
             var releasedTags = orderedTags
                                         .Select( ( tag, idx ) => new { Tag = tag, Index = idx, ReleasedTag = CSVersion.TryParse( tag ) } )
-                                        .Select( s => { Assert.That( s.ReleasedTag.IsValid, s.Tag ); return s; } );
+                                        .Select( s => { Assert.That( s.ReleasedTag.IsValidSyntax, s.Tag ); return s; } );
             var orderedByFileVersion = releasedTags
                                         .OrderBy( s => s.ReleasedTag.OrderedVersion );
             var orderedByFileVersionParts = releasedTags
@@ -302,7 +302,7 @@ namespace SimpleGitVersion.Core.Tests
                                     .Where( v => v.Length > 0 )
                                     .ToArray();
             var rStart = CSVersion.TryParse( start );
-            Assert.That( rStart != null && rStart.IsValid );
+            Assert.That( rStart != null && rStart.IsValidSyntax );
             // Checks successors (and that they are ordered).
             var cNext = rStart.GetDirectSuccessors( true ).Select( v => v.ToString() ).ToArray();
             CollectionAssert.AreEqual( next, cNext, start + " => " + string.Join( ", ", cNext ) );
@@ -352,7 +352,7 @@ namespace SimpleGitVersion.Core.Tests
                 return null;
             }
             var t = new CSVersion( v );
-            Assert.That( (v == 0) == !t.IsValid );
+            Assert.That( (v == 0) == !t.IsValidSyntax );
             Assert.That( t.OrderedVersion, Is.EqualTo( v ) );
             var sSemVer = t.ToString( CSVersionFormat.SemVer );
             var tSemVer = CSVersion.TryParse( sSemVer );
@@ -368,13 +368,13 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( tSemVer.ToString(), Is.EqualTo( t.ToString() ) );
             Assert.That( tNormalized.ToString(), Is.EqualTo( t.ToString() ) );
             // Successors/Predecessors check.
-            var vSemVer = SemVersion.Parse( sSemVer, true );
+            var vSemVer = SVersion.Parse( sSemVer );
             int count = 0;
             foreach( var succ in t.GetDirectSuccessors( false ) )
             {
                 ++count;
                 Assert.That( succ.IsDirectPredecessor( t ) );
-                var vSemVerSucc = SemVersion.Parse( succ.ToString( CSVersionFormat.SemVer ) );
+                var vSemVerSucc = SVersion.Parse( succ.ToString( CSVersionFormat.SemVer ) );
                 Assert.That( vSemVer < vSemVerSucc, "{0} < {1}", vSemVer, vSemVerSucc );
             }
             //if( count > _greatersuccessorCount )

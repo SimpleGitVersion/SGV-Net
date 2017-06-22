@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleGitVersion.Core.Tests
+namespace CSemVer.Tests
 {
     public static class RandomExtensions
     {

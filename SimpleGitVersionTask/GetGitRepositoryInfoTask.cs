@@ -157,8 +157,8 @@ namespace SimpleGitVersion
                 GitSolutionDirectory = i.Info.GitSolutionDirectory;
                 IsValidRelease = i.IsValidRelease;
                 IsValidCIBuild = i.IsValidCIBuild;
-                SemVer = i.SemVer;
-                NuGetVersion = i.NuGetVersion;
+                SemVer = i.SafeSemVersion;
+                NuGetVersion = i.SafeNuGetVersion;
                 OriginalTagText = i.OriginalTagText;
                 Major = i.Major;
                 Minor = i.Minor;

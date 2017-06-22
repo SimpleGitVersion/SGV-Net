@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Semver;
+﻿using CSemVer;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace SimpleGitVersion
+namespace CSemVer.Tests
 {
     public class NuGetV2StringComparer : IComparer<string>
     {
@@ -24,8 +20,8 @@ namespace SimpleGitVersion
 
         public int Compare( string x, string y )
         {
-            var vX = SemVersion.Parse( x, true );
-            var vY = SemVersion.Parse( y, true );
+            var vX = SVersion.Parse( x );
+            var vY = SVersion.Parse( y );
             CheckValid( x );
             CheckValid( y );
             Assert.That( vX.Prerelease.Length <= 20, "{0} => PreRelease must not contain more than 20 characters (lenght is {1}).", x, x.Length );

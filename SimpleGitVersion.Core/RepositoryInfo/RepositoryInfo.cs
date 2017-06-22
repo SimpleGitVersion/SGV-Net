@@ -122,12 +122,21 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets the NuGet version that must be used.
-        /// Null if for any reason, no version can be generated.
+        /// Never null: defaults to <see cref="SVersion.Invalid"/>.
         /// </summary>
-        public string FinalNuGetVersion
-        {
-            get { return CIRelease != null ? CIRelease.BuildVersionNuGet : (ValidReleaseTag != null ? ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ) : null); }
-        }
+        public readonly SVersion FinalNuGetVersion;
+
+        /// <summary>
+        /// Gets the semantic version that must be used.
+        /// Never null: defaults to <see cref="SVersion.Invalid"/>.
+        /// </summary>
+        public readonly SVersion FinalSemVersion;
+
+        /// <summary>
+        /// Gets the standardized information version string.
+        /// Never null: defaults to <see cref="InformationalVersion.InvalidInformationalVersion"/> string.
+        /// </summary>
+        public readonly string FinalInformationalVersion;
 
         /// <summary>
         /// Gets the <see cref="RepositoryInfoOptions"/> that has been used.
@@ -203,7 +212,7 @@ namespace SimpleGitVersion
                                 {
                                     ReleaseTagIsNotPossibleError = true;
                                     errors.Append( "Release tag '" )
-                                           .Append( info.ThisCommit.ThisTag.OriginalTagText )
+                                           .Append( info.ThisCommit.ThisTag.OriginalParsedText )
                                            .Append( "' is not valid here. Valid tags are: " )
                                            .Append( string.Join( ", ", possibleSet ) )
                                            .AppendLine();
@@ -230,7 +239,30 @@ namespace SimpleGitVersion
                         }
                         if( errors.Length > 0 ) SetError( errors, out ReleaseTagErrorLines, out ReleaseTagErrorText );
                     }
+
+                    // Conclusion:
+                    if( CIRelease != null )
+                    {
+                        FinalNuGetVersion = CIRelease.BuildVersionNuGet;
+                        FinalSemVersion = CIRelease.BuildVersion;
+                    }
+                    else if( ValidReleaseTag != null )
+                    {
+                        FinalNuGetVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ) );
+                        FinalSemVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.SemVer ) );
+                    }
                 }
+            }
+            // Handles FinalInformationalVersion and SVersion.Invalid for versions if needed.
+            if( FinalSemVersion == null )
+            {
+                FinalSemVersion = SVersion.Invalid;
+                FinalNuGetVersion = SVersion.Invalid;
+                FinalInformationalVersion = InformationalVersion.InvalidInformationalVersion;
+            }
+            else
+            {
+                FinalInformationalVersion = InformationalVersion.BuildInformationalVersion( FinalSemVersion.Text, FinalNuGetVersion.Text, CommitSha, CommitDateUtc );
             }
         }
 

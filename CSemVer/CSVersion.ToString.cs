@@ -11,10 +11,7 @@ namespace CSemVer
         /// Gets the string version in <see cref="CSVersionFormat.Normalized"/> format ('v' + <see cref="CSVersionFormat.SemVerWithMarker"/>).
         /// </summary>
         /// <returns>Formated string (or <see cref="ParseErrorMessage"/> if any).</returns>
-        public override string ToString()
-        {
-            return ToString( CSVersionFormat.Normalized );
-        }
+        public override string ToString() =>  ToString( CSVersionFormat.Normalized );
 
         /// <summary>
         /// Gets this version in a <see cref="CSVersionFormat.FileVersion"/> format.
@@ -39,7 +36,8 @@ namespace CSemVer
         public string ToString( CSVersionFormat f, CIBuildDescriptor buildInfo = null, bool usePreReleaseNameFromTag = false )
         {
             if( ParseErrorMessage != null ) return ParseErrorMessage;
-            if( buildInfo != null && !buildInfo.IsValid ) throw new ArgumentException( "buildInfo must be valid." );
+            bool isCIBuild = buildInfo != null;
+            if( isCIBuild && !buildInfo.IsValid ) throw new ArgumentException( "buildInfo must be valid." );
             if( f == CSVersionFormat.FileVersion )
             {
                 return ToStringFileVersion( buildInfo != null );
@@ -55,10 +53,9 @@ namespace CSemVer
                         prName = PreReleaseNameIdx >= 0 ? _standardNames[PreReleaseNameIdx][0].ToString() : String.Empty;
 
                         string suffix = IsMarkedInvalid ? Marker : null;
-                        bool isCIBuild = buildInfo != null;
-                        if( isCIBuild && !buildInfo.IsValidForNuGetV2 ) throw new ArgumentException( "buildInfo must be valid for NuGetV2 format." );
                         if( isCIBuild )
                         {
+                            if( !buildInfo.IsValidForNuGetV2 ) throw new ArgumentException( "buildInfo must be valid for NuGetV2 format." );
                             suffix = buildInfo.ToStringForNuGetV2() + suffix;
                         }
                         if( IsPreRelease )
@@ -95,7 +92,6 @@ namespace CSemVer
                 case CSVersionFormat.SemVerWithMarker:
                     {
                         string suffix = f == CSVersionFormat.SemVerWithMarker ? Marker : string.Empty;
-                        bool isCIBuild = buildInfo != null;
                         if( isCIBuild )
                         {
                             suffix = buildInfo.ToString() + suffix;
@@ -152,20 +148,22 @@ namespace CSemVer
 
         /// <summary>
         /// Gets the standard Informational version string.
-        /// If <see cref="IsValid"/> is false this throws an <see cref="InvalidOperationException"/>: 
+        /// If <see cref="IsValidSyntax"/> is false this throws an <see cref="InvalidOperationException"/>: 
         /// the constant <see cref="InvalidInformationalVersion"/> should be used when IsValid is false.
         /// </summary>
-        /// <param name="commitSha">The SHA1 of the commit (40 hex digits).</param>
-        /// <param name="commitDateUtc">The commit date in UTC.</param>
+        /// <param name="commitSha">The SHA1 of the commit (must be 40 hex digits).</param>
+        /// <param name="commitDateUtc">The commit date (must be in UTC).</param>
+        /// <param name="buildInfo">
+        /// Not null for post-release version. 
+        /// <see cref="CIBuildDescriptor.IsValid"/> and <see cref="CIBuildDescriptor.IsValidForNuGetV2"/> must be true.
+        /// </param>
         /// <returns>The informational version.</returns>
-        public string GetInformationalVersion( string commitSha, DateTime commitDateUtc )
+        public string GetInformationalVersion( string commitSha, DateTime commitDateUtc, CIBuildDescriptor buildInfo = null )
         {
-            if( !IsValid ) throw new InvalidOperationException( "IsValid must be true. Use CSVersion.InvalidInformationalVersion when IsValid is false." );
-            if( string.IsNullOrWhiteSpace( commitSha ) || !commitSha.All( IsHexDigit ) ) throw new ArgumentException( "Must be a 40 hex digits string.", nameof( commitSha ) );
-            if( commitDateUtc.Kind != DateTimeKind.Utc ) throw new ArgumentException( "Must be a UTC date.", nameof( commitDateUtc ) );
-            var semVer = ToString( CSVersionFormat.SemVer );
-            var nugetVer = ToString( CSVersionFormat.NugetPackageV2 );
-            return $"{semVer} ({nugetVer}) - SHA1: {commitSha} - CommitDate: {commitDateUtc.ToString( "u" )}";
+            if( !IsValidSyntax ) throw new InvalidOperationException( "IsValid must be true. Use CSVersion.InvalidInformationalVersion when IsValid is false." );
+            var semVer = ToString( CSVersionFormat.SemVer, buildInfo );
+            var nugetVer = ToString( CSVersionFormat.NugetPackageV2, buildInfo );
+            return InformationalVersion.BuildInformationalVersion( semVer, nugetVer, commitSha, commitDateUtc );
         }
 
         static bool IsHexDigit( char c ) => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');

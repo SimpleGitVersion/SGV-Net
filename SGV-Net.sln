@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCakeBuilder", "CodeCake
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSemVer", "CSemVer\CSemVer.csproj", "{07FBD224-B043-44FE-874D-2DA6B28F5E1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSemVer.Tests", "Tests\CSemVer.Tests\CSemVer.Tests.csproj", "{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{07FBD224-B043-44FE-874D-2DA6B28F5E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07FBD224-B043-44FE-874D-2DA6B28F5E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07FBD224-B043-44FE-874D-2DA6B28F5E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,5 +76,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
 		{D97A8EA9-3534-45A3-A3BA-289525A950AE} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
+		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
 	EndGlobalSection
 EndGlobal

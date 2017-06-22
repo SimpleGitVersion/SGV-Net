@@ -11,10 +11,12 @@ namespace SimpleGitVersion
 {
     /// <summary>
     /// Encapsulates CI release information.
+    /// Instances of this class are created internally if and only a CI build can 
+    /// actually be done.
     /// </summary>
     public class CIReleaseInfo
     {
-        internal CIReleaseInfo( CSVersion ciBaseTag, int ciBaseDepth, string ciBuildVersion, string ciBuildVersionNuGet )
+        CIReleaseInfo( CSVersion ciBaseTag, int ciBaseDepth, SVersion ciBuildVersion, SVersion ciBuildVersionNuGet )
         {
             BaseTag = ciBaseTag;
             Depth = ciBaseDepth;
@@ -25,7 +27,6 @@ namespace SimpleGitVersion
         /// <summary>
         /// The base <see cref="CSVersion"/> from which <see cref="BuildVersion"/> is built.
         /// It is either the the previous release or the <see cref="CSVersion.VeryFirstVersion"/>.
-        /// Null if and only if CIBuildVersion is null.
         /// </summary>
         public readonly CSVersion BaseTag;
 
@@ -36,30 +37,27 @@ namespace SimpleGitVersion
         public readonly int Depth;
 
         /// <summary>
-        /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either because it is the current branch 
-        /// or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it), the <see cref="RepositoryInfoOptions.StartingCommitSha"/> is null or 
-        /// empty and there is no <see cref="RepositoryInfo.ValidReleaseTag"/> on the commit.
-        /// The format is based on <see cref="CSVersionFormat.SemVer"/>
+        /// Never null: this is the CSemVer-CI version in <see cref="CSVersionFormat.SemVer"/> format.
         /// </summary>
-        public readonly string BuildVersion;
+        public readonly SVersion BuildVersion;
 
         /// <summary>
-        /// Same as <see cref="BuildVersion"/> instead that the format is based on <see cref="CSVersionFormat.NuGetPackage"/>
+        /// Never null: this is the CSemVer-CI version in <see cref="CSVersionFormat.NuGetPackage"/> format.
         /// </summary>
-        public readonly string BuildVersionNuGet;
+        public readonly SVersion BuildVersionNuGet;
 
         internal static CIReleaseInfo Create( Commit commit, CIBranchVersionMode ciVersionMode, string ciBuildName, StringBuilder errors, CommitVersionInfo info )
         {
             var actualBaseTag = info.PreviousMaxTag;
             CSVersion ciBaseTag = actualBaseTag ?? CSVersion.VeryFirstVersion;
-            string ciBuildVersionNuGet = null, ciBuildVersion = null;
+            SVersion ciBuildVersionNuGet = null, ciBuildVersion = null;
 
             // If there is no base release found, we fall back to ZeroTimedBased mode.
             if( ciVersionMode == CIBranchVersionMode.ZeroTimed || actualBaseTag == null )
             {
                 DateTime timeRelease = commit.Committer.When.ToUniversalTime().UtcDateTime;
-                ciBuildVersion = CreateSemVerZeroTimed( ciBuildName, timeRelease, actualBaseTag?.ToString() );
-                ciBuildVersionNuGet = CreateNuGetZeroTimed( ciBuildName, timeRelease );
+                ciBuildVersion = SVersion.Parse( CreateSemVerZeroTimed( ciBuildName, timeRelease, actualBaseTag?.ToString() ) );
+                ciBuildVersionNuGet = SVersion.Parse( CreateNuGetZeroTimed( ciBuildName, timeRelease ) );
             }
             else
             {
@@ -69,13 +67,14 @@ namespace SimpleGitVersion
                 {
                     errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
                     errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
-                            .AppendFormat( @"<Branch Name=""{0}"" VersionName=""{1}"" ... />.", ci.BranchName, ci.BranchName.Substring( 0, 8 ) )
-                            .AppendLine();
+                          .AppendLine()
+                          .Append( $@"<Branch Name=""{ci.BranchName}"" VersionName=""{ci.BranchName.Substring( 0, 8 )}"" ... />." )
+                          .AppendLine();
                 }
                 else
                 {
-                    ciBuildVersion = actualBaseTag.ToString( CSVersionFormat.SemVer, ci );
-                    ciBuildVersionNuGet = actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci );
+                    ciBuildVersion = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.SemVer, ci ) );
+                    ciBuildVersionNuGet = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci ) );
                 }
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );

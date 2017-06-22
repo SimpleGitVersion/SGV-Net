@@ -56,7 +56,7 @@ namespace SimpleGitVersion.Core.Tests
         public void testing_SimpleGitRepositoryInfo_on_this_repository()
         {
             var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), TestHelper.SolutionFolder );
-            Console.WriteLine( "This repo's SemVer: {0}", info.SemVer );
+            Console.WriteLine( "This repo's SemVer: {0}", info.SafeSemVersion );
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace SimpleGitVersion.Core.Tests
         public void testing_SimpleGitRepositoryInfo_on_other_repository()
         {
             var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), @"C:\Dev\CK-Core-Projects\CK-Core" );
-            Console.WriteLine( "This repo's SemVer: {0}", info.SemVer );
+            Console.WriteLine( "This repo's SemVer: {0}", info.SafeSemVersion );
         }
     }
 }
