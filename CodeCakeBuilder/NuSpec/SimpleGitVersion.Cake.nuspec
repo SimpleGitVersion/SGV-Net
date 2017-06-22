@@ -23,8 +23,9 @@
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
     <dependencies>
       <dependency id="SimpleGitVersion.Core" version="$version$" />
-      <dependency id="Cake.Core" version="0.17.0" />
-   </dependencies>
+      <dependency id="Cake.Core" version="0.20.0" />
+      <dependency id="Cake.Common" version="0.20.0" />
+    </dependencies>
   </metadata>
   <files>
     <file src="SimpleGitVersion.Cake\bin\{{configuration}}\SimpleGitVersion.Cake.dll" target="lib\net45" />

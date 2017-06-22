@@ -22,6 +22,9 @@
     <tags>Git, Tag, Versioning, NuGet, SemVer, CSemVer</tags>
     <developmentDependency>true</developmentDependency>
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
+    <dependencies>
+      <dependency id="CSemVer" version="0.30.0-a00-00-develop-0002" />
+    </dependencies>
   </metadata>
   <files>
     <file src="SimpleGitVersion.Core\bin\{{configuration}}\ILMerged\SimpleGitVersion.Core.dll" target="lib\net45" />
