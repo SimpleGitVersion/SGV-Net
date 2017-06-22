@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9CD47A9D-B076-4579-95D5-E69419EF1F2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Core", "SimpleGitVersion.Core\SimpleGitVersion.Core.csproj", "{053309DF-B585-4DCB-972B-634669733244}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersionTask", "SimpleGitVersionTask\SimpleGitVersionTask.csproj", "{C6B8D36C-503E-4F33-8932-C48C86FB212A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Cake", "SimpleGitVersion.Cake\SimpleGitVersion.Cake.csproj", "{FE78A6B1-778C-48B2-9D93-4FBCDC5191AB}"
@@ -33,16 +31,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSemVer", "CSemVer\CSemVer.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSemVer.Tests", "Tests\CSemVer.Tests\CSemVer.Tests.csproj", "{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Core", "SimpleGitVersion.Core\SimpleGitVersion.Core.csproj", "{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{07FBD224-B043-44FE-874D-2DA6B28F5E1B} = {07FBD224-B043-44FE-874D-2DA6B28F5E1B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{053309DF-B585-4DCB-972B-634669733244}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{053309DF-B585-4DCB-972B-634669733244}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{053309DF-B585-4DCB-972B-634669733244}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{053309DF-B585-4DCB-972B-634669733244}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6B8D36C-503E-4F33-8932-C48C86FB212A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C6B8D36C-503E-4F33-8932-C48C86FB212A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6B8D36C-503E-4F33-8932-C48C86FB212A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,6 +68,10 @@ Global
 		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E66ECDC-4F5E-4C50-BBC3-F2E7F1C30114}.Release|Any CPU.Build.0 = Release|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

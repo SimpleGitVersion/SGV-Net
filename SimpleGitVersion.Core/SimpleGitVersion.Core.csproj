@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" />
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{053309DF-B585-4DCB-972B-634669733244}</ProjectGuid>
+    <ProjectGuid>{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimpleGitVersion.Core</RootNamespace>
@@ -14,7 +14,6 @@
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <StartAction>Program</StartAction>
@@ -22,49 +21,6 @@
     <StartWorkingDirectory>$(SolutionDir)Tests\TestProject\</StartWorkingDirectory>
     <StartArguments>&gt; BuildLog.txt</StartArguments>
   </PropertyGroup>
-  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
-    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\SharedKey.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\CSemVer\CIBuildDescriptor.cs">
-      <Link>CSemVer\CIBuildDescriptor.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\CSVersion.cs">
-      <Link>CSemVer\CSVersion.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\CSVersion.OrderedVersion.cs">
-      <Link>CSemVer\CSVersion.OrderedVersion.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\CSVersion.Parse.cs">
-      <Link>CSemVer\CSVersion.Parse.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\CSVersion.ToString.cs">
-      <Link>CSemVer\CSVersion.ToString.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\CSVersionFormat.cs">
-      <Link>CSemVer\CSVersionFormat.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\CSVersionKind.cs">
-      <Link>CSemVer\CSVersionKind.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\CSVersionKindExtensions.cs">
-      <Link>CSemVer\CSVersionKindExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\InformationalVersion.cs">
-      <Link>CSemVer\InformationalVersion.cs</Link>
-    </Compile>
-    <Compile Include="..\CSemVer\SVersion.cs">
-      <Link>CSemVer\SVersion.cs</Link>
-    </Compile>
-    <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>Properties\SharedAssemblyInfo.cs</Link>
-    </Compile>
-  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -81,12 +37,21 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\SimpleGitVersion.Core.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\SharedKey.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LibGit2Sharp">
-      <HintPath>..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="CSemVer">
+      <HintPath>..\CSemVer\bin\Debug\net461\CSemVer.dll</HintPath>
+    </Reference>
+    <Reference Include="LibGit2Sharp, Version=0.24.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\packages\LibGit2Sharp.0.24.0\lib\net40\LibGit2Sharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -96,55 +61,51 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmptyLogger.cs" />
-    <Compile Include="PathComparer.cs" />
-    <Compile Include="RepositoryInfo\CIReleaseInfo.cs" />
-    <Compile Include="RepositoryInfo\Options\IWorkingFolderModifiedFile.cs" />
-    <Compile Include="RepositoryInfo\Options\PossibleVersionsMode.cs" />
-    <Compile Include="SimpleRepositoryInfo.Extension.cs" />
-    <Compile Include="TagCollector\ITagCommit.cs" />
-    <Compile Include="ILogger.cs" />
-    <Compile Include="TagCollector\IFullTagCommit.cs" />
-    <Compile Include="TagCollector\CommitVersionInfo.cs" />
-    <Compile Include="TagCollector\RepositoryVersions.cs" />
-    <Compile Include="TagCollector\TagCollector.VersionReader.cs" />
-    <Compile Include="SimpleRepositoryInfo.cs" />
-    <Compile Include="RepositoryInfo\Options\CIBranchVersionMode.cs" />
-    <Compile Include="UsefulExtensions.cs" />
     <Compile Include="GitExtensions.cs" />
     <Compile Include="GitHelper.cs" />
+    <Compile Include="ILogger.cs" />
+    <Compile Include="PathComparer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RepositoryInfo\CIReleaseInfo.cs" />
+    <Compile Include="RepositoryInfo\Options\CIBranchVersionMode.cs" />
+    <Compile Include="RepositoryInfo\Options\IWorkingFolderModifiedFile.cs" />
+    <Compile Include="RepositoryInfo\Options\PossibleVersionsMode.cs" />
+    <Compile Include="RepositoryInfo\Options\RepositoryInfoOptions.cs" />
     <Compile Include="RepositoryInfo\Options\RepositoryInfoOptionsBranch.cs" />
     <Compile Include="RepositoryInfo\ReleaseTagParsingMode.cs" />
-    <Compile Include="TagCollector\TagCollector.cs" />
     <Compile Include="RepositoryInfo\RepositoryInfo.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RepositoryInfo\Options\RepositoryInfoOptions.cs" />
-    <Compile Include="TagCollector\TagCommit.cs" />
     <Compile Include="RepositoryWriter\RepositoryWriter.cs" />
     <Compile Include="SGVSchema.cs" />
+    <Compile Include="SimpleRepositoryInfo.cs" />
+    <Compile Include="SimpleRepositoryInfo.Extension.cs" />
+    <Compile Include="TagCollector\CommitVersionInfo.cs" />
+    <Compile Include="TagCollector\IFullTagCommit.cs" />
+    <Compile Include="TagCollector\ITagCommit.cs" />
+    <Compile Include="TagCollector\RepositoryVersions.cs" />
+    <Compile Include="TagCollector\TagCollector.cs" />
+    <Compile Include="TagCollector\TagCollector.VersionReader.cs" />
+    <Compile Include="TagCollector\TagCommit.cs" />
+    <Compile Include="UsefulExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SharedKey.snk">
       <Link>Properties\SharedKey.snk</Link>
     </None>
     <None Include="NuGetAssets\SimpleGitVersion.Core.props" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
     <Message Text="ILMerge LibGit2Sharp.dll into SimpleGitVersion.Core in directory: $(TargetDir)ILMerged\" Importance="high" />
     <MakeDir Directories="$(TargetDir)ILMerged\" />
-    <Exec Command="&quot;$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILmerge.exe&quot;  /allowDup /keyfile:&quot;$(SolutionDir)SharedKey.snk&quot; /out:&quot;$(TargetDir)ILMerged\$(TargetFileName)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)LibGit2Sharp.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot; /internalize " />
+    <Exec Command="&quot;$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILmerge.exe&quot;  /allowDup /ndebug /keyfile:&quot;$(SolutionDir)SharedKey.snk&quot; /out:&quot;$(TargetDir)ILMerged\$(TargetFileName)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)LibGit2Sharp.dll&quot; /target:library /targetplatform:&quot;v4,$(FrameworkPathOverride)&quot; /internalize " />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets'))" />
-    <Error Condition="!Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.NativeBinaries.1.0.164\build\LibGit2Sharp.NativeBinaries.props'))" />
-    <Error Condition="!Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets'))" />
+    <Error Condition="!Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.NativeBinaries.1.0.185\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.22.0-r\build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.22.0-r\build\SimpleGitVersionTask.targets'))" />
   </Target>
-  <Import Project="..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.20.0\Build\SimpleGitVersionTask.targets')" />
-  <Import Project="..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets" Condition="Exists('..\packages\Brutal.Dev.StrongNameSigner.2.1.0\build\Brutal.Dev.StrongNameSigner.targets')" />
+  <Import Project="..\packages\SimpleGitVersionTask.0.22.0-r\build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.22.0-r\build\SimpleGitVersionTask.targets')" />
 </Project>
