@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright( "Copyright © Invenietis 2015" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
-[assembly: CLSCompliant( true )]
 [assembly: ComVisible( false )]
 
 #if DEBUG
