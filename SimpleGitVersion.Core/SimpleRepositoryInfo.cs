@@ -92,7 +92,7 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets the 'Major.Minor.Build.Revision' windows file version to use.
-        /// When <see cref="IsValid"/> is false, it is '0.0.0.0' (<see cref="InformationalVersion.InvalidFileVersion"/>).
+        /// When <see cref="IsValid"/> is false, it is '0.0.0.0' (<see cref="InformationalVersion.ZeroFileVersion"/>).
         /// When it is a release the last part (Revision) is even and it is odd for CI builds. 
         /// </summary>
         public string FileVersion { get; private set; }
@@ -299,7 +299,7 @@ namespace SimpleGitVersion
             PreReleaseName = string.Empty;
             PreReleaseNumber = 0;
             PreReleaseFix = 0;
-            FileVersion = InformationalVersion.InvalidFileVersion;
+            FileVersion = InformationalVersion.ZeroFileVersion;
             OrderedVersion = 0;
             SafeNuGetVersion = reason;
             SafeSemVersion = reason;

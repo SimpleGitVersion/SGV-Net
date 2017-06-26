@@ -122,19 +122,19 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets the NuGet version that must be used.
-        /// Never null: defaults to <see cref="SVersion.Invalid"/>.
+        /// Never null: defaults to <see cref="SVersion.ZeroVersion"/>.
         /// </summary>
         public readonly SVersion FinalNuGetVersion;
 
         /// <summary>
         /// Gets the semantic version that must be used.
-        /// Never null: defaults to <see cref="SVersion.Invalid"/>.
+        /// Never null: defaults to <see cref="SVersion.ZeroVersion"/>.
         /// </summary>
         public readonly SVersion FinalSemVersion;
 
         /// <summary>
         /// Gets the standardized information version string.
-        /// Never null: defaults to <see cref="InformationalVersion.InvalidInformationalVersion"/> string.
+        /// Never null: defaults to <see cref="InformationalVersion.ZeroInformationalVersion"/> string.
         /// </summary>
         public readonly string FinalInformationalVersion;
 
@@ -253,12 +253,12 @@ namespace SimpleGitVersion
                     }
                 }
             }
-            // Handles FinalInformationalVersion and SVersion.Invalid for versions if needed.
+            // Handles FinalInformationalVersion and SVersion.ZeroVersion for versions if needed.
             if( FinalSemVersion == null )
             {
-                FinalSemVersion = SVersion.Invalid;
-                FinalNuGetVersion = SVersion.Invalid;
-                FinalInformationalVersion = InformationalVersion.InvalidInformationalVersion;
+                FinalSemVersion = SVersion.ZeroVersion;
+                FinalNuGetVersion = SVersion.ZeroVersion;
+                FinalInformationalVersion = InformationalVersion.ZeroInformationalVersion;
             }
             else
             {
