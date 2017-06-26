@@ -256,9 +256,9 @@ namespace SimpleGitVersion
             // Handles FinalInformationalVersion and SVersion.Invalid for versions if needed.
             if( FinalSemVersion == null )
             {
-                FinalSemVersion = SVersion.Invalid;
-                FinalNuGetVersion = SVersion.Invalid;
-                FinalInformationalVersion = InformationalVersion.InvalidInformationalVersion;
+                FinalSemVersion = SVersion.ZeroVersion;
+                FinalNuGetVersion = SVersion.ZeroVersion;
+                FinalInformationalVersion = InformationalVersion.ZeroInformationalVersion;
             }
             else
             {
