@@ -299,7 +299,7 @@ namespace SimpleGitVersion
             PreReleaseName = string.Empty;
             PreReleaseNumber = 0;
             PreReleaseFix = 0;
-            FileVersion = InformationalVersion.ZeroFileVersion;
+            FileVersion = InformationalVersion.InvalidFileVersion;
             OrderedVersion = 0;
             SafeNuGetVersion = reason;
             SafeSemVersion = reason;
