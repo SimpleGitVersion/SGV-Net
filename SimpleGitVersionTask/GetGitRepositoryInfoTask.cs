@@ -108,6 +108,9 @@ namespace SimpleGitVersion
         [Output]
         public DateTime CommitDateUtc { get; set; }
 
+        [Output]
+        public string InformationalVersion { get; set; }
+
         class Logger : ILogger
         {
             readonly ITask _task;
@@ -173,7 +176,7 @@ namespace SimpleGitVersion
                 CurrentUserName = i.CurrentUserName;
                 CommitSha = i.CommitSha;
                 CommitDateUtc = i.CommitDateUtc;
-
+                InformationalVersion = i.Info.FinalInformationalVersion;
                 if( i.Info.HasError )
                 {
                     this.LogError( i.Info.RepositoryError ?? i.Info.ReleaseTagErrorText );

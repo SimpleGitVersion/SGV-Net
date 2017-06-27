@@ -21,8 +21,7 @@
       <Output TaskParameter="SemVer" PropertyName="SGVSemVer" />
       <Output TaskParameter="NuGetVersion" PropertyName="SGVNuGetVersion" />
       <Output TaskParameter="FileVersion" PropertyName="SGVFileVersion" />
-      <Output TaskParameter="CommitSha" PropertyName="SGVCommitSha" />
-      <Output TaskParameter="CurrentUserName" PropertyName="SGVCurrentUserName" />
+      <Output TaskParameter="InformationalVersion" PropertyName="SGVInformationalVersion" />
     </SimpleGitVersion.GetGitRepositoryInfoTask>
 
     <SimpleGitVersion.CreateAssemblyInfoTask
@@ -32,7 +31,7 @@
 	          MajorMinorPatch="$(SGVMajorMinorPatch)"
             SemVer="$(SGVSemVer)"
 	          AssemblyFileVersionInfo="$(SGVFileVersion)"
-	          AssemblyInformationalVersionInfo="$(SGVNuGetVersion) Sha:$(SGVCommitSha) User:$(SGVCurrentUserName)" 
+	          AssemblyInformationalVersionInfo="$(SGVInformationalVersion)" 
             >
       <Output TaskParameter="AssemblyInfoTempFilePath" PropertyName="AssemblyInfoTempFilePath" />
     </SimpleGitVersion.CreateAssemblyInfoTask>
