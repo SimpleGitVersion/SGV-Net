@@ -23,7 +23,7 @@
     <developmentDependency>true</developmentDependency>
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
     <dependencies>
-      <dependency id="CSemVer" version="0.30.0-p01" />
+      <dependency id="CSemVer" version="1.0.1" />
     </dependencies>
   </metadata>
   <files>
