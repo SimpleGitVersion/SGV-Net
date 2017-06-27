@@ -46,8 +46,8 @@
       <HintPath>..\packages\Code.Cake.0.15.0\lib\net45\Code.Cake.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CSemVer, Version=0.30.0.0, Culture=neutral, PublicKeyToken=731c291b31fb8d27, processorArchitecture=MSIL">
-      <HintPath>..\packages\CSemVer.0.30.0-p01\lib\net461\CSemVer.dll</HintPath>
+    <Reference Include="CSemVer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=731c291b31fb8d27, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSemVer.1.0.1\lib\net461\CSemVer.dll</HintPath>
     </Reference>
     <Reference Include="SimpleGitVersion.Cake, Version=0.25.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SimpleGitVersion.Cake.0.25.0\lib\net45\SimpleGitVersion.Cake.dll</HintPath>
