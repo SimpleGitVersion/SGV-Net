@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8">
     <id>SimpleGitVersion.Cake</id>
@@ -23,8 +23,8 @@
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
     <dependencies>
       <dependency id="SimpleGitVersion.Core" version="$version$" />
-      <dependency id="Cake.Core" version="0.20.0" />
-      <dependency id="Cake.Common" version="0.20.0" />
+      <dependency id="Cake.Core" version="0.23.0" />
+      <dependency id="Cake.Common" version="0.23.0" />
     </dependencies>
   </metadata>
   <files>
