@@ -1,4 +1,4 @@
-﻿using Cake.Common.Tools.DotNetCore;
+using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.MSBuild;
 using Cake.Core;
 using System;
@@ -45,7 +45,7 @@ namespace SimpleGitVersion
         static void AddVersionToolArguments( Cake.Core.Tooling.ToolSettings t, SimpleRepositoryInfo info )
         {
             string version = info.Info.FinalNuGetVersion.Text;
-            string assemblyVersion = info.MajorMinorPatch;
+            string assemblyVersion = info.MajorMinor;
             string fileVersion = info.FileVersion;
             string informationalVersion = info.Info.FinalInformationalVersion;
             var prev = t.ArgumentCustomization;
