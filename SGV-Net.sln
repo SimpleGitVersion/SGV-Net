@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9CD47A9D-B076-4579-95D5-E69419EF1F2A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Core", "SimpleGitVersion.Core\SimpleGitVersion.Core.csproj", "{053309DF-B585-4DCB-972B-634669733244}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersionTask", "SimpleGitVersionTask\SimpleGitVersionTask.csproj", "{C6B8D36C-503E-4F33-8932-C48C86FB212A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Cake", "SimpleGitVersion.Cake\SimpleGitVersion.Cake.csproj", "{FE78A6B1-778C-48B2-9D93-4FBCDC5191AB}"
 EndProject
@@ -18,19 +14,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		nuget.config = nuget.config
 		README.md = README.md
 		RepositoryInfo.xml = RepositoryInfo.xml
-		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
+		Common\Shared.props = Common\Shared.props
 		SimpleGitVersion.png = SimpleGitVersion.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Core.Tests", "Tests\SimpleGitVersion.Core.Tests\SimpleGitVersion.Core.Tests.csproj", "{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSProjTestProject", "Tests\CSProjTestProject\CSProjTestProject.csproj", "{D97A8EA9-3534-45A3-A3BA-289525A950AE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCakeBuilder", "CodeCakeBuilder\CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.DNXCommands", "SimpleGitVersion.DNXCommands\SimpleGitVersion.DNXCommands.csproj", "{AE679E77-40E4-45E5-B19C-692AF9755CC5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.DNXCommands.Tests", "Tests\SimpleGitVersion.DNXCommands.Tests\SimpleGitVersion.DNXCommands.Tests.csproj", "{8CDB9B4F-7B79-47F7-B72E-827F1ACF7470}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGitVersion.Core", "SimpleGitVersion.Core\SimpleGitVersion.Core.csproj", "{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,14 +30,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{053309DF-B585-4DCB-972B-634669733244}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{053309DF-B585-4DCB-972B-634669733244}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{053309DF-B585-4DCB-972B-634669733244}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{053309DF-B585-4DCB-972B-634669733244}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6B8D36C-503E-4F33-8932-C48C86FB212A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6B8D36C-503E-4F33-8932-C48C86FB212A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C6B8D36C-503E-4F33-8932-C48C86FB212A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C6B8D36C-503E-4F33-8932-C48C86FB212A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FE78A6B1-778C-48B2-9D93-4FBCDC5191AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FE78A6B1-778C-48B2-9D93-4FBCDC5191AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE78A6B1-778C-48B2-9D93-4FBCDC5191AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -54,27 +38,22 @@ Global
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D97A8EA9-3534-45A3-A3BA-289525A950AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D97A8EA9-3534-45A3-A3BA-289525A950AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE679E77-40E4-45E5-B19C-692AF9755CC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE679E77-40E4-45E5-B19C-692AF9755CC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE679E77-40E4-45E5-B19C-692AF9755CC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE679E77-40E4-45E5-B19C-692AF9755CC5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8CDB9B4F-7B79-47F7-B72E-827F1ACF7470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8CDB9B4F-7B79-47F7-B72E-827F1ACF7470}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8CDB9B4F-7B79-47F7-B72E-827F1ACF7470}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8CDB9B4F-7B79-47F7-B72E-827F1ACF7470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{399B4720-DA22-4435-8FA4-ECCE1BDBEBB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{86B0C218-3BF3-4A33-B4E2-D44D712DDF59} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
-		{D97A8EA9-3534-45A3-A3BA-289525A950AE} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
-		{8CDB9B4F-7B79-47F7-B72E-827F1ACF7470} = {9CD47A9D-B076-4579-95D5-E69419EF1F2A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B2456020-C39A-4B61-80DA-E498BE75A6B4}
 	EndGlobalSection
 EndGlobal

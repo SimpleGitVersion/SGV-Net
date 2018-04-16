@@ -28,7 +28,7 @@ namespace SimpleGitVersion
             using( var r = new Repository( Path ) )
             {
                 Branch b = r.Branches[branchName];
-                r.Checkout( b, new CheckoutOptions() { CheckoutModifiers = CheckoutModifiers.Force } );
+                Commands.Checkout( r, b, new CheckoutOptions() { CheckoutModifiers = CheckoutModifiers.Force });
             }
         }
 

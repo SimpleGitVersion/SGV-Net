@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +20,7 @@ namespace SimpleGitVersion
         Default = 0,
         /// <summary>
         /// All possible versions are allowed.
-        /// This is the default that allows the release of a non-patch version (ie. 2.1.0) even
+        /// This allows the release of a non-patch version (ie. 2.1.0) even
         /// when a greater version exists in the repository (ie. 3.0.0).
         /// </summary>
         AllSuccessors = 1,

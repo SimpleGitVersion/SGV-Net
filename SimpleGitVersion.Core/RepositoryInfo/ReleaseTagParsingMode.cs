@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSemVer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,11 +17,11 @@ namespace SimpleGitVersion
         /// </summary>
         IgnoreMalformedTag,
         /// <summary>
-        /// If the tag is malformed (<see cref="ReleaseTagVersion.IsValid"/> is false and <see cref="ReleaseTagVersion.IsMalformed"/> is true), an error is raised.
+        /// If the tag is malformed (<see cref="CSVersion.IsValidSyntax"/> is false and <see cref="CSVersion.IsMalformed"/> is true), an error is raised.
         /// </summary>
         RaiseErrorOnMalformedTag,
         /// <summary>
-        /// Same as <see cref="RaiseErrorOnMalformedTag"/> with the addition that <see cref="ReleaseTagVersion.IsPreReleaseNameStandard"/> must be true.
+        /// Same as <see cref="RaiseErrorOnMalformedTag"/> with the addition that <see cref="CSVersion.IsPreReleaseNameStandard"/> must be true.
         /// </summary>
         RaiseErrorOnMalformedTagAndNonStandardPreReleaseName
     }

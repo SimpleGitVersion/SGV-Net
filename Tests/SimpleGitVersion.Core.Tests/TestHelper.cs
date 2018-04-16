@@ -48,7 +48,7 @@ namespace SimpleGitVersion
                             {
                                 using( var r = new Repository( gitPath ) )
                                 {
-                                    r.Fetch( "origin", new FetchOptions() { TagFetchMode = TagFetchMode.All } );
+                                    Commands.Fetch( r, "origin", Enumerable.Empty<string>(), new FetchOptions() { TagFetchMode = TagFetchMode.All }, "Testing." );
                                 }
                             }
                             catch( LibGit2SharpException ex )

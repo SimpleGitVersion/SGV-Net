@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LibGit2Sharp;
+using CSemVer;
 
 namespace SimpleGitVersion
 {
@@ -13,14 +14,14 @@ namespace SimpleGitVersion
         readonly string _commitSha;
         readonly string _contentSha;
         TagCommit _bestTagCommit;
-        ReleaseTagVersion _thisTag;
-        List<ReleaseTagVersion> _extraCollectedTags;
+        CSVersion _thisTag;
+        List<CSVersion> _extraCollectedTags;
         TagCommit _nextSameTree;
         TagCommit _headSameTree;
 
-        public TagCommit( Commit c, ReleaseTagVersion first )
+        public TagCommit( Commit c, CSVersion first )
         {
-            Debug.Assert( c != null && first != null && first.IsValid );
+            Debug.Assert( c != null && first != null && first.IsValidSyntax );
             _commitSha = c.Sha;
             _contentSha = c.Tree.Sha;
             _thisTag = first;
@@ -41,7 +42,7 @@ namespace SimpleGitVersion
         /// It is necessarily not null once <see cref="TagCollector"/> exposes it: tags that are invalid are 
         /// removed.
         /// </summary>
-        public ReleaseTagVersion ThisTag => _thisTag; 
+        public CSVersion ThisTag => _thisTag; 
 
         /// <summary>
         /// Gets the best commit. This <see cref="IFullTagCommit"/> if no better version exists on the content.
@@ -51,7 +52,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets <see cref="ThisTag"/> or the best version from the content.
         /// </summary>
-        public ReleaseTagVersion BestTag => _headSameTree != null ? _headSameTree._bestTagCommit.ThisTag : _thisTag; 
+        public CSVersion BestTag => _headSameTree != null ? _headSameTree._bestTagCommit.ThisTag : _thisTag; 
 
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace SimpleGitVersion
 
         #region Step 1: Collect
 
-        public void AddCollectedTag( ReleaseTagVersion t )
+        public void AddCollectedTag( CSVersion t )
         {
             Debug.Assert( t != null );
             if( t.Equals( _thisTag ) )
@@ -86,7 +87,7 @@ namespace SimpleGitVersion
             }
             else
             {
-                if( _extraCollectedTags == null ) _extraCollectedTags = new List<ReleaseTagVersion>();
+                if( _extraCollectedTags == null ) _extraCollectedTags = new List<CSVersion>();
                 _extraCollectedTags.Add( t );
             }
         }
@@ -100,7 +101,7 @@ namespace SimpleGitVersion
         public bool CloseCollect( StringBuilder errors )
         {
             var t = DoCloseCollect( errors );
-            if( t != null && t.IsValid )
+            if( t != null && t.IsValidSyntax )
             {
                 _thisTag = t;
                 return true;
@@ -109,7 +110,7 @@ namespace SimpleGitVersion
             return false;
         }
 
-        ReleaseTagVersion DoCloseCollect( StringBuilder errors )
+        CSVersion DoCloseCollect( StringBuilder errors )
         {
             if( _extraCollectedTags == null ) return _thisTag.IsMarkedInvalid ? null : _thisTag;
             _extraCollectedTags.Add( _thisTag );
