@@ -1,4 +1,4 @@
-﻿using CSemVer;
+using CSemVer;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -104,11 +104,6 @@ namespace SimpleGitVersion
         public long OrderedVersion { get; private set; }
 
         /// <summary>
-        /// Gets the current user name.
-        /// </summary>
-        public string CurrentUserName { get { return Info.CurrentUserName; } }
-
-        /// <summary>
         /// Gets the Sha of the current commit.
         /// </summary>
         public string CommitSha { get; private set; }
@@ -156,7 +151,7 @@ namespace SimpleGitVersion
                 string optionFile = Path.Combine( gitPath, "RepositoryInfo.xml" );
                 bool fileExists = File.Exists( optionFile );
                 var options = fileExists ? RepositoryInfoOptions.Read( optionFile ) : new RepositoryInfoOptions();
-                if( optionsChecker != null ) optionsChecker( logger, fileExists, options );
+                optionsChecker?.Invoke( logger, fileExists, options );
                 return options;
             } );
             return new SimpleRepositoryInfo( logger, info );
@@ -249,7 +244,7 @@ namespace SimpleGitVersion
             }
             else
             {
-                if( info.Options.PossibleVersionsMode == PossibleVersionsMode.Restricted )
+                if( info.Options.PossibleVersionsMode.IsStrict() )
                 {
                     logger.Info( $"Possible version(s) (Restricted): {string.Join( ", ", info.PossibleVersionsStrict )}" );
                 }

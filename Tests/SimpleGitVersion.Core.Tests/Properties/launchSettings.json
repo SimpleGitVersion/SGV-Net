@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "NUnit GUI": {
+      "commandName": "Executable",
+      "executablePath": "%USERPROFILE%\\.nuget\\packages\\nunit.runners.net4\\2.6.4\\tools\\nunit.exe",
+      "commandLineArgs": "SimpleGitVersion.Core.Tests.dll"
+    }
+  }
+}

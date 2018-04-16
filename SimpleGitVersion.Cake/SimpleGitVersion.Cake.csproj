@@ -1,93 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FE78A6B1-778C-48B2-9D93-4FBCDC5191AB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleGitVersion.Cake</RootNamespace>
-    <AssemblyName>SimpleGitVersion.Cake</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\SimpleGitVersion.Cake.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
-    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Cake.Common, Version=0.23.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cake.Common.0.23.0\lib\net46\Cake.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Cake.Core, Version=0.23.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cake.Core.0.23.0\lib\net46\Cake.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CSemVer, Version=1.1.0.0, Culture=neutral, PublicKeyToken=731c291b31fb8d27, processorArchitecture=MSIL">
-      <HintPath>..\packages\CSemVer.1.1.0\lib\net461\CSemVer.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.XML" />
-    <Reference Include="System.Xml.Linq" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>Properties\SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="CakeEnvironmentExtension.cs" />
-    <Compile Include="RunCmdAliases.cs" />
-    <Compile Include="SimpleGitVersionAliases.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ToolSettingsVersionExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleGitVersion.Core\SimpleGitVersion.Core.csproj">
-      <Project>{053309df-b585-4dcb-972b-634669733244}</Project>
-      <Name>SimpleGitVersion.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\SimpleGitVersionTask.0.29.0\build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.29.0\build\SimpleGitVersionTask.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\Common\Shared.props" />
+
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Description>Cake extension that enables Cake scripts to obtain SimpleGitVersion information from current Git repository.</Description>
+        <PackageIconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-NetCore/master/SimpleGitVersion.png</PackageIconUrl>
+        <PackageTags>Versioning, SemVer, NuGet, CSemVer, InformationalVersion, Cake</PackageTags>
+
+      <!-- Remove signing from Shared.props since Cake is not signed. -->
+      <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+      <SignAssembly>false</SignAssembly>
+      <PublicSign>false</PublicSign>
+
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.29.0\build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.29.0\build\SimpleGitVersionTask.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+    <ItemGroup>
+        <ProjectReference Include="../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
+        <PackageReference Include="Code.Cake" Version="0.25.1-Cdevelop-0019" />
+    </ItemGroup>
+
 </Project>

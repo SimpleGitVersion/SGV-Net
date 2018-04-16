@@ -1,4 +1,4 @@
-﻿using CSemVer;
+using CSemVer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,8 +62,8 @@ namespace SimpleGitVersion
                 Debug.Assert( _prevMaxCommit != null );
             }
             _maxCommit = BestContentTag >= PreviousMaxTag 
-                            ? (_contentCommit != null ? _contentCommit.BestCommit : null) 
-                            : (_prevMaxCommit._contentCommit != null ? _prevMaxCommit._contentCommit.BestCommit : null);
+                            ? (_contentCommit?.BestCommit) 
+                            : (_prevMaxCommit._contentCommit?.BestCommit);
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets this release tag. Null if no tag is associated to this commit.
         /// </summary>
-        public CSVersion ThisTag => _thisCommit != null ? _thisCommit.ThisTag : null; 
+        public CSVersion ThisTag => _thisCommit?.ThisTag; 
 
         /// <summary>
         /// Gets this <see cref="ITagCommit"/>. Null if no tag is associated to this commit.
@@ -84,7 +84,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the maximum release tag: it can be this tag, this content tag or a previous tag.
         /// </summary>
-        public CSVersion MaxTag => _maxCommit != null ? _maxCommit.ThisTag : null;
+        public CSVersion MaxTag => _maxCommit?.ThisTag;
 
         /// <summary>
         /// Gets the maximmum <see cref="ITagCommit"/>. It can be this commit or any previous commit.
@@ -94,22 +94,22 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the best previous release tag set among the parent commits.
         /// </summary>
-        public CSVersion PreviousTag => _prevCommit != null ? _prevCommit.ThisTag : null; 
+        public CSVersion PreviousTag => _prevCommit?.ThisTag; 
 
         /// <summary>
         /// Gets the best previous <see cref="ITagCommit"/> set among the parent commits.
         /// </summary>
-        public ITagCommit PreviousCommit => _prevCommit != null ? _prevCommit.ThisCommit : null;
+        public ITagCommit PreviousCommit => _prevCommit?.ThisCommit;
 
         /// <summary>
         /// Gets the maximum release tag among parents (either explicit tags or tags on content).
         /// </summary>
-        public CSVersion PreviousMaxTag => _prevMaxCommit != null ? _prevMaxCommit.MaxTag : null;
+        public CSVersion PreviousMaxTag => _prevMaxCommit?.MaxTag;
 
         /// <summary>
         /// Gets the maximum <see cref="ITagCommit"/> among parents (either explicit tags or tags on content).
         /// </summary>
-        public ITagCommit PreviousMaxCommit => _prevMaxCommit != null ? _prevMaxCommit._maxCommit : null;
+        public ITagCommit PreviousMaxCommit => _prevMaxCommit?._maxCommit;
 
         /// <summary>
         /// Gets the number of commits between this commit (longest path) and the <see cref="PreviousMaxCommit"/>, including this one:
@@ -186,7 +186,7 @@ namespace SimpleGitVersion
             }
         }
 
-        CSVersion BestContentTag { get { return _contentCommit != null ? _contentCommit.BestCommit.ThisTag : null; } }
+        CSVersion BestContentTag => _contentCommit?.BestCommit.ThisTag;
 
         /// <summary>
         /// Returns either { PreviousTag, PreviousMaxTag }, { PreviousTag }, { PreviousMaxTag } or { null }.
