@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,7 +70,7 @@ namespace SimpleGitVersion
 
         public static string RepositoryXSDPath
         {
-            get { return Path.Combine( TestHelper.SolutionFolder, "SimpleGitVersionTask", "NuGetAssets", "RepositoryInfo.xsd" ); }
+            get { return Path.Combine( TestHelper.SolutionFolder, "SimpleGitVersion.Core", "RepositoryInfo.xsd" ); }
         }
 
 

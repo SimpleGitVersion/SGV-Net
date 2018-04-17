@@ -2,12 +2,15 @@
 
     <Import Project="..\..\Common\Shared.props" />
 
-    <PropertyGroup>
-        <TargetFramework>net461</TargetFramework>
-        <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">Exe</OutputType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+  </PropertyGroup>
 
-    <ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
         <ProjectReference Include="../../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
         <PackageReference Include="FluentAssertions" Version="5.2.0" />
     </ItemGroup>

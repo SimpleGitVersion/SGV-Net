@@ -3,8 +3,7 @@
     <Import Project="..\Common\Shared.props" />
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-      <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
         <Description></Description>
         <PackageIconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-Net/master/SimpleGitVersion.png</PackageIconUrl>
         <PackageTags>Versioning, SemVer, NuGet, CSemVer, InformationalVersion</PackageTags>
