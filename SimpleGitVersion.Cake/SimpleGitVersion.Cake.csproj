@@ -1,23 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <Import Project="..\Common\Shared.props" />
-
-    <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <Description>Cake extension that enables Cake scripts to obtain SimpleGitVersion information from current Git repository.</Description>
-        <PackageIconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-NetCore/master/SimpleGitVersion.png</PackageIconUrl>
-        <PackageTags>Versioning, SemVer, NuGet, CSemVer, InformationalVersion, Cake</PackageTags>
-
-      <!-- Remove signing from Shared.props since Cake is not signed. -->
-      <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
-      <SignAssembly>false</SignAssembly>
-      <PublicSign>false</PublicSign>
-
-    </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
-        <PackageReference Include="Code.Cake" Version="0.25.1-Cdevelop-0019" />
-    </ItemGroup>
-
+  <Import Project="..\Common\Shared.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Cake extension that enables Cake scripts to obtain SimpleGitVersion information from current Git repository.</Description>
+    <PackageIconUrl>https://raw.githubusercontent.com/SimpleGitVersion/SGV-NetCore/master/SimpleGitVersion.png</PackageIconUrl>
+    <PackageTags>Versioning, SemVer, NuGet, CSemVer, InformationalVersion, Cake</PackageTags>
+    <!-- Remove signing from Shared.props since Cake is not signed. -->
+    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+    <SignAssembly>false</SignAssembly>
+    <PublicSign>false</PublicSign>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
+    <PackageReference Include="Code.Cake" Version="0.25.1-Cdevelop-0022" />
+  </ItemGroup>
 </Project>
