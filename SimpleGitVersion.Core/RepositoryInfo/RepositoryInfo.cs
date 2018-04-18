@@ -398,10 +398,20 @@ namespace SimpleGitVersion
                 }
                 else
                 {
-                    Branch br = r.Branches[options.StartingBranchName] ?? r.Branches[ options.RemoteName + '/' + options.StartingBranchName];
-                    if( br == null ) return $"Unknown StartingBranchName: '{options.StartingBranchName}' (also tested on remote '{options.RemoteName}/{options.StartingBranchName}').";
+                    string remotePrefix = options.RemoteName + '/';
+                    string localBranchName = options.StartingBranchName.StartsWith( remotePrefix )
+                                                ? options.StartingBranchName.Substring( remotePrefix.Length )
+                                                : options.StartingBranchName;
+                    Branch br = r.Branches[options.StartingBranchName];
+                    if( br == null && ReferenceEquals( localBranchName, options.StartingBranchName ) )
+                    {
+                        string remoteName = remotePrefix + options.StartingBranchName;
+                        br = r.Branches[remoteName];
+                        if( br == null ) return $"Unknown StartingBranchName: '{options.StartingBranchName}' (also tested on remote '{remoteName}').";
+                    }
+                    if( br == null ) return $"Unknown (remote) StartingBranchName: '{options.StartingBranchName}'.";
                     commit = br.Tip;
-                    branchNames = new[] { options.StartingBranchName };
+                    branchNames = new[] { localBranchName };
                 }
                 RepositoryInfoOptionsBranch bOpt;
                 if( options.Branches != null
