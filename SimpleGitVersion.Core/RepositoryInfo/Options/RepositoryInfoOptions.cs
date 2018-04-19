@@ -57,9 +57,17 @@ namespace SimpleGitVersion
         public string StartingVersionForCSemVer { get; set; }
 
         /// <summary>
-        /// Gets or sets the set of possible versions that must be used to consider a version tag as a valid one.
+        /// Gets or sets the only major version that must be released.
+        /// This is typically for LTS branches.
+        /// Obviously defaults to null.
         /// </summary>
-        public PossibleVersionsMode PossibleVersionsMode { get; set; }
+        public int? SingleMajor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the whether patch only versions must be released.
+        /// This is typically for LTS (fix only) branches. 
+        /// </summary>
+        public bool OnlyPatch { get; set; }
 
         /// <summary>
         /// Gets or sets branches informations.
@@ -124,9 +132,11 @@ namespace SimpleGitVersion
                                         ? new XElement( SGVSchema.Debug, new XAttribute( SGVSchema.IgnoreDirtyWorkingFolder, "true" ) ) 
                                         : null,
                                     StartingVersionForCSemVer != null ? new XElement( SGVSchema.StartingVersionForCSemVer, StartingVersionForCSemVer ) : null,
-                                    RemoteName != "origin" ? new XElement( SGVSchema.RemoteName, RemoteName ) : null,
-                                    PossibleVersionsMode != PossibleVersionsMode.Default
-                                        ? new XElement( SGVSchema.PossibleVersionsMode, PossibleVersionsMode.ToString() )
+                                    SingleMajor.HasValue
+                                        ? new XElement( SGVSchema.SingleMajor, SingleMajor.Value.ToString() )
+                                        : null,
+                                    OnlyPatch
+                                        ? new XElement( SGVSchema.OnlyPatch, "true" )
                                         : null,
                                     IgnoreModifiedFiles.Count > 0
                                         ? new XElement( SGVSchema.IgnoreModifiedFiles,
@@ -135,7 +145,8 @@ namespace SimpleGitVersion
                                     Branches != null
                                         ? new XElement( SGVSchema.Branches,
                                                             Branches.Where( b => b != null ).Select( b => b.ToXml() ) )
-                                        : null );
+                                        : null,
+                                    RemoteName != "origin" ? new XElement( SGVSchema.RemoteName, RemoteName ) : null );
         }
 
         /// <summary>
@@ -147,27 +158,23 @@ namespace SimpleGitVersion
         {
             var info = new RepositoryInfoOptions();
 
-            var eD = e.Element( SGVSchema.Debug );
-            if( eD != null )
-            {
-                var attrIgnoreDirty = eD.Attribute( SGVSchema.IgnoreDirtyWorkingFolder );
-                info.IgnoreDirtyWorkingFolder = attrIgnoreDirty != null ? attrIgnoreDirty.Value == "true" || attrIgnoreDirty.Value == "1" : false;
-            }
+            info.IgnoreDirtyWorkingFolder = (bool?)e.Element( SGVSchema.Debug )
+                                                    ?.Attribute( SGVSchema.IgnoreDirtyWorkingFolder ) ?? false;
 
-            var eS = e.Element( SGVSchema.StartingVersionForCSemVer );
-            if( eS != null ) info.StartingVersionForCSemVer = eS.Value;
+            info.StartingVersionForCSemVer = (string)e.Element( SGVSchema.StartingVersionForCSemVer );
 
-            var eR = e.Element( SGVSchema.RemoteName );
-            if( eR != null ) info.RemoteName = eR.Value;
 
-            var eP = e.Element( SGVSchema.PossibleVersionsMode );
-            if( eP != null ) info.PossibleVersionsMode = (PossibleVersionsMode)Enum.Parse( typeof( PossibleVersionsMode), eP.Value );
+            info.SingleMajor = (int?)e.Element( SGVSchema.SingleMajor );
+
+            info.OnlyPatch = (bool?)e.Element( SGVSchema.OnlyPatch ) ?? false;
 
             info.Branches = e.Elements( SGVSchema.Branches )
                                     .Elements( SGVSchema.Branch )
                                     .Select( b => new RepositoryInfoOptionsBranch( b ) ).ToList();
 
             info.IgnoreModifiedFiles.UnionWith( e.Elements( SGVSchema.IgnoreModifiedFiles ).Elements( SGVSchema.Add ).Select( i => i.Value ) );
+
+            info.RemoteName = (string)e.Element( SGVSchema.RemoteName );
 
             return info;
         }

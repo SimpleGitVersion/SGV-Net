@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -45,7 +45,7 @@ namespace SimpleGitVersion
         /// Optional function that drives the behavior regarding malformed tags of commits.
         /// When null, <see cref="ReleaseTagParsingMode.IgnoreMalformedTag">IgnoreMalformedTag</see> is used for all tags.
         /// </param>
-        /// <param name="OverriddenTags">Optional commits with associated tags that are applied as if they exist in the repository.</param>
+        /// <param name="overriddenTags">Optional commits with associated tags that are applied as if they exist in the repository.</param>
         /// <param name="checkValidExistingVersions">
         /// When true, existing versions are checked: one of the valid first version must exist and exisitng versions
         /// must be compact.
@@ -55,7 +55,7 @@ namespace SimpleGitVersion
             Repository repo,
             string startingVersionForCSemVer = null,
             Func<Commit, ReleaseTagParsingMode> analyseInvalidTagSyntax = null,
-            IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> OverriddenTags = null,
+            IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> overriddenTags = null,
             bool checkValidExistingVersions = false )
         {
             Debug.Assert( errors != null && repo != null );
@@ -73,7 +73,7 @@ namespace SimpleGitVersion
                 }
             }
             // Register all tags.
-            RegisterAllTags( errors, repo, analyseInvalidTagSyntax, OverriddenTags );
+            RegisterAllTags( errors, repo, analyseInvalidTagSyntax, overriddenTags );
 
             // Resolves multiple tags on the same commit.
             CloseCollect( errors );
@@ -91,7 +91,7 @@ namespace SimpleGitVersion
             }
         }
 
-        void RegisterAllTags( StringBuilder errors, Repository repo, Func<Commit, ReleaseTagParsingMode> analyseInvalidTagSyntax, IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> OverriddenTags )
+        void RegisterAllTags( StringBuilder errors, Repository repo, Func<Commit, ReleaseTagParsingMode> analyseInvalidTagSyntax, IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> overriddenTags )
         {
             bool startingVersionForCSemVerFound = _startingVersionForCSemVer == null;
             foreach( var tag in repo.Tags )
@@ -101,9 +101,9 @@ namespace SimpleGitVersion
                 RegisterOneTag( errors, tagCommit, tag.FriendlyName, analyseInvalidTagSyntax, ref startingVersionForCSemVerFound );
             }
             // Applies overrides (if any) as if they exist in the repository.
-            if( OverriddenTags != null )
+            if( overriddenTags != null )
             {
-                foreach( var k in OverriddenTags )
+                foreach( var k in overriddenTags )
                 {
                     Commit o = null;
                     if( string.IsNullOrEmpty( k.Key ) )

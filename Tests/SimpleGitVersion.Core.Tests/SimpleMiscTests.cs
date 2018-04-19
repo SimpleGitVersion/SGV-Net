@@ -40,7 +40,11 @@ namespace SimpleGitVersion.Core.Tests
         [Test]
         public void testing_SimpleGitRepositoryInfo_on_this_repository()
         {
-            var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), TestHelper.SolutionFolder );
+            var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), TestHelper.SolutionFolder, (logger, hasRepoXml,opt) =>
+            {
+                logger.Info( "Ignoring DirtyWorkingFolder check." );
+                opt.IgnoreDirtyWorkingFolder = true;
+            } );
             Console.WriteLine( "This repo's SemVer: {0}", info.SafeSemVersion );
         }
 

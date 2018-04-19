@@ -238,20 +238,22 @@ namespace SimpleGitVersion
 
         void LogValidVersions( ILogger logger, RepositoryInfo info )
         {
+            string opt = null;
+            if( info.Options.OnlyPatch ) opt += "OnlyPatch";
+            if( info.Options.SingleMajor.HasValue )
+            {
+                if( opt != null ) opt += ", ";
+                opt += "SingleMajor = " + info.Options.SingleMajor.ToString();
+            }
+            if( opt != null ) opt = " (" + opt + ")";
+
             if( info.PossibleVersions.Count == 0 )
             {
-                logger.Info( "No possible versions." );
+                logger.Info( $"No possible versions {opt}." );
             }
             else
             {
-                if( info.Options.PossibleVersionsMode.IsStrict() )
-                {
-                    logger.Info( $"Possible version(s) (Restricted): {string.Join( ", ", info.PossibleVersionsStrict )}" );
-                }
-                else
-                {
-                    logger.Info( $"Possible version(s) (AllSuccessors): {string.Join( ", ", info.PossibleVersions )}" );
-                }
+                logger.Info( $"Possible version(s) {opt}: {string.Join( ", ", info.PossibleVersions )}" );
             }
         }
 

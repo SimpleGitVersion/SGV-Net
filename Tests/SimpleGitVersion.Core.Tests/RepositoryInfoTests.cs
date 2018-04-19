@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,7 +70,7 @@ namespace SimpleGitVersion.Core.Tests
             {
                 var i = repoTest.GetRepositoryInfo( tagged.Sha, overrides );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( bb1Tag ) );
-                CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersionsStrict );
+                CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersions );
             };
 
             // Checking possible versions before: none.
@@ -192,7 +192,6 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v1beta ) );
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 CollectionAssert.AreEqual( v1beta.GetDirectSuccessors(), i.PossibleVersions );
-                CollectionAssert.AreEqual( v1beta.GetDirectSuccessors(), i.PossibleVersionsStrict );
             }
 
             var cAlphaContinue = repoTest.Commits.First( sc => sc.Message.StartsWith( "Dev again in Alpha." ) );
@@ -226,11 +225,7 @@ namespace SimpleGitVersion.Core.Tests
                 var tagged = CSVersion.TryParse( "2.1.0-beta" );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.EqualTo( tagged ) );
-                CollectionAssert.AreEqual( 
-                    new[] { CSVersion.TryParse( "1.0.0-beta.0.1" ) }
-                            .Concat( CSVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
-                    i.PossibleVersionsStrict );
-                // In no strict mode, alpha branch can continue with any successors of
+                // alpha branch can continue with any successors of
                 // the 1.0.0-beta except the v2.0.0 of course.
                 CollectionAssert.AreEqual( 
                             CSVersion.TryParse( "1.0.0-beta" ).GetDirectSuccessors()
@@ -238,97 +233,6 @@ namespace SimpleGitVersion.Core.Tests
                             .Concat( CSVersion.TryParse( "2.0.0" ).GetDirectSuccessors() ), 
                     i.PossibleVersions );
             }
-        }
-
-        [Test]
-        public void StrictMode_content_based_decisions_saves_the_cherry_picks()
-        {
-            var repoTest = TestHelper.TestGitRepository;
-
-            var cRoot = repoTest.Commits.Single( sc => sc.Message.StartsWith( "First in parallel world." ) );
-            var cChange = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Change in parallel-world.txt content (1)." ) );
-            var cReset = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Reset change in parallel-world.txt content (2)." ) );
-
-            var cPickReset = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Cherry Pick - Reset change in parallel-world.txt content (2)." ) );
-            var cPickChange = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Cherry Pick - Change in parallel-world.txt content (1)." ) );
-            var cPostReset = repoTest.Commits.Single( sc => sc.Sha == "3035a581af1302293739e5caf7dfbc009a71454f" ); // "Merge branch 'gamma' into parallel-world" (there are two of them);
-            var cDevInGamma = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Dev in Gamma." ) );
-            var cMergeAll = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Merge branch 'parallel-world' into alpha" ) );
-
-            var v1 = CSVersion.TryParse( "1.0.0" );
-            var v2 = CSVersion.TryParse( "2.0.0" );
-            var overrides = new TagsOverride()
-                .MutableAdd( cRoot.Sha, v1.ToString() )
-                .MutableAdd( cChange.Sha, v2.ToString() );
-
-            //     cMergeAll            => succ(v2.0.0) 
-            //      /     \
-            //    /         \
-            //   |           |
-            // cDevInGamma   |          => fixes(v1.0.0)+succ(v2.0.0).
-            //   |           |
-            // cPickReset    |          => fixes(v1.0.0)+succ(v2.0.0) because the cherry pick makes cPickChange content v2.0.0 
-            //   |           |
-            // cPickChange   |          => fixes(v1.0.0). (Its content is actually v2.0.0)   
-            //   |           |
-            //   |       cPostReset     => succ(v2.0.0)
-            //   |           |     
-            //   |       cReset         => succ(v2.0.0)
-            //   |           |
-            //   |   cChange - v2.0.0
-            //   |      /
-            //   |    /
-            //   |  /
-            //   |/
-            // cRoot - v1.0.0
-
-            Action<SimpleCommit> v1Successors = commit =>
-            {
-                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
-                {
-                    StartingCommitSha = commit.Sha,
-                    OverriddenTags = overrides.Overrides
-                } );
-                CollectionAssert.AreEqual( v1.GetDirectSuccessors().Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersionsStrict );
-            };
-
-            Action<SimpleCommit> v1FixSuccessors = commit =>
-            {
-                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
-                {
-                    StartingCommitSha = commit.Sha,
-                    OverriddenTags = overrides.Overrides
-                } );
-                CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ), i.PossibleVersionsStrict );
-            };
-
-            Action<SimpleCommit> v1FixAndV2Successors = commit =>
-            {
-                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
-                {
-                    StartingCommitSha = commit.Sha,
-                    OverriddenTags = overrides.Overrides
-                } );
-                CollectionAssert.AreEqual( v1.GetDirectSuccessors( true ).Where( t => t.ToString() != "v2.0.0" ).Concat( v2.GetDirectSuccessors() ), i.PossibleVersionsStrict );
-            };
-
-            Action<SimpleCommit> v2Successors = commit =>
-            {
-                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
-                {
-                    StartingCommitSha = commit.Sha,
-                    PossibleVersionsMode = PossibleVersionsMode.Restricted,
-                    OverriddenTags = overrides.Overrides
-                } );
-                CollectionAssert.AreEqual( v2.GetDirectSuccessors(), i.PossibleVersionsStrict );
-            };
-
-            v2Successors( cReset );
-            v1FixSuccessors( cPickChange );
-            v1FixAndV2Successors( cPickReset );
-            v2Successors( cPostReset );
-            v1FixAndV2Successors( cDevInGamma );
-            v2Successors( cMergeAll );
         }
 
         [Test]
@@ -710,8 +614,7 @@ namespace SimpleGitVersion.Core.Tests
                 } );
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.SameAs( i.PreviousRelease.ThisTag ) );
-                CollectionAssert.AreEqual( new[] { v5rc01 }, i.PossibleVersionsStrict );
-                // In default mode, the fix of the fumble commit, v5.0.0-rc.0.1 and rc.1 are possible.  
+                // Fix of the fumble commit, v5.0.0-rc.0.1 and rc.1 are possible.  
                 CollectionAssert.AreEqual( new[] { v5rc01, v5rc1 }, i.PossibleVersions );
             }
             {
@@ -727,10 +630,6 @@ namespace SimpleGitVersion.Core.Tests
                 var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v5.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
-
-                var possibleStrict = new List<CSVersion>() { v5rc01 };
-                possibleStrict.AddRange( v5.GetDirectSuccessors() );
-                CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
             }
         }
 
@@ -767,18 +666,13 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
 
-                var possibleStrict = new List<CSVersion>() { v5rc01 };
-                possibleStrict.AddRange( v10.GetDirectSuccessors() );
-                CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
-
                 var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
             }
             {
                 // On B-Commit:
-                // Restricted Mode: it is the same, v4.4.0-alpha.0.1 and successors of v10.
-                // AllSuccessors Mode: all successors of v4.4.0-alpha (except the v5.0.0) are allowed and successors of v10.
+                // All successors of v4.4.0-alpha (except the v5.0.0) are allowed and successors of v10.
                 var v44a = CSVersion.TryParse( "v4.4.0-alpha" );
                 var v44a01 = CSVersion.TryParse( "v4.4.0-alpha.0.1" );
                 var v44a1 = CSVersion.TryParse( "v4.4.0-alpha.1" );
@@ -790,10 +684,6 @@ namespace SimpleGitVersion.Core.Tests
                 } );
                 Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v44a ) );
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
-
-                var possibleStrict = new List<CSVersion>() { v44a01 };
-                possibleStrict.AddRange( v10.GetDirectSuccessors() );
-                CollectionAssert.AreEqual( possibleStrict, i.PossibleVersionsStrict );
 
                 var possible = new List<CSVersion>();
                 possible.AddRange( v44a.GetDirectSuccessors().Where( v => v != v500 ) );

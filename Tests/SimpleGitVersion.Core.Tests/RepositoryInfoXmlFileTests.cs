@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.IO;
 using System.Xml.Linq;
@@ -74,7 +74,8 @@ namespace SimpleGitVersion.Core.Tests
         <Branch Name=""other"" CIVersionMode=""None"" />
     </Branches>
 	<StartingVersionForCSemVer>v4.2.0</StartingVersionForCSemVer>
-    <PossibleVersionsMode>AllSuccessors</PossibleVersionsMode>
+    <OnlyPatch>true</OnlyPatch>
+    <SingleMajor>3</SingleMajor>
     <IgnoreModifiedFiles>
         <Add>SharedKey.snk</Add>
     </IgnoreModifiedFiles>
@@ -94,7 +95,8 @@ namespace SimpleGitVersion.Core.Tests
             Assert.That( opt.StartingVersionForCSemVer, Is.EqualTo( opt2.StartingVersionForCSemVer ) );
             Assert.That( opt.Branches.Count, Is.EqualTo( opt2.Branches.Count ) );
             Assert.That( opt.IgnoreModifiedFiles.Count, Is.EqualTo( opt2.IgnoreModifiedFiles.Count ) );
-            Assert.That( opt.PossibleVersionsMode, Is.EqualTo( PossibleVersionsMode.AllSuccessors ) );
+            Assert.That( opt.OnlyPatch, Is.True );
+            Assert.That( opt.SingleMajor, Is.EqualTo( 3 ) );
         }
 
         private static void ValidateAgainstSchema( XDocument d )

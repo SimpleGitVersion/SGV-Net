@@ -119,7 +119,6 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
-        /// These possible versions are not necessarily valid.
         /// </summary>
         public IReadOnlyList<CSVersion> PossibleVersions
         {
@@ -130,28 +129,13 @@ namespace SimpleGitVersion
             }
         }
 
-        /// <summary>
-        /// Gets the possible versions on this commit in a strict sense: this is a subset 
-        /// of the <see cref="PossibleVersions"/>.
-        /// A possible versions that is not a <see cref="CSVersion.IsPatch"/> do not appear here 
-        /// if a greater version exists in the repository.
-        /// </summary>
-        public IReadOnlyList<CSVersion> PossibleVersionsStrict
-        {
-            get
-            {
-                if( _possibleVersionsStrict == null ) ComputePossibleVersions();
-                return _possibleVersionsStrict;
-            }
-        }
-
         void ComputePossibleVersions()
         {
             var allVersions = _tagCollector.ExistingVersions.Versions;
 
             // Special case: there is no existing versions (other than this that is skipped if it exists) but
             // there is a startingVersionForCSemVer, every commit may be the first one. 
-            if( _tagCollector.StartingVersionForCSemVer != null 
+            if( _tagCollector.StartingVersionForCSemVer != null
                 && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
             {
                 _possibleVersionsStrict = _possibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
@@ -161,30 +145,69 @@ namespace SimpleGitVersion
                 var versions = allVersions.Where( c => c != _thisCommit );
 
                 List<CSVersion> possible = new List<CSVersion>();
-                List<CSVersion> possibleStrict = new List<CSVersion>();
                 foreach( CSVersion b in GetBaseVersions() )
                 {
-                    // The base version b can be null here: a null version tag correctly generates 
-                    // the very first possible versions (and the comparison operators handle null).
-                    var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
-                    var successors = CSVersion.GetDirectSuccessors( false, b );
-                    foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer 
-                                                             && (nextReleased == null || v < nextReleased.ThisTag) ) )
-                    {
-                        if( !possible.Contains( v ) )
-                        {
-                            possible.Add( v );
-                            if( nextReleased == null || v.IsPatch )
-                            {
-                                possibleStrict.Add( v );
-                            }
-                        }
-                    }
+                    CollectPossibleVersions( b, versions, possible );
                 }
                 _possibleVersions = possible;
-                _possibleVersionsStrict = possibleStrict;
             }
         }
+
+        void CollectPossibleVersions(CSVersion baseVersion, IEnumerable<IFullTagCommit> allVersions, List<CSVersion> possible )
+        {
+            // The base version can be null here: a null version tag correctly generates 
+            // the very first possible versions (and the comparison operators handle null).
+            var nextReleased = allVersions.FirstOrDefault( c => c.ThisTag > baseVersion );
+            var successors = CSVersion.GetDirectSuccessors( false, baseVersion );
+            foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer
+                                                     && (nextReleased == null || v < nextReleased.ThisTag) ) )
+            {
+                if( !possible.Contains( v ) ) possible.Add( v );
+            }
+        }
+
+        //void ComputeNextPossibleVersions()
+        //{
+        //    if( ThisTag == null )
+        //    {
+        //        _nextPossibleVersions = PossibleVersions;
+        //    }
+        //    var allVersions = _tagCollector.ExistingVersions.Versions;
+
+        //    // Special case: there is no existing versions but
+        //    // there is a startingVersionForCSemVer, every commit may be the first one. 
+        //    if( _tagCollector.StartingVersionForCSemVer != null && allVersions.Count == 0 )
+        //    {
+        //        _nextPossibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
+        //    }
+        //    else
+        //    {
+        //        var versions = allVersions.Where( c => c != _thisCommit );
+
+        //        List<CSVersion> possible = new List<CSVersion>();
+        //        foreach( CSVersion b in GetBaseVersions() )
+        //        {
+        //            // The base version b can be null here: a null version tag correctly generates 
+        //            // the very first possible versions (and the comparison operators handle null).
+        //            var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
+        //            var successors = CSVersion.GetDirectSuccessors( false, b );
+        //            foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer
+        //                                                     && (nextReleased == null || v < nextReleased.ThisTag) ) )
+        //            {
+        //                if( !possible.Contains( v ) )
+        //                {
+        //                    possible.Add( v );
+        //                    if( nextReleased == null || v.IsPatch )
+        //                    {
+        //                        possibleStrict.Add( v );
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        _possibleVersions = possible;
+        //        _possibleVersionsStrict = possibleStrict;
+        //    }
+        //}
 
         CSVersion BestContentTag => _contentCommit?.BestCommit.ThisTag;
 

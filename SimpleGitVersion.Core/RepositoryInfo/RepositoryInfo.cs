@@ -108,16 +108,6 @@ namespace SimpleGitVersion
         public readonly IReadOnlyList<CSVersion> PossibleVersions;
 
         /// <summary>
-        /// Gets the possible versions on this commit in a strict sense: this is a subset 
-        /// of the <see cref="PossibleVersions"/>.
-        /// A possible versions that is not a <see cref="CSVersion.IsPatch"/> do not appear here 
-        /// if a greater version exists in the repository.
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
-        /// prevented its computation.
-        /// </summary>
-        public readonly IReadOnlyList<CSVersion> PossibleVersionsStrict;
-
-        /// <summary>
         /// Gets CI informations if a CI release must be done.
         /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either 
         /// because it is the current branch or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it), the <see cref="RepositoryInfoOptions.StartingCommitSha"/> 
@@ -192,13 +182,13 @@ namespace SimpleGitVersion
                             CommitVersionInfo info = collector.GetVersionInfo( commit );
                             ExistingVersions = collector.ExistingVersions.TagCommits;
                             PossibleVersions = info.PossibleVersions;
-                            PossibleVersionsStrict = info.PossibleVersionsStrict;
                             PreviousRelease = info.PreviousCommit;
                             PreviousMaxRelease = info.PreviousMaxCommit;
                             if( info.ThisCommit != null )
                             {
-                                bool strictMode = options.PossibleVersionsMode.IsStrict();
-                                var possibleSet = strictMode ? info.PossibleVersionsStrict : info.PossibleVersions;
+                                IEnumerable<CSVersion> possibleSet = info.PossibleVersions;
+                                if( options.OnlyPatch ) possibleSet = possibleSet.Where( v => v.IsPatch );
+                                if( options.SingleMajor.HasValue ) possibleSet = possibleSet.Where( v => v.Major == options.SingleMajor.Value );
                                 if( possibleSet.Contains( info.ThisCommit.ThisTag ) )
                                 {
                                     ValidReleaseTag = info.ThisCommit.ThisTag;
@@ -211,16 +201,10 @@ namespace SimpleGitVersion
                                            .Append( "' is not valid here. Valid tags are: " )
                                            .Append( string.Join( ", ", possibleSet ) )
                                            .AppendLine();
-                                    if( strictMode && info.PossibleVersions.Contains( info.ThisCommit.ThisTag ))
+                                    if( possibleSet != info.PossibleVersions
+                                        && info.PossibleVersions.Contains( info.ThisCommit.ThisTag ))
                                     {
-                                        if( options.PossibleVersionsMode == PossibleVersionsMode.Default )
-                                        {
-                                            errors.Append( "Consider setting <PossibleVersionsMode>AllSuccessors</PossibleVersionsMode> in RepositoryInfo.xml to allow this version." );
-                                        }
-                                        else
-                                        {
-                                            errors.Append( "Current <PossibleVersionsMode>Restricted</PossibleVersionsMode> in RepositoryInfo.xml forbids this version." );
-                                        }
+                                        errors.Append( "Note: this version is invalid because of <SingleMajor> or <OnlyPatch> setting in RepositoryInfo.xml." );
                                     }
                                 }
                             }

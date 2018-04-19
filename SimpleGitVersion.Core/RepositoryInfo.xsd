@@ -3,8 +3,8 @@
     targetNamespace="http://csemver.org/schemas/2015"
     elementFormDefault="qualified"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns="http://csemver.org/schemas/2015"
->
+    xmlns="http://csemver.org/schemas/2015" >
+    
     <xs:simpleType name="versionMode">
         <xs:restriction base="xs:string">
             <xs:enumeration value="None" />
@@ -85,13 +85,18 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="PossibleVersionsMode" minOccurs="0" type="possibleVersionsMode">
+                <xs:element name="OnlyPatch" minOccurs="0" type="xs:boolean">
                     <xs:annotation>
                         <xs:documentation>
-                            Defines which set of possible versions must be used to consider a version tag as a valid one.
-                            Default is 'Restricted': Restricted mode prevents a non-patch version to be produced whenever
-                            a greater version exists in the repository. 'AllSuccessors' mode considers all valid successors: this can be used
-                            on "Long Term Support" branches since this allows a 4.3.0 to be released even if a 5.0.0 version exists.
+                            Sets it to true to allow only patches version. This should be used on Long Term Support (fix only) branches.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="SingleMajor" minOccurs="0" type="xs:int">
+                    <xs:annotation>
+                        <xs:documentation>
+                            This should be used on Long Term Support branches.
+                            Setting this major number will only allow versions with this exact number as their Major.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
