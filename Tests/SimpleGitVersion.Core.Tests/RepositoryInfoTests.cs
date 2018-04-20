@@ -604,9 +604,30 @@ namespace SimpleGitVersion.Core.Tests
             var v5rc = CSVersion.TryParse( "v5.0.0-rc" );
             var v5rc01 = CSVersion.TryParse( "v5.0.0-rc.0.1" );
             var v5rc1 = CSVersion.TryParse( "v5.0.0-rc.1" );
+
+            // cX     +   
+            //        |    
+            // cFix   +         This commit point has the same content as cM (the "master").
+            //        |         => Publishing any 5.X.X versions from this commit would be silly!
+            //        |    
+            // cM     |    +     v5.0.0 - Merge in "master"
+            //        |   /|
+            //        |  / |
+            //        | /  |
+            //        |/   |
+            // cB     +    |     v5.0.0-rc
+            //        |    |
+            //        |    |
+            // cC     +    |     v4.4.0-alpha
+            //        |    |    
+            // cF     |    +     Fumble Commit (commit in "master" that should have been done on "dev").     
+            //        |   /          
+            //        |  /          
+            //        | /          
+            //        |/          
+            // cD     +          v4.3.2
+
             {
-                // On the fix of the fumble commit, only v5.0.0-rc.0.1 is possible in Restricted mode.
-                // Restricted mode disallow rc.1 (next version below the first already released next one).  
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     OverriddenTags = overrides.Overrides,
@@ -616,6 +637,11 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.PreviousMaxRelease.ThisTag, Is.SameAs( i.PreviousRelease.ThisTag ) );
                 // Fix of the fumble commit, v5.0.0-rc.0.1 and rc.1 are possible.  
                 CollectionAssert.AreEqual( new[] { v5rc01, v5rc1 }, i.PossibleVersions );
+
+                // Above the fix of the fumble commit, v5.0.0-rc.0.1 and any successor of the 5.0.0 is possible.
+                var possible = new List<CSVersion>() { v5rc01, v5rc1 };
+                possible.AddRange( v5.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possible, i.NextPossibleVersions );
             }
             {
                 // Above the fix of the fumble commit, v5.0.0-rc.0.1 and any successor of the 5.0.0 is possible.
@@ -630,6 +656,7 @@ namespace SimpleGitVersion.Core.Tests
                 var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v5.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
+                CollectionAssert.AreEqual( possible, i.NextPossibleVersions );
             }
         }
 
@@ -641,15 +668,41 @@ namespace SimpleGitVersion.Core.Tests
             var cC = repoTest.Commits.First( sc => sc.Message.StartsWith( "C-Commit." ) );
             var cF = repoTest.Commits.First( sc => sc.Sha == "27a629754c6b9034f7ca580442b589a0241773c5" );
             var cB = repoTest.Commits.First( sc => sc.Message.StartsWith( "B-Commit." ) );
-            var cA = repoTest.Commits.First( sc => sc.Message.StartsWith( "Merge branch 'fumble-develop' into fumble-master" ) );
+            var cM = repoTest.Commits.First( sc => sc.Message.StartsWith( "Merge branch 'fumble-develop' into fumble-master" ) );
             var cFix = repoTest.Commits.First( sc => sc.Sha == "e6766d127f9a2df42567151222c6569601614626" );
             var cX = repoTest.Commits.First( sc => sc.Message.StartsWith( "X-Commit." ) );
             var cExtra = repoTest.Commits.First( sc => sc.Message.StartsWith( "C-Commit (cherry pick)." ) );
+
+            // cExtra  +            v10.0.0 - This has the same content (cherry pick) as cC (here in v4.4.0-alpha). 
+            //         |      
+            //         |       
+            //         |       
+            // cFix    |   +         This commit point has the same content as cM (the "master").
+            //         |   |         => Publishing any 5.X.X versions from this commit would be silly!
+            //         |   |    
+            // cM      |   |    +     v5.0.0 - Merge in "master"
+            //         |   |   /|
+            //         |   |  / |
+            //         |   | /  |
+            //         |   |/   |
+            // cB      |   +    |     v5.0.0-rc
+            //         |   |    |
+            //         |   |    |
+            // cC      |   +    |     v4.4.0-alpha (but now its content is actually v10.0.0)
+            //         |   |    |    
+            // cF      |   |    +     Fumble Commit (commit in "master" that should have been done on "dev").     
+            //         \   |   /          
+            //          \  |  /          
+            //           \ | /          
+            //            \|/          
+            // cD          +          v4.3.2
+
+
             var overrides = new TagsOverride()
                 .MutableAdd( cD.Sha, "v4.3.2" )
                 .MutableAdd( cC.Sha, "v4.4.0-alpha" )
                 .MutableAdd( cB.Sha, "v5.0.0-rc" )
-                .MutableAdd( cA.Sha, "v5.0.0" )
+                .MutableAdd( cM.Sha, "v5.0.0" )
                 .MutableAdd( cExtra.Sha, "v10.0.0" );
             var v5 = CSVersion.TryParse( "v5.0.0" );
             var v5rc = CSVersion.TryParse( "v5.0.0-rc" );
@@ -657,7 +710,7 @@ namespace SimpleGitVersion.Core.Tests
             var v5rc1 = CSVersion.TryParse( "v5.0.0-rc.1" );
             var v10 = CSVersion.TryParse( "v10.0.0" );
             {
-                // The injected v10 overrides everything except the possibilty to release the v5.0.0-rc.0.1.
+                // On cFix, the releases can be the v5.0.0-rc.0.1 and v5.0.0-rc.1.
                 RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
                 {
                     OverriddenTags = overrides.Overrides,
@@ -669,6 +722,12 @@ namespace SimpleGitVersion.Core.Tests
                 var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
+
+                // Above cFix, the injected v10 overrides the 5.0.0 possibility.
+                possible = new List<CSVersion>() { v5rc01, v5rc1 };
+                possible.AddRange( v10.GetDirectSuccessors() );
+                CollectionAssert.AreEqual( possible, i.NextPossibleVersions );
+
             }
             {
                 // On B-Commit:
@@ -689,6 +748,22 @@ namespace SimpleGitVersion.Core.Tests
                 possible.AddRange( v44a.GetDirectSuccessors().Where( v => v != v500 ) );
                 possible.AddRange( v10.GetDirectSuccessors() );
                 CollectionAssert.AreEqual( possible, i.PossibleVersions );
+            }
+            {
+                // On C-Extra: the v10.0.0 was actually not allowed.
+                var v432 = CSVersion.TryParse( "v4.3.2" );
+                var v44a = CSVersion.TryParse( "v4.4.0-alpha" );
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
+                    OverriddenTags = overrides.Overrides,
+                    StartingCommitSha = cExtra.Sha
+                } );
+                Assert.That( i.ReleaseTagIsNotPossibleError );
+                // Posible versions actually are the successors of 4.3.2 but below the existing 4.4.0-alpha.
+                CollectionAssert.AreEqual( v432.GetDirectSuccessors().Where( v => v < v44a ), i.PossibleVersions );
+                // But the v10.0.0 tag exits, the versions above cExtra are
+                CollectionAssert.AreEqual( v10.GetDirectSuccessors(), i.NextPossibleVersions );
+
             }
         }
     }

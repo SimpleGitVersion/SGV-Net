@@ -103,9 +103,32 @@ namespace SimpleGitVersion
         /// <summary>
         /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
         /// prevented its computation.
+        /// This is the set of unfiltered versions (<see cref="RepositoryInfoOptions.SingleMajor"/>
+        /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> are ignored).
+        /// </summary>
+        public readonly IReadOnlyList<CSVersion> RawPossibleVersions;
+
+        /// <summary>
+        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
+        /// prevented its computation.
         /// When empty, this means that there can not be a valid release tag on the current commit point.
         /// </summary>
         public readonly IReadOnlyList<CSVersion> PossibleVersions;
+
+        /// <summary>
+        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
+        /// prevented its computation.
+        /// These are the versions that may be available to any commit above the current one, not filtered
+        /// by <see cref="RepositoryInfoOptions.SingleMajor"/> nor <see cref="RepositoryInfoOptions.OnlyPatch"/>.
+        /// </summary>
+        public readonly IReadOnlyList<CSVersion> RawNextPossibleVersions;
+
+        /// <summary>
+        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
+        /// prevented its computation.
+        /// These are the versions that may be available to any commit above the current one.
+        /// </summary>
+        public readonly IReadOnlyList<CSVersion> NextPossibleVersions;
 
         /// <summary>
         /// Gets CI informations if a CI release must be done.
@@ -181,15 +204,24 @@ namespace SimpleGitVersion
                         {
                             CommitVersionInfo info = collector.GetVersionInfo( commit );
                             ExistingVersions = collector.ExistingVersions.TagCommits;
-                            PossibleVersions = info.PossibleVersions;
+
+                            RawPossibleVersions = info.PossibleVersions;
+                            IEnumerable<CSVersion> possibleSet = RawPossibleVersions;
+                            if( options.OnlyPatch ) possibleSet = possibleSet.Where( v => v.IsPatch );
+                            if( options.SingleMajor.HasValue ) possibleSet = possibleSet.Where( v => v.Major == options.SingleMajor.Value );
+                            PossibleVersions = possibleSet != RawPossibleVersions ? possibleSet.ToList() : RawPossibleVersions;
+
+                            RawNextPossibleVersions = info.NextPossibleVersions;
+                            IEnumerable<CSVersion> nextPossibleSet = RawNextPossibleVersions;
+                            if( options.OnlyPatch ) nextPossibleSet = nextPossibleSet.Where( v => v.IsPatch );
+                            if( options.SingleMajor.HasValue ) nextPossibleSet = nextPossibleSet.Where( v => v.Major == options.SingleMajor.Value );
+                            NextPossibleVersions = nextPossibleSet != RawNextPossibleVersions ? nextPossibleSet.ToList() : RawNextPossibleVersions;
+
                             PreviousRelease = info.PreviousCommit;
                             PreviousMaxRelease = info.PreviousMaxCommit;
                             if( info.ThisCommit != null )
                             {
-                                IEnumerable<CSVersion> possibleSet = info.PossibleVersions;
-                                if( options.OnlyPatch ) possibleSet = possibleSet.Where( v => v.IsPatch );
-                                if( options.SingleMajor.HasValue ) possibleSet = possibleSet.Where( v => v.Major == options.SingleMajor.Value );
-                                if( possibleSet.Contains( info.ThisCommit.ThisTag ) )
+                                if( PossibleVersions.Contains( info.ThisCommit.ThisTag ) )
                                 {
                                     ValidReleaseTag = info.ThisCommit.ThisTag;
                                 }
@@ -201,8 +233,8 @@ namespace SimpleGitVersion
                                            .Append( "' is not valid here. Valid tags are: " )
                                            .Append( string.Join( ", ", possibleSet ) )
                                            .AppendLine();
-                                    if( possibleSet != info.PossibleVersions
-                                        && info.PossibleVersions.Contains( info.ThisCommit.ThisTag ))
+                                    if( PossibleVersions != RawPossibleVersions
+                                        && RawPossibleVersions.Contains( info.ThisCommit.ThisTag ))
                                     {
                                         errors.Append( "Note: this version is invalid because of <SingleMajor> or <OnlyPatch> setting in RepositoryInfo.xml." );
                                     }

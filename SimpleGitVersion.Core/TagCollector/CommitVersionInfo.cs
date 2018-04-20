@@ -22,7 +22,7 @@ namespace SimpleGitVersion
         readonly IFullTagCommit _maxCommit;
         readonly int _maxCommitDepth;
         IReadOnlyList<CSVersion> _possibleVersions;
-        IReadOnlyList<CSVersion> _possibleVersionsStrict;
+        IReadOnlyList<CSVersion> _nextPossibleVersions;
 
         internal CommitVersionInfo( 
             TagCollector tagCollector, 
@@ -65,6 +65,9 @@ namespace SimpleGitVersion
                             ? (_contentCommit?.BestCommit) 
                             : (_prevMaxCommit._contentCommit?.BestCommit);
         }
+
+
+        CSVersion BestContentTag => _contentCommit?.BestCommit.ThisTag;
 
         /// <summary>
         /// Gets this commit sha.
@@ -115,7 +118,7 @@ namespace SimpleGitVersion
         /// Gets the number of commits between this commit (longest path) and the <see cref="PreviousMaxCommit"/>, including this one:
         /// this is the build index to use for post-releases.
         /// </summary>
-        public int PreviousMaxCommitDepth => _maxCommitDepth; 
+        public int PreviousMaxCommitDepth => _maxCommitDepth;
 
         /// <summary>
         /// Gets the possible versions on this commit regardless of the actual <see cref="ThisTag"/> already set on it.
@@ -129,6 +132,18 @@ namespace SimpleGitVersion
             }
         }
 
+        /// <summary>
+        /// Gets the possible next versions based on on this commit.
+        /// </summary>
+        public IReadOnlyList<CSVersion> NextPossibleVersions
+        {
+            get
+            {
+                if( _nextPossibleVersions == null ) ComputeNextPossibleVersions();
+                return _nextPossibleVersions;
+            }
+        }
+
         void ComputePossibleVersions()
         {
             var allVersions = _tagCollector.ExistingVersions.Versions;
@@ -138,18 +153,38 @@ namespace SimpleGitVersion
             if( _tagCollector.StartingVersionForCSemVer != null
                 && (allVersions.Count == 0 || (allVersions.Count == 1 && ThisTag != null)) )
             {
-                _possibleVersionsStrict = _possibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
+                _possibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
             }
             else
             {
                 var versions = allVersions.Where( c => c != _thisCommit );
 
                 List<CSVersion> possible = new List<CSVersion>();
-                foreach( CSVersion b in GetBaseVersions() )
-                {
-                    CollectPossibleVersions( b, versions, possible );
-                }
+                if( PreviousTag != null ) CollectPossibleVersions( PreviousTag, versions, possible );
+                if( PreviousMaxTag != null && PreviousMaxTag != PreviousTag ) CollectPossibleVersions( PreviousMaxTag, versions, possible );
+                if( PreviousMaxTag == null && PreviousTag == null ) CollectPossibleVersions( null, versions, possible );
                 _possibleVersions = possible;
+            }
+        }
+
+
+        void ComputeNextPossibleVersions()
+        {
+            var allVersions = _tagCollector.ExistingVersions.Versions;
+            // Special case: there is no existing versions but there is a startingVersionForCSemVer,
+            // every commit may be the first one. 
+            if( _tagCollector.StartingVersionForCSemVer != null && allVersions.Count == 0 )
+            {
+                _nextPossibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
+            }
+            else
+            {
+                List<CSVersion> possible = new List<CSVersion>();
+                var t = ThisTag ?? PreviousTag;
+                if( t != null ) CollectPossibleVersions( t, allVersions, possible );
+                if( MaxTag != null && MaxTag != t ) CollectPossibleVersions( MaxTag, allVersions, possible );
+                if( t == null && MaxTag == null ) CollectPossibleVersions( null, allVersions, possible );
+                _nextPossibleVersions = possible;
             }
         }
 
@@ -165,51 +200,6 @@ namespace SimpleGitVersion
                 if( !possible.Contains( v ) ) possible.Add( v );
             }
         }
-
-        //void ComputeNextPossibleVersions()
-        //{
-        //    if( ThisTag == null )
-        //    {
-        //        _nextPossibleVersions = PossibleVersions;
-        //    }
-        //    var allVersions = _tagCollector.ExistingVersions.Versions;
-
-        //    // Special case: there is no existing versions but
-        //    // there is a startingVersionForCSemVer, every commit may be the first one. 
-        //    if( _tagCollector.StartingVersionForCSemVer != null && allVersions.Count == 0 )
-        //    {
-        //        _nextPossibleVersions = new[] { _tagCollector.StartingVersionForCSemVer };
-        //    }
-        //    else
-        //    {
-        //        var versions = allVersions.Where( c => c != _thisCommit );
-
-        //        List<CSVersion> possible = new List<CSVersion>();
-        //        foreach( CSVersion b in GetBaseVersions() )
-        //        {
-        //            // The base version b can be null here: a null version tag correctly generates 
-        //            // the very first possible versions (and the comparison operators handle null).
-        //            var nextReleased = versions.FirstOrDefault( c => c.ThisTag > b );
-        //            var successors = CSVersion.GetDirectSuccessors( false, b );
-        //            foreach( var v in successors.Where( v => v > _tagCollector.StartingVersionForCSemVer
-        //                                                     && (nextReleased == null || v < nextReleased.ThisTag) ) )
-        //            {
-        //                if( !possible.Contains( v ) )
-        //                {
-        //                    possible.Add( v );
-        //                    if( nextReleased == null || v.IsPatch )
-        //                    {
-        //                        possibleStrict.Add( v );
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        _possibleVersions = possible;
-        //        _possibleVersionsStrict = possibleStrict;
-        //    }
-        //}
-
-        CSVersion BestContentTag => _contentCommit?.BestCommit.ThisTag;
 
         /// <summary>
         /// Returns either { PreviousTag, PreviousMaxTag }, { PreviousTag }, { PreviousMaxTag } or { null }.

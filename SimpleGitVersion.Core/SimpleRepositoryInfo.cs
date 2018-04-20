@@ -212,14 +212,14 @@ namespace SimpleGitVersion
                     {
                         IsValidCIBuild = true;
                         SetNumericalVersionValues( info.CIRelease.BaseTag, true );
-                        logger.Info( $"CI release: '{SafeSemVersion}'." );
+                        logger.Info( $"CI release: '{SafeNuGetVersion}'." );
                         LogValidVersions( logger, info );
                     }
                     else
                     {
                         if( t == null )
                         {
-                            SetInvalidValuesAndLog( logger, "No valid release tag.", false );
+                            SetInvalidValuesAndLog( logger, "No release tag found on the commit.", false );
                             LogValidVersions( logger, info );
                         }
                         else
@@ -227,7 +227,7 @@ namespace SimpleGitVersion
                             IsValidRelease = true;
                             OriginalTagText = t.OriginalParsedText;
                             SetNumericalVersionValues( t, false );
-                            logger.Info( $"Release: '{SafeSemVersion}'." );
+                            logger.Info( $"Release: '{SafeNuGetVersion}'." );
                         }
                     }
                 }
