@@ -164,7 +164,7 @@ namespace CodeCake
                 }
                 else if (existCount == 0)
                 {
-                    Cake.Information($": All {missingCount} packages must be pushed.");
+                    Cake.Information($"{feedId}: All {missingCount} packages must be pushed.");
                 }
                 else
                 {

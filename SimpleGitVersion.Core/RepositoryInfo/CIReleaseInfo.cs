@@ -1,4 +1,4 @@
-﻿using CSemVer;
+using CSemVer;
 using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
@@ -63,9 +63,9 @@ namespace SimpleGitVersion
             {
                 Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && actualBaseTag != null );
                 CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciBuildName, BuildIndex = info.PreviousMaxCommitDepth };
-                if( !ci.IsValidForNuGetV2 )
+                if( !ci.IsValidForShortForm )
                 {
-                    errors.AppendLine( "Due to NuGet V2 limitation, the branch name must not be longer than 8 characters. " );
+                    errors.AppendLine( "Due to ShortForm (NuGet V2 compliance) limitation, the branch name must not be longer than 8 characters. " );
                     errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
                           .AppendLine()
                           .Append( $@"<Branch Name=""{ci.BranchName}"" VersionName=""{ci.BranchName.Substring( 0, 8 )}"" ... />." )
@@ -73,7 +73,7 @@ namespace SimpleGitVersion
                 }
                 else
                 {
-                    ciBuildVersion = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.SemVer, ci ) );
+                    ciBuildVersion = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.Normalized, ci ) );
                     ciBuildVersionNuGet = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci ) );
                 }
             }
@@ -114,7 +114,7 @@ namespace SimpleGitVersion
         {
             if( string.IsNullOrWhiteSpace( ciBuildName ) ) throw new ArgumentException( nameof( ciBuildName ) );
             var name = string.Format( "0.0.0--ci-{0}.{1:yyyy-MM-ddTHH-mm-ss-ff}", ciBuildName, timeRelease );
-            return name + (actualBaseTag != null ? '+' + actualBaseTag : null);
+            return name + (actualBaseTag != null ? "+v" + actualBaseTag : null);
         }
 
         static string ToBase62( long number )
