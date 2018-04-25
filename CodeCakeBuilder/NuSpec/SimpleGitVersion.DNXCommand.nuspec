@@ -19,15 +19,17 @@
     <language>en-US</language>
     <tags>Git, Tag, Versioning, NuGet, SemVer, CSemVer, DNX</tags>
     <developmentDependency>true</developmentDependency>
-    <dependencies>
-      <dependency id="SimpleGitVersion.Core" version="$version$" />
-    </dependencies>
     <releaseNotes>https://github.com/SimpleGitVersion/SGV-Net/releases</releaseNotes>
   </metadata>
   <files>
-    <file src="SimpleGitVersion.DNXCommands\bin\{{configuration}}\SimpleGitVersion.DNXCommands.exe" target="lib/net45/SimpleGitVersion.DNXCommands.exe" />
-    <file src="SimpleGitVersion.DNXCommands\bin\{{configuration}}\SimpleGitVersion.DNXCommands.pdb" target="lib/net45/SimpleGitVersion.DNXCommands.pdb" />
-    
+    <file src="SimpleGitVersion.DNXCommands\bin\{{configuration}}\dotnet-sgv.exe" target="lib/net45/dotnet-sgv.exe" />
+    <file src="SimpleGitVersion.DNXCommands\bin\{{configuration}}\dotnet-sgv.pdb" target="lib/net45/dotnet-sgv.pdb" />
+    <file src="SimpleGitVersion.Core\bin\{{configuration}}\ILMerged\SimpleGitVersion.Core.dll" target="lib\net45" />
+    <file src="SimpleGitVersion.Core\bin\{{configuration}}\ILMerged\SimpleGitVersion.Core.pdb" target="lib\net45" />
+    <file src="SimpleGitVersion.Core\bin\{{configuration}}\SimpleGitVersion.Core.xml" target="lib\net45" />
+    <file src="SimpleGitVersion.Core\bin\{{configuration}}\NativeBinaries\amd64\*.dll" target="NativeBinaries\amd64" />
+    <file src="SimpleGitVersion.Core\bin\{{configuration}}\NativeBinaries\x86\*.dll" target="NativeBinaries\x86" />
+
     <file src="CodeCakeBuilder\Releases\SimpleGitVersion.DNXCommands\app\*" target="app/" />
   </files>
 
