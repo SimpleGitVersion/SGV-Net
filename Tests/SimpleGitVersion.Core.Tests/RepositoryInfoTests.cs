@@ -315,7 +315,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( "2.0.1--ci-gamma.7" ) );
+                Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( "2.0.1--ci.7.gamma" ) );
             }
             // Testing "gamma" branch in ZeroTimed mode. 
             {
@@ -343,7 +343,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( "2.0.1--ci-ALPHAAAA.6" ) );
+                Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( "2.0.1--ci.6.ALPHAAAA" ) );
             }
             // Testing "alpha" branch in ZeroTimed mode.  
             {
@@ -371,7 +371,7 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( "2.0.1--ci-BBBBBB.6" ) );
+                Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( "2.0.1--ci.6.BBBBBB" ) );
             }
             // Testing ZeroTimed mode on "beta" branch. 
             {
@@ -390,12 +390,12 @@ namespace SimpleGitVersion.Core.Tests
 
         }
 
-        [TestCase( "v1.0.0", "alpha", "1.0.1--ci-alpha.1", null, "1.0.1-Calpha-0001" )]
-        [TestCase( "v1.0.0", "beta", "1.0.1--ci-beta.1", null, "1.0.1-Cbeta-0001" )]
-        [TestCase( "v1.0.0", "gamma", "1.0.1--ci-gamma.2", null, "1.0.1-Cgamma-0002" )]
-        [TestCase( "v1.0.0", "parallel-world", "1.0.1--ci-parallel.3", "parallel", "1.0.1-Cparallel-0003" )]
-        [TestCase( "v0.1.0-beta", "alpha", "0.1.0-beta.0.0.ci-alpha.1", null, "0.1.0-b00-00-alpha-0001" )]
-        [TestCase( "v0.0.0-rc", "beta", "0.0.0-rc.0.0.ci-beta.1", null, "0.0.0-r00-00-beta-0001" )]
+        [TestCase( "v1.0.0", "alpha", "1.0.1--ci.1.alpha", null, "1.0.1-C0001-alpha" )]
+        [TestCase( "v1.0.0", "beta", "1.0.1--ci.1.beta", null, "1.0.1-C0001-beta")]
+        [TestCase( "v1.0.0", "gamma", "1.0.1--ci.2.gamma", null, "1.0.1-C0002-gamma")]
+        [TestCase( "v1.0.0", "parallel-world", "1.0.1--ci.3.parallel", "parallel", "1.0.1-C0003-parallel")]
+        [TestCase( "v0.1.0-beta", "alpha", "0.1.0-beta.0.0.ci.1.alpha", null, "0.1.0-b00-00-0001-alpha")]
+        [TestCase( "v0.0.0-rc", "beta", "0.0.0-rc.0.0.ci.1.beta", null, "0.0.0-r00-00-0001-beta")]
         public void CIBuildVersion_from_RealDevInAlpha_commits_ahead_tests( string vRealDevInAlpha, string branchName, string ciBuildVersion, string branchVersionName, string ciBuildVersionNuGet )
         {
             var repoTest = TestHelper.TestGitRepository;
@@ -417,21 +417,21 @@ namespace SimpleGitVersion.Core.Tests
             }
         }
 
-        [TestCase( "v0.0.0-alpha.1.1", "alpha", "0.0.0-alpha.1.1.ci-alpha.6", null, "0.0.0-a01-01-alpha-0006" )]
-        [TestCase( "v0.0.0-alpha.2", "alpha", "0.0.0-alpha.2.0.ci-alpha.6", null, "0.0.0-a02-00-alpha-0006" )]
-        [TestCase( "v0.0.0-beta", "alpha", "0.0.0-beta.0.0.ci-alpha.6", null, "0.0.0-b00-00-alpha-0006" )]
+        [TestCase( "v0.0.0-alpha.1.1", "alpha", "0.0.0-alpha.1.1.ci.6.alpha", null, "0.0.0-a01-01-0006-alpha")]
+        [TestCase( "v0.0.0-alpha.2", "alpha", "0.0.0-alpha.2.0.ci.6.alpha", null, "0.0.0-a02-00-0006-alpha")]
+        [TestCase( "v0.0.0-beta", "alpha", "0.0.0-beta.0.0.ci.6.alpha", null, "0.0.0-b00-00-0006-alpha")]
 
-        [TestCase( "v0.0.0-alpha.1.1", "beta", "0.0.0-alpha.1.1.ci-beta.6", null, "0.0.0-a01-01-beta-0006" )]
-        [TestCase( "v0.0.0-alpha.2", "beta", "0.0.0-alpha.2.0.ci-beta.6", null, "0.0.0-a02-00-beta-0006" )]
-        [TestCase( "v0.0.0-beta", "beta", "0.0.0-beta.0.0.ci-beta.6", null, "0.0.0-b00-00-beta-0006" )]
+        [TestCase( "v0.0.0-alpha.1.1", "beta", "0.0.0-alpha.1.1.ci.6.beta", null, "0.0.0-a01-01-0006-beta")]
+        [TestCase( "v0.0.0-alpha.2", "beta", "0.0.0-alpha.2.0.ci.6.beta", null, "0.0.0-a02-00-0006-beta")]
+        [TestCase( "v0.0.0-beta", "beta", "0.0.0-beta.0.0.ci.6.beta", null, "0.0.0-b00-00-0006-beta")]
 
-        [TestCase( "v0.0.0-alpha.1.1", "parallel-world", "0.0.0-alpha.1.1.ci-parallel.8", "parallel", "0.0.0-a01-01-parallel-0008" )]
-        [TestCase( "v0.0.0-alpha.2", "parallel-world", "0.0.0-alpha.2.0.ci-parallel.8", "parallel", "0.0.0-a02-00-parallel-0008" )]
-        [TestCase( "v0.0.0-beta", "parallel-world", "0.0.0-beta.0.0.ci-parallel.8", "parallel", "0.0.0-b00-00-parallel-0008" )]
+        [TestCase( "v0.0.0-alpha.1.1", "parallel-world", "0.0.0-alpha.1.1.ci.8.parallel", "parallel", "0.0.0-a01-01-0008-parallel")]
+        [TestCase( "v0.0.0-alpha.2", "parallel-world", "0.0.0-alpha.2.0.ci.8.parallel", "parallel", "0.0.0-a02-00-0008-parallel")]
+        [TestCase( "v0.0.0-beta", "parallel-world", "0.0.0-beta.0.0.ci.8.parallel", "parallel", "0.0.0-b00-00-0008-parallel")]
 
-        [TestCase( "v0.0.0-nimp", "f-beta-nothing", "0.0.0-alpha.1.0.ci-XXX.4", "XXX", "0.0.0-a01-00-XXX-0004" )]
-        [TestCase( "v0.0.0-dont-care", "f-beta-nothing", "0.0.0-alpha.1.0.ci-YYYY.4", "YYYY", "0.0.0-a01-00-YYYY-0004" )]
-        [TestCase( "v0.0.0-onDevInAlpha", "f-beta-nothing", "0.0.0-alpha.1.0.ci-B.4", "B", "0.0.0-a01-00-B-0004" )]
+        [TestCase( "v0.0.0-nimp", "f-beta-nothing", "0.0.0-alpha.1.0.ci.4.XXX", "XXX", "0.0.0-a01-00-0004-XXX")]
+        [TestCase( "v0.0.0-dont-care", "f-beta-nothing", "0.0.0-alpha.1.0.ci.4.YYYY", "YYYY", "0.0.0-a01-00-0004-YYYY")]
+        [TestCase( "v0.0.0-onDevInAlpha", "f-beta-nothing", "0.0.0-alpha.1.0.ci.4.B", "B", "0.0.0-a01-00-0004-B")]
         public void CIBuildVersion_from_DevInAlpha_commits_ahead_tests( string vDevInAlpha, string branchName, string ciBuildVersion, string branchNameVersion, string ciBuildVersionNuGet )
         {
             var repoTest = TestHelper.TestGitRepository;
