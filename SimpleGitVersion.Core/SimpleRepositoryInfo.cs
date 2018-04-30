@@ -174,9 +174,9 @@ namespace SimpleGitVersion
                 CommitDateUtc = info.CommitDateUtc;
                 var t = info.ValidReleaseTag;
                 // Always warn on non standard pre release name.
-                if( t != null && t.IsPreRelease && !t.IsPreReleaseNameStandard )
+                if( t != null && t.IsPrerelease && !t.IsPrereleaseNameStandard )
                 {
-                    logger.Warn( $"Non standard pre release name '{t.PreReleaseNameFromTag}' is mapped to '{t.PreReleaseName}'." );
+                    logger.Warn( $"Non standard pre release name '{t.ParsedPrereleaseName}' is mapped to '{t.PrereleaseName}'." );
                 }
                 if( info.IsDirty && !info.Options.IgnoreDirtyWorkingFolder )
                 {
@@ -205,8 +205,8 @@ namespace SimpleGitVersion
                     }
 
                     // Will be replaced by SetInvalidValuesAndLog if needed.
-                    SafeNuGetVersion = info.FinalNuGetVersion.Text;
-                    SafeSemVersion = info.FinalSemVersion.Text;
+                    SafeNuGetVersion = info.FinalNuGetVersion.NormalizedTextWithBuildMetaData;
+                    SafeSemVersion = info.FinalSemVersion.NormalizedTextWithBuildMetaData;
 
                     if( info.CIRelease != null )
                     {
@@ -225,7 +225,7 @@ namespace SimpleGitVersion
                         else
                         {
                             IsValidRelease = true;
-                            OriginalTagText = t.OriginalParsedText;
+                            OriginalTagText = t.ParsedText;
                             SetNumericalVersionValues( t, false );
                             logger.Info( $"Release: '{SafeNuGetVersion}'." );
                         }
@@ -262,9 +262,9 @@ namespace SimpleGitVersion
             Major = t.Major;
             Minor = t.Minor;
             Patch = t.Patch;
-            PreReleaseName = t.PreReleaseName;
-            PreReleaseNumber = t.PreReleaseNumber;
-            PreReleaseFix = t.PreReleasePatch;
+            PreReleaseName = t.PrereleaseName;
+            PreReleaseNumber = t.PrereleaseNumber;
+            PreReleaseFix = t.PrereleasePatch;
             FileVersion = t.ToStringFileVersion( isCIBuild );
             OrderedVersion = t.OrderedVersion;
         }

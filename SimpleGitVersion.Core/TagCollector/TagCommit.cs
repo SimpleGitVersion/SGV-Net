@@ -21,7 +21,7 @@ namespace SimpleGitVersion
 
         public TagCommit( Commit c, CSVersion first )
         {
-            Debug.Assert( c != null && first != null && first.IsValidSyntax );
+            Debug.Assert( c != null && first != null && first.IsValid );
             _commitSha = c.Sha;
             _contentSha = c.Tree.Sha;
             _thisTag = first;
@@ -101,7 +101,7 @@ namespace SimpleGitVersion
         public bool CloseCollect( StringBuilder errors )
         {
             var t = DoCloseCollect( errors );
-            if( t != null && t.IsValidSyntax )
+            if( t != null && t.IsValid )
             {
                 _thisTag = t;
                 return true;

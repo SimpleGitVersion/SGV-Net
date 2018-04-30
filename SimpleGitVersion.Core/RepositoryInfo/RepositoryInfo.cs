@@ -198,7 +198,6 @@ namespace SimpleGitVersion
                         TagCollector collector = new TagCollector( errors,
                                                                    r,
                                                                    options.StartingVersionForCSemVer,
-                                                                   c => c.Sha == CommitSha ? ReleaseTagParsingMode.RaiseErrorOnMalformedTag : ReleaseTagParsingMode.IgnoreMalformedTag,
                                                                    options.OverriddenTags );
                         if( errors.Length == 0 )
                         {
@@ -229,7 +228,7 @@ namespace SimpleGitVersion
                                 {
                                     ReleaseTagIsNotPossibleError = true;
                                     errors.Append( "Release tag '" )
-                                           .Append( info.ThisCommit.ThisTag.OriginalParsedText )
+                                           .Append( info.ThisCommit.ThisTag.ParsedText )
                                            .Append( "' is not valid here. Valid tags are: " )
                                            .Append( string.Join( ", ", possibleSet ) )
                                            .AppendLine();
@@ -260,7 +259,7 @@ namespace SimpleGitVersion
                     else if( ValidReleaseTag != null )
                     {
                         FinalNuGetVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ) );
-                        FinalSemVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.SemVer ) );
+                        FinalSemVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.Normalized ) );
                     }
                 }
             }
@@ -273,7 +272,7 @@ namespace SimpleGitVersion
             }
             else
             {
-                FinalInformationalVersion = InformationalVersion.BuildInformationalVersion( FinalSemVersion.Text, FinalNuGetVersion.Text, CommitSha, CommitDateUtc );
+                FinalInformationalVersion = InformationalVersion.BuildInformationalVersion( FinalSemVersion.NormalizedText, FinalNuGetVersion.NormalizedText, CommitSha, CommitDateUtc );
             }
         }
 
