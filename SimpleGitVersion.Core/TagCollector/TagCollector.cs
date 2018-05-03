@@ -1,21 +1,22 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LibGit2Sharp;
+using CSemVer;
 
 namespace SimpleGitVersion
 {
 
     /// <summary>
-    /// Discovers existing tags in the repository, resolves them by applying <see cref="ReleaseTagVersion.DefinitionStrength"/>, detects some of the possible inconsistencies
+    /// Discovers existing tags in the repository, resolves them by applying <see cref="CSVersion.DefinitionStrength"/>, detects some of the possible inconsistencies
     /// and provide a <see cref="GetVersionInfo"/> to retrieve commit information.
     /// </summary>
     partial class TagCollector
     {
-        readonly ReleaseTagVersion _startingVersionForCSemVer;
+        readonly CSVersion _startingVersionForCSemVer;
         readonly Dictionary<string, TagCommit> _collector;
         readonly Dictionary<string, CommitVersionInfo> _versionsCache;
         readonly RepositoryVersions _repoVersions;
@@ -23,11 +24,11 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the minimal version to consider. When null, the whole repository must be valid in terms of release tags.
         /// </summary>
-        public ReleaseTagVersion StartingVersionForCSemVer => _startingVersionForCSemVer; 
+        public CSVersion StartingVersionForCSemVer => _startingVersionForCSemVer; 
 
         /// <summary>
         /// Gets a read only and ordered list of the existing versions in the repository. 
-        /// If there is no <see cref="StartingVersionForCSemVer"/>, the first version is checked (it must be one of the <see cref="ReleaseTagVersion.FirstPossibleVersions"/>), otherwise
+        /// If there is no <see cref="StartingVersionForCSemVer"/>, the first version is checked (it must be one of the <see cref="CSVersion.FirstPossibleVersions"/>), otherwise
         /// this existing versions does not contain any version smaller than StartingVersionForCSemVer.
         /// This existing versions must always be compact (ie. no "holes" must exist between them) otherwise an error is added to the collector.
         /// </summary>
@@ -40,11 +41,7 @@ namespace SimpleGitVersion
         /// <param name="errors">A collector of errors. One line per error.</param>
         /// <param name="repo">The Git repository.</param>
         /// <param name="startingVersionForCSemVer">Vesion tags lower than this version will be ignored.</param>
-        /// <param name="analyseInvalidTagSyntax">
-        /// Optional function that drives the behavior regarding malformed tags of commits.
-        /// When null, <see cref="ReleaseTagParsingMode.IgnoreMalformedTag">IgnoreMalformedTag</see> is used for all tags.
-        /// </param>
-        /// <param name="OverriddenTags">Optional commits with associated tags that are applied as if they exist in the repository.</param>
+        /// <param name="overriddenTags">Optional commits with associated tags that are applied as if they exist in the repository.</param>
         /// <param name="checkValidExistingVersions">
         /// When true, existing versions are checked: one of the valid first version must exist and exisitng versions
         /// must be compact.
@@ -53,8 +50,7 @@ namespace SimpleGitVersion
             StringBuilder errors,
             Repository repo,
             string startingVersionForCSemVer = null,
-            Func<Commit, ReleaseTagParsingMode> analyseInvalidTagSyntax = null,
-            IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> OverriddenTags = null,
+            IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> overriddenTags = null,
             bool checkValidExistingVersions = false )
         {
             Debug.Assert( errors != null && repo != null );
@@ -64,15 +60,15 @@ namespace SimpleGitVersion
 
             if( startingVersionForCSemVer != null )
             {
-                _startingVersionForCSemVer = ReleaseTagVersion.TryParse( startingVersionForCSemVer, true );
+                _startingVersionForCSemVer = CSVersion.TryParse( startingVersionForCSemVer, true );
                 if( !_startingVersionForCSemVer.IsValid )
                 {
-                    errors.Append( "Invalid StartingVersionForCSemVer. " ).Append( _startingVersionForCSemVer.ParseErrorMessage ).AppendLine();
+                    errors.Append( "Invalid StartingVersionForCSemVer. " ).Append( _startingVersionForCSemVer.ErrorMessage ).AppendLine();
                     return;
                 }
             }
             // Register all tags.
-            RegisterAllTags( errors, repo, analyseInvalidTagSyntax, OverriddenTags );
+            RegisterAllTags( errors, repo, overriddenTags );
 
             // Resolves multiple tags on the same commit.
             CloseCollect( errors );
@@ -90,19 +86,19 @@ namespace SimpleGitVersion
             }
         }
 
-        void RegisterAllTags( StringBuilder errors, Repository repo, Func<Commit, ReleaseTagParsingMode> analyseInvalidTagSyntax, IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> OverriddenTags )
+        void RegisterAllTags( StringBuilder errors, Repository repo, IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> overriddenTags )
         {
             bool startingVersionForCSemVerFound = _startingVersionForCSemVer == null;
             foreach( var tag in repo.Tags )
             {
                 Commit tagCommit = tag.ResolveTarget() as Commit;
                 if( tagCommit == null ) continue;
-                RegisterOneTag( errors, tagCommit, tag.FriendlyName, analyseInvalidTagSyntax, ref startingVersionForCSemVerFound );
+                RegisterOneTag( errors, tagCommit, tag.FriendlyName, ref startingVersionForCSemVerFound );
             }
             // Applies overrides (if any) as if they exist in the repository.
-            if( OverriddenTags != null )
+            if( overriddenTags != null )
             {
-                foreach( var k in OverriddenTags )
+                foreach( var k in overriddenTags )
                 {
                     Commit o = null;
                     if( string.IsNullOrEmpty( k.Key ) )
@@ -126,7 +122,7 @@ namespace SimpleGitVersion
                     {
                         foreach( string tagName in k.Value )
                         {
-                            RegisterOneTag( errors, o, tagName, analyseInvalidTagSyntax, ref startingVersionForCSemVerFound );
+                            RegisterOneTag( errors, o, tagName, ref startingVersionForCSemVerFound );
                         }
                     }
                 }
@@ -138,21 +134,10 @@ namespace SimpleGitVersion
             }
         }
 
-        void RegisterOneTag( StringBuilder errors, Commit c, string tagName, Func<Commit, ReleaseTagParsingMode> analyseInvalidTagSyntax, ref bool startingVersionForCSemVerFound )
+        void RegisterOneTag( StringBuilder errors, Commit c, string tagName, ref bool startingVersionForCSemVerFound )
         {
-            ReleaseTagParsingMode mode = analyseInvalidTagSyntax == null ? ReleaseTagParsingMode.IgnoreMalformedTag : analyseInvalidTagSyntax( c );
-            ReleaseTagVersion v = ReleaseTagVersion.TryParse( tagName, mode == ReleaseTagParsingMode.RaiseErrorOnMalformedTag );
-            if( v.IsMalformed )
-            {
-                // Parsing in strict mode can result in malformed tag. We can not assume that here:
-                // Debug.Assert( mode == ReleaseTagParsingMode.RaiseErrorOnMalformedTag );
-                if( mode == ReleaseTagParsingMode.RaiseErrorOnMalformedTag )
-                {
-                    errors.AppendFormat( "Malformed {0} on commit '{1}'.", v.ParseErrorMessage, c.Sha ).AppendLine();
-                }
-                return;
-            }
-            if( v.IsValid )
+            CSVersion v = CSVersion.TryParse( tagName );
+           if( v.IsValid )
             {
                 if( _startingVersionForCSemVer != null )
                 {
@@ -164,11 +149,6 @@ namespace SimpleGitVersion
                         // we ignore it.
                         return;
                     }
-                }
-                if( mode == ReleaseTagParsingMode.RaiseErrorOnMalformedTagAndNonStandardPreReleaseName && v.IsPreRelease && !v.IsPreReleaseNameStandard )
-                {
-                    errors.AppendFormat( "Invalid PreRelease name in '{0}' on commit '{1}'.", v.OriginalTagText, c.Sha ).AppendLine();
-                    return;
                 }
                 TagCommit tagCommit;
                 if( _collector.TryGetValue( c.Sha, out tagCommit ) )

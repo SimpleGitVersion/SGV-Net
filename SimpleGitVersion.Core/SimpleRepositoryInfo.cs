@@ -1,4 +1,5 @@
-﻿using System;
+using CSemVer;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -62,7 +63,7 @@ namespace SimpleGitVersion
         public int Patch { get; private set; }
 
         /// <summary>
-        /// Gets the standard pre release name among <see cref="ReleaseTagVersion.StandardPreReleaseNames"/>.
+        /// Gets the standard pre release name among <see cref="CSVersion.StandardPreReleaseNames"/>.
         /// <see cref="string.Empty"/> when this is not a pre release version or <see cref="IsValid"/> is false.
         /// </summary>
         public string PreReleaseName { get; private set; }
@@ -91,7 +92,7 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// Gets the 'Major.Minor.Build.Revision' windows file version to use.
-        /// When <see cref="IsValid"/> is false, it is '0.0.0.0'.
+        /// When <see cref="IsValid"/> is false, it is '0.0.0.0' (<see cref="InformationalVersion.ZeroFileVersion"/>).
         /// When it is a release the last part (Revision) is even and it is odd for CI builds. 
         /// </summary>
         public string FileVersion { get; private set; }
@@ -101,11 +102,6 @@ namespace SimpleGitVersion
         /// When <see cref="IsValid"/> it is greater than 0.
         /// </summary>
         public long OrderedVersion { get; private set; }
-
-        /// <summary>
-        /// Gets the current user name.
-        /// </summary>
-        public string CurrentUserName { get { return Info.CurrentUserName; } }
 
         /// <summary>
         /// Gets the Sha of the current commit.
@@ -118,18 +114,18 @@ namespace SimpleGitVersion
         public DateTime CommitDateUtc { get; private set; }
 
         /// <summary>
-        /// Gets the version in <see cref="ReleaseTagFormat.SemVer"/> format.
+        /// Gets the version in <see cref="CSVersionFormat.SemVer"/> format.
         /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
         /// any attempt to use this to actually package something will fail.
         /// </summary>
-        public string SemVer { get; private set; }
+        public string SafeSemVersion { get; private set; }
 
         /// <summary>
         /// Gets the NuGet version to use.
         /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
         /// any attempt to use this to actually package something will fail.
         /// </summary>
-        public string NuGetVersion { get; private set; }
+        public string SafeNuGetVersion { get; private set; }
 
         /// <summary>
         /// Gets the original tag on the current commit point.
@@ -155,7 +151,7 @@ namespace SimpleGitVersion
                 string optionFile = Path.Combine( gitPath, "RepositoryInfo.xml" );
                 bool fileExists = File.Exists( optionFile );
                 var options = fileExists ? RepositoryInfoOptions.Read( optionFile ) : new RepositoryInfoOptions();
-                if( optionsChecker != null ) optionsChecker( logger, fileExists, options );
+                optionsChecker?.Invoke( logger, fileExists, options );
                 return options;
             } );
             return new SimpleRepositoryInfo( logger, info );
@@ -178,9 +174,9 @@ namespace SimpleGitVersion
                 CommitDateUtc = info.CommitDateUtc;
                 var t = info.ValidReleaseTag;
                 // Always warn on non standard pre release name.
-                if( t != null && t.IsPreRelease && !t.IsPreReleaseNameStandard )
+                if( t != null && t.IsPrerelease && !t.IsPrereleaseNameStandard )
                 {
-                    logger.Warn( "Non standard pre release name '{0}' is mapped to '{1}'.", t.PreReleaseNameFromTag, t.PreReleaseName );
+                    logger.Warn( $"Non standard pre release name '{t.ParsedPrereleaseName}' is mapped to '{t.PrereleaseName}'." );
                 }
                 if( info.IsDirty && !info.Options.IgnoreDirtyWorkingFolder )
                 {
@@ -197,76 +193,78 @@ namespace SimpleGitVersion
                     }
                     if( info.PreviousRelease != null )
                     {
-                        logger.Trace( "Previous release found '{0}' on commit '{1}'.", info.PreviousRelease.ThisTag, info.PreviousRelease.CommitSha );
+                        logger.Trace( $"Previous release found '{info.PreviousRelease.ThisTag}' on commit '{info.PreviousRelease.CommitSha}'." );
                     }
                     if( info.PreviousMaxRelease != null && info.PreviousMaxRelease != info.PreviousRelease )
                     {
-                        logger.Trace( "Previous max release found '{0}' on commit '{1}'.", info.PreviousMaxRelease.ThisTag, info.PreviousMaxRelease.CommitSha );
+                        logger.Trace( $"Previous max release found '{info.PreviousMaxRelease.ThisTag}' on commit '{info.PreviousMaxRelease.CommitSha}'." );
                     }
                     if( info.PreviousRelease == null && info.PreviousMaxRelease == null )
                     {
                         logger.Trace( "No previous release found'." );
                     }
 
+                    // Will be replaced by SetInvalidValuesAndLog if needed.
+                    SafeNuGetVersion = info.FinalNuGetVersion.NormalizedTextWithBuildMetaData;
+                    SafeSemVersion = info.FinalSemVersion.NormalizedTextWithBuildMetaData;
+
                     if( info.CIRelease != null )
                     {
                         IsValidCIBuild = true;
                         SetNumericalVersionValues( info.CIRelease.BaseTag, true );
-                        NuGetVersion = info.CIRelease.BuildVersionNuGet;
-                        SemVer = info.CIRelease.BuildVersion;
-                        logger.Info( "CI release: '{0}'.", SemVer );
+                        logger.Info( $"CI release: '{SafeNuGetVersion}'." );
                         LogValidVersions( logger, info );
                     }
                     else
                     {
                         if( t == null )
                         {
-                            SetInvalidValuesAndLog( logger, "No valid release tag.", false );
+                            SetInvalidValuesAndLog( logger, "No release tag found on the commit.", false );
                             LogValidVersions( logger, info );
                         }
                         else
                         {
                             IsValidRelease = true;
-                            OriginalTagText = t.OriginalTagText;
+                            OriginalTagText = t.ParsedText;
                             SetNumericalVersionValues( t, false );
-                            NuGetVersion = t.ToString( ReleaseTagFormat.NuGetPackage );
-                            SemVer = t.ToString( ReleaseTagFormat.SemVerWithMarker );
-                            logger.Info( "Release: '{0}'.", SemVer );
+                            logger.Info( $"Release: '{SafeNuGetVersion}'." );
                         }
                     }
                 }
             }
-            MajorMinor = string.Format( "{0}.{1}", Major, Minor );
-            MajorMinorPatch = string.Format( "{0}.{1}", MajorMinor, Patch );
+            MajorMinor = $"{Major}.{Minor}";
+            MajorMinorPatch = $"{MajorMinor}.{Patch}";
         }
 
         void LogValidVersions( ILogger logger, RepositoryInfo info )
         {
+            string opt = null;
+            if( info.Options.OnlyPatch ) opt += "OnlyPatch";
+            if( info.Options.SingleMajor.HasValue )
+            {
+                if( opt != null ) opt += ", ";
+                opt += "SingleMajor = " + info.Options.SingleMajor.ToString();
+            }
+            if( opt != null ) opt = " (" + opt + ")";
+
             if( info.PossibleVersions.Count == 0 )
             {
-                logger.Info( "No possible versions." );
+                logger.Info( $"No possible versions {opt}." );
             }
             else
             {
-                if( info.Options.PossibleVersionsMode == PossibleVersionsMode.Restricted )
-                {
-                    logger.Info( "Possible version(s) (Restricted): {0}", string.Join( ", ", info.PossibleVersionsStrict ) );
-                }
-                else
-                {
-                    logger.Info( "Possible version(s) (AllSuccessors): {0}", string.Join( ", ", info.PossibleVersions ) );
-                }
+                logger.Info( $"Possible version(s) {opt}: {string.Join( ", ", info.PossibleVersions )}" );
             }
         }
 
-        void SetNumericalVersionValues( ReleaseTagVersion t, bool isCIBuild )
+        void SetNumericalVersionValues( CSVersion t, bool isCIBuild )
         {
             Major = t.Major;
             Minor = t.Minor;
             Patch = t.Patch;
-            PreReleaseName = t.PreReleaseName;
-            PreReleaseNumber = t.PreReleaseNumber;
-            PreReleaseFix = t.PreReleasePatch;
+            PreReleaseName = t.PrereleaseName;
+            PreReleaseNumber = t.PrereleaseNumber;
+            PreReleaseFix = t.PrereleasePatch;
             FileVersion = t.ToStringFileVersion( isCIBuild );
             OrderedVersion = t.OrderedVersion;
         }
@@ -298,10 +296,10 @@ namespace SimpleGitVersion
             PreReleaseName = string.Empty;
             PreReleaseNumber = 0;
             PreReleaseFix = 0;
-            FileVersion = "0.0.0.0";
+            FileVersion = InformationalVersion.ZeroFileVersion;
             OrderedVersion = 0;
-            NuGetVersion = reason;
-            SemVer = reason;
+            SafeNuGetVersion = reason;
+            SafeSemVersion = reason;
         }
     }
 }

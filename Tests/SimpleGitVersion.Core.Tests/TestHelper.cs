@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -48,7 +48,7 @@ namespace SimpleGitVersion
                             {
                                 using( var r = new Repository( gitPath ) )
                                 {
-                                    r.Fetch( "origin", new FetchOptions() { TagFetchMode = TagFetchMode.All } );
+                                    Commands.Fetch( r, "origin", Enumerable.Empty<string>(), new FetchOptions() { TagFetchMode = TagFetchMode.All }, "Testing." );
                                 }
                             }
                             catch( LibGit2SharpException ex )
@@ -70,7 +70,7 @@ namespace SimpleGitVersion
 
         public static string RepositoryXSDPath
         {
-            get { return Path.Combine( TestHelper.SolutionFolder, "SimpleGitVersionTask", "NuGetAssets", "RepositoryInfo.xsd" ); }
+            get { return Path.Combine( TestHelper.SolutionFolder, "SimpleGitVersion.Core", "RepositoryInfo.xsd" ); }
         }
 
 
