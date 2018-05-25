@@ -37,7 +37,7 @@ namespace SimpleGitVersion
         public readonly int Depth;
 
         /// <summary>
-        /// Never null: this is the CSemVer-CI version in <see cref="CSVersionFormat.SemVer"/> format.
+        /// Never null: this is the CSemVer-CI version in <see cref="CSVersionFormat.Normalized"/> format.
         /// </summary>
         public readonly SVersion BuildVersion;
 
