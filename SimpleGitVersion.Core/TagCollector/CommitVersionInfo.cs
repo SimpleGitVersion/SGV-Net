@@ -47,9 +47,10 @@ namespace SimpleGitVersion
             if( prevMaxCommitParent != null )
             {
                 Debug.Assert( prevMaxCommitParent.PreviousMaxTag == null || prevMaxCommitParent._prevMaxCommit != null );
-                if( prevMaxCommitParent._prevMaxCommit == null || prevMaxCommitParent.BestContentTag > prevMaxCommitParent.PreviousMaxTag )
+                if( prevMaxCommitParent._prevMaxCommit == null
+                    || prevMaxCommitParent._contentCommit?.BestCommit.ThisTag > prevMaxCommitParent.PreviousMaxTag )
                 {
-                    Debug.Assert( prevMaxCommitParent.MaxTag == prevMaxCommitParent.BestContentTag );
+                    Debug.Assert( prevMaxCommitParent.MaxTag == prevMaxCommitParent._contentCommit?.BestCommit.ThisTag );
                     _prevMaxCommit = prevMaxCommitParent;
                     _maxCommitDepth = 1;
                 }
@@ -61,13 +62,10 @@ namespace SimpleGitVersion
                 }
                 Debug.Assert( _prevMaxCommit != null );
             }
-            _maxCommit = BestContentTag >= PreviousMaxTag 
+            _maxCommit = _contentCommit?.BestCommit.ThisTag >= PreviousMaxTag 
                             ? (_contentCommit?.BestCommit) 
                             : (_prevMaxCommit._contentCommit?.BestCommit);
         }
-
-
-        CSVersion BestContentTag => _contentCommit?.BestCommit.ThisTag;
 
         /// <summary>
         /// Gets this commit sha.
@@ -75,14 +73,28 @@ namespace SimpleGitVersion
         public string CommitSha => _commitSha;
 
         /// <summary>
+        /// Gets this <see cref="ITagCommit"/>. Null if no tag is associated to this commit.
+        /// </summary>
+        public ITagCommit ThisCommit => _thisCommit;
+
+        /// <summary>
+        /// Gets the greatest <see cref="ITagCommit"/> associated to the content of this commit.
+        /// Null if no other tagged commits exist with this content or if it is <see cref="ThisCommit"/>.
+        /// </summary>
+        public ITagCommit ThisContentCommit => _thisCommit != _contentCommit
+                                                    ? _contentCommit?.BestCommit
+                                                    : null; 
+
+        /// <summary>
+        /// Gets the greatest version associated to the content of this commit.
+        /// Null if no other tagged commits exist with this content.
+        /// </summary>
+        CSVersion ThisContentTag => ThisContentCommit?.ThisTag;
+
+        /// <summary>
         /// Gets this release tag. Null if no tag is associated to this commit.
         /// </summary>
         public CSVersion ThisTag => _thisCommit?.ThisTag; 
-
-        /// <summary>
-        /// Gets this <see cref="ITagCommit"/>. Null if no tag is associated to this commit.
-        /// </summary>
-         public ITagCommit ThisCommit => _thisCommit; 
 
         /// <summary>
         /// Gets the maximum release tag: it can be this tag, this content tag or a previous tag.
