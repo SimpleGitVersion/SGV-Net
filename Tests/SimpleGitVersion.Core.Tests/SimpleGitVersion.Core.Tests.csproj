@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
-    <PackageReference Include="FluentAssertions" Version="5.3.0" />
+    <PackageReference Include="FluentAssertions" Version="5.3.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="NUnitLite" Version="3.10.1" />
