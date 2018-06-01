@@ -52,7 +52,7 @@ namespace SimpleGitVersion.Core.Tests
         [Explicit]
         public void testing_SimpleGitRepositoryInfo_on_other_repository()
         {
-            var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), @"C:\Dev\CK-Core-Projects\CK-WeakAssemblyNameResolver" );
+            var info = SimpleRepositoryInfo.LoadFromPath( new ConsoleLogger(), @"C:\Dev\SimpleGitVersion\CodeCake" );
             Console.WriteLine( "This repo's SemVer: {0}", info.SafeSemVersion );
         }
     }
