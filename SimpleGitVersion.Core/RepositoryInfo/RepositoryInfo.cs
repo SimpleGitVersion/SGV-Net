@@ -265,7 +265,7 @@ namespace SimpleGitVersion
                     }
                     else if( ValidReleaseTag != null )
                     {
-                        ContentOrFinalNuGetVersion = FinalNuGetVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ) );
+                        ContentOrFinalNuGetVersion = FinalNuGetVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ), false );
                         FinalSemVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.Normalized ) );
                     }
                     else

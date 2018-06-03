@@ -69,7 +69,7 @@ namespace SimpleGitVersion.Core.Tests
             // The version on the commit point.
             {
                 var i = repoTest.GetRepositoryInfo( tagged.Sha, overrides );
-                Assert.That( i.FinalNuGetVersion, Is.EqualTo( bb1Tag ) );
+                Assert.That( i.FinalNuGetVersion.ToString(), Is.EqualTo( "0.0.0-a" ) );
                 CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersions );
             };
 
@@ -448,6 +448,27 @@ namespace SimpleGitVersion.Core.Tests
             var cRoot = repoTest.Commits.First( sc => sc.Message.StartsWith( "First in parallel world." ) );
             var cPickChange = repoTest.Commits.First( sc => sc.Message.StartsWith( "Cherry Pick - Change in parallel-world.txt content (1)." ) );
             var cDevInAlpha = repoTest.Commits.First( sc => sc.Message.StartsWith( "Dev in Alpha." ) );
+
+            //
+            // branch: alpha, beta, parallel-world
+            //                  |
+            //                 ~~~
+            //                  |
+            // cDevInAlpha      + "vDevInAlpha"
+            //                  |        
+            //                  |       
+            // branch:          |     f-beta-nothing       
+            //                  |     /
+            //                  |    /
+            //                  |   /
+            //                  |  /
+            //                  | /
+            //                  |/
+            // cPickChange      +   v0.0.0-alpha.1
+            //                  |
+            //                  |
+            // cRoot            +   v0.0.0-alpha
+
             var overrides = new TagsOverride()
                 .MutableAdd( cRoot.Sha, "v0.0.0-alpha" )
                 .MutableAdd( cPickChange.Sha, "v0.0.0-alpha.1" )
