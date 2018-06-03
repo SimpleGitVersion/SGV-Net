@@ -63,7 +63,7 @@ namespace SimpleGitVersion
         public int Patch { get; private set; }
 
         /// <summary>
-        /// Gets the standard pre release name among <see cref="CSVersion.StandardPreReleaseNames"/>.
+        /// Gets the standard pre release name among <see cref="CSVersion.StandardPrereleaseNames"/>.
         /// <see cref="string.Empty"/> when this is not a pre release version or <see cref="IsValid"/> is false.
         /// </summary>
         public string PreReleaseName { get; private set; }
@@ -114,7 +114,7 @@ namespace SimpleGitVersion
         public DateTime CommitDateUtc { get; private set; }
 
         /// <summary>
-        /// Gets the version in <see cref="CSVersionFormat.SemVer"/> format.
+        /// Gets the version in <see cref="CSVersionFormat.Normalized"/> format.
         /// When <see cref="IsValid"/> is false, it contains the error message (the first error line) so that
         /// any attempt to use this to actually package something will fail.
         /// </summary>
@@ -191,15 +191,15 @@ namespace SimpleGitVersion
                         logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
                         logger.Warn( info.IsDirtyExplanations );
                     }
-                    if( info.PreviousRelease != null )
+                    if( info.CommitVersionInfo.PreviousCommit != null )
                     {
-                        logger.Trace( $"Previous release found '{info.PreviousRelease.ThisTag}' on commit '{info.PreviousRelease.CommitSha}'." );
+                        logger.Trace( $"Previous release found '{info.CommitVersionInfo.PreviousTag}' on commit '{info.CommitVersionInfo.PreviousCommit.CommitSha}'." );
                     }
-                    if( info.PreviousMaxRelease != null && info.PreviousMaxRelease != info.PreviousRelease )
+                    if( info.CommitVersionInfo.PreviousMaxCommit != null && info.CommitVersionInfo.PreviousMaxCommit != info.CommitVersionInfo.PreviousCommit )
                     {
-                        logger.Trace( $"Previous max release found '{info.PreviousMaxRelease.ThisTag}' on commit '{info.PreviousMaxRelease.CommitSha}'." );
+                        logger.Trace( $"Previous max release found '{info.CommitVersionInfo.PreviousMaxTag}' on commit '{info.CommitVersionInfo.PreviousMaxCommit.CommitSha}'." );
                     }
-                    if( info.PreviousRelease == null && info.PreviousMaxRelease == null )
+                    if( info.CommitVersionInfo.PreviousCommit == null && info.CommitVersionInfo.PreviousMaxCommit == null )
                     {
                         logger.Trace( "No previous release found'." );
                     }

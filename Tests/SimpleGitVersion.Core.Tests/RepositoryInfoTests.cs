@@ -24,8 +24,8 @@ namespace SimpleGitVersion.Core.Tests
                 Assert.That( i.RepositoryError, Is.Null );
                 Assert.That( i.ReleaseTagErrorLines, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.PreviousRelease, Is.Null );
-                Assert.That( i.PreviousMaxRelease, Is.Null );
+                Assert.That( i.CommitVersionInfo.PreviousCommit, Is.Null );
+                Assert.That( i.CommitVersionInfo.PreviousMaxCommit, Is.Null );
                 CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersions );
             }
         }
@@ -69,7 +69,7 @@ namespace SimpleGitVersion.Core.Tests
             // The version on the commit point.
             {
                 var i = repoTest.GetRepositoryInfo( tagged.Sha, overrides );
-                Assert.That( i.ValidReleaseTag, Is.EqualTo( bb1Tag ) );
+                Assert.That( i.FinalNuGetVersion, Is.EqualTo( bb1Tag ) );
                 CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersions );
             };
 
@@ -119,7 +119,7 @@ namespace SimpleGitVersion.Core.Tests
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
                 Assert.That( i.ValidReleaseTag.ToString(), Is.EqualTo( "4.0.3-beta" ) );
-                Assert.That( i.PreviousRelease, Is.Null );
+                Assert.That( i.CommitVersionInfo.PreviousCommit, Is.Null );
                 CollectionAssert.AreEqual( i.PossibleVersions.Select( t => t.ToString() ), new[] { "4.0.3-beta" } );
             }
             {
@@ -131,7 +131,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingVersionForCSemVer = "4.0.3-beta"
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
-                Assert.That( i.PreviousRelease.ThisTag.ToString(), Is.EqualTo( "4.0.3-beta" ) );
+                Assert.That( i.CommitVersionInfo.PreviousCommit.ThisTag.ToString(), Is.EqualTo( "4.0.3-beta" ) );
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 CollectionAssert.Contains( i.PossibleVersions.Select( t => t.ToString() ), "4.0.3-beta.0.1", "4.0.3-beta.1", "4.0.3-delta", "4.0.3", "4.1.0-rc", "4.1.0", "5.0.0" );
             }
@@ -146,7 +146,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingVersionForCSemVer = "4.0.3-beta"
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
-                Assert.That( i.PreviousRelease, Is.Null );
+                Assert.That( i.CommitVersionInfo.PreviousCommit, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 CollectionAssert.IsEmpty( i.PossibleVersions );
             }
@@ -159,7 +159,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingVersionForCSemVer = "4.0.3-beta"
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
-                Assert.That( i.PreviousRelease, Is.Null );
+                Assert.That( i.CommitVersionInfo.PreviousCommit, Is.Null );
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 CollectionAssert.IsEmpty( i.PossibleVersions );
             }
@@ -189,7 +189,7 @@ namespace SimpleGitVersion.Core.Tests
                     OverriddenTags = overrides.Overrides
                 } );
                 Assert.That( i.ReleaseTagErrorText, Is.Null );
-                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v1beta ) );
+                Assert.That( i.CommitVersionInfo.PreviousCommit.ThisTag, Is.EqualTo( v1beta ) );
                 Assert.That( i.ValidReleaseTag, Is.Null );
                 CollectionAssert.AreEqual( v1beta.GetDirectSuccessors(), i.PossibleVersions );
             }
@@ -265,7 +265,7 @@ namespace SimpleGitVersion.Core.Tests
                     StartingCommitSha = cDevInAlpha.Sha,
                     OverriddenTags = overrides.Overrides
                 } );
-                Assert.That( i.ValidReleaseTag, Is.EqualTo( CSVersion.TryParse( "v2.0.0" ) ) );
+               Assert.That( i.ValidReleaseTag, Is.EqualTo( CSVersion.TryParse( "v2.0.0" ) ) );
             }
 
             overrides.MutableAdd( cDevInBeta.Sha, "v1.0.1-beta" );
@@ -391,11 +391,11 @@ namespace SimpleGitVersion.Core.Tests
         }
 
         [TestCase( "v1.0.0", "alpha", "1.0.1--ci.1.alpha", null, "1.0.1-C0001-alpha" )]
-        [TestCase( "v1.0.0", "beta", "1.0.1--ci.1.beta", null, "1.0.1-C0001-beta")]
-        [TestCase( "v1.0.0", "gamma", "1.0.1--ci.2.gamma", null, "1.0.1-C0002-gamma")]
-        [TestCase( "v1.0.0", "parallel-world", "1.0.1--ci.3.parallel", "parallel", "1.0.1-C0003-parallel")]
+        [TestCase( "v1.0.0", "beta", null, null, "content:1.0.0" )]
+        [TestCase( "v1.0.0", "gamma", null, null, "content:1.0.0" )]
+        [TestCase( "v1.0.0", "parallel-world", null, "parallel", "content:1.0.0")]
         [TestCase( "v0.1.0-beta", "alpha", "0.1.0-beta.0.0.ci.1.alpha", null, "0.1.0-b00-00-0001-alpha")]
-        [TestCase( "v0.0.0-rc", "beta", "0.0.0-rc.0.0.ci.1.beta", null, "0.0.0-r00-00-0001-beta")]
+        [TestCase( "v0.0.0-rc", "beta", null, null, "content:0.0.0-rc")]
         public void CIBuildVersion_from_RealDevInAlpha_commits_ahead_tests( string vRealDevInAlpha, string branchName, string ciBuildVersion, string branchVersionName, string ciBuildVersionNuGet )
         {
             var repoTest = TestHelper.TestGitRepository;
@@ -412,8 +412,18 @@ namespace SimpleGitVersion.Core.Tests
                     }
                 } );
                 Assert.That( i.ValidReleaseTag, Is.Null );
-                Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( ciBuildVersion ) );
-                Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedText, Is.EqualTo( ciBuildVersionNuGet ) );
+                if( ciBuildVersionNuGet.StartsWith( "content:" ) )
+                {
+                    ciBuildVersionNuGet = ciBuildVersionNuGet.Substring( 8 );
+                    Assert.That( i.CIRelease, Is.Null );
+                    Assert.That( i.CommitContentHasTag );
+                    Assert.That( i.ContentOrFinalNuGetVersion.ToString(), Is.EqualTo( ciBuildVersionNuGet ) );
+                }
+                else
+                {
+                    Assert.That( i.CIRelease.BuildVersion.NormalizedText, Is.EqualTo( ciBuildVersion ) );
+                    Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedText, Is.EqualTo( ciBuildVersionNuGet ) );
+                }
             }
         }
 
@@ -438,6 +448,27 @@ namespace SimpleGitVersion.Core.Tests
             var cRoot = repoTest.Commits.First( sc => sc.Message.StartsWith( "First in parallel world." ) );
             var cPickChange = repoTest.Commits.First( sc => sc.Message.StartsWith( "Cherry Pick - Change in parallel-world.txt content (1)." ) );
             var cDevInAlpha = repoTest.Commits.First( sc => sc.Message.StartsWith( "Dev in Alpha." ) );
+
+            //
+            // branch: alpha, beta, parallel-world
+            //                  |
+            //                 ~~~
+            //                  |
+            // cDevInAlpha      + "vDevInAlpha"
+            //                  |        
+            //                  |       
+            // branch:          |     f-beta-nothing       
+            //                  |     /
+            //                  |    /
+            //                  |   /
+            //                  |  /
+            //                  | /
+            //                  |/
+            // cPickChange      +   v0.0.0-alpha.1
+            //                  |
+            //                  |
+            // cRoot            +   v0.0.0-alpha
+
             var overrides = new TagsOverride()
                 .MutableAdd( cRoot.Sha, "v0.0.0-alpha" )
                 .MutableAdd( cPickChange.Sha, "v0.0.0-alpha.1" )
@@ -633,8 +664,8 @@ namespace SimpleGitVersion.Core.Tests
                     OverriddenTags = overrides.Overrides,
                     StartingCommitSha = cFix.Sha
                 } );
-                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
-                Assert.That( i.PreviousMaxRelease.ThisTag, Is.SameAs( i.PreviousRelease.ThisTag ) );
+                Assert.That( i.CommitVersionInfo.PreviousCommit.ThisTag, Is.EqualTo( v5rc ) );
+                Assert.That( i.CommitVersionInfo.PreviousMaxCommit.ThisTag, Is.SameAs( i.CommitVersionInfo.PreviousCommit.ThisTag ) );
                 // Fix of the fumble commit, v5.0.0-rc.0.1 and rc.1 are possible.  
                 CollectionAssert.AreEqual( new[] { v5rc01, v5rc1 }, i.PossibleVersions );
 
@@ -650,8 +681,8 @@ namespace SimpleGitVersion.Core.Tests
                     OverriddenTags = overrides.Overrides,
                     StartingCommitSha = cX.Sha
                 } );
-                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
-                Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v5 ) );
+                Assert.That( i.CommitVersionInfo.PreviousCommit.ThisTag, Is.EqualTo( v5rc ) );
+                Assert.That( i.CommitVersionInfo.PreviousMaxCommit.ThisTag, Is.EqualTo( v5 ) );
 
                 var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v5.GetDirectSuccessors() );
@@ -716,8 +747,8 @@ namespace SimpleGitVersion.Core.Tests
                     OverriddenTags = overrides.Overrides,
                     StartingCommitSha = cFix.Sha
                 } );
-                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v5rc ) );
-                Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
+                Assert.That( i.CommitVersionInfo.PreviousCommit.ThisTag, Is.EqualTo( v5rc ) );
+                Assert.That( i.CommitVersionInfo.PreviousMaxCommit.ThisTag, Is.EqualTo( v10 ) );
 
                 var possible = new List<CSVersion>() { v5rc01, v5rc1 };
                 possible.AddRange( v10.GetDirectSuccessors() );
@@ -741,8 +772,8 @@ namespace SimpleGitVersion.Core.Tests
                     OverriddenTags = overrides.Overrides,
                     StartingCommitSha = cB.Sha
                 } );
-                Assert.That( i.PreviousRelease.ThisTag, Is.EqualTo( v44a ) );
-                Assert.That( i.PreviousMaxRelease.ThisTag, Is.EqualTo( v10 ) );
+                Assert.That( i.CommitVersionInfo.PreviousCommit.ThisTag, Is.EqualTo( v44a ) );
+                Assert.That( i.CommitVersionInfo.PreviousMaxCommit.ThisTag, Is.EqualTo( v10 ) );
 
                 var possible = new List<CSVersion>();
                 possible.AddRange( v44a.GetDirectSuccessors().Where( v => v != v500 ) );

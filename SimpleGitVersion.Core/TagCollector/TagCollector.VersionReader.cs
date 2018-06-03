@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -39,7 +39,8 @@ namespace SimpleGitVersion
                 var prevTag = pV.ThisTag ?? pV.PreviousTag;
                 if( prevTag != null )
                 {
-                    if( prevCommitParent == null || (prevCommitParent.ThisTag ?? prevCommitParent.PreviousTag) < prevTag )
+                    if( prevCommitParent == null
+                        || prevTag > (prevCommitParent.ThisTag ?? prevCommitParent.PreviousTag) )
                     {
                         prevCommitParent = pV;
                     }
@@ -60,9 +61,21 @@ namespace SimpleGitVersion
                     else 
                     {
                         int cmp = prevMaxTag.CompareTo( maxTag );
-                        if( cmp < 0 || (cmp == 0 && prevMaxCommitParent.PreviousMaxCommitDepth < pV.PreviousMaxCommitDepth) )
+                        if( cmp < 0 ) prevMaxCommitParent = pV;
+                        else if( cmp == 0 )
                         {
-                            prevMaxCommitParent = pV;
+                            // Same MaxTag: we must choose the one with the greatest Depth for the parent.
+                            int curDepth = prevMaxCommitParent.PreviousMaxCommitDepth;
+                            if( prevMaxCommitParent.ThisContentCommit?.ThisTag > prevMaxCommitParent.PreviousMaxTag )
+                            {
+                                curDepth = 0;
+                            }
+                            int pVDepth = pV.PreviousMaxCommitDepth;
+                            if( pV.ThisContentCommit?.ThisTag > pV.PreviousMaxTag )
+                            {
+                                pVDepth = 0;
+                            }
+                            if( curDepth < pVDepth ) prevMaxCommitParent = pV;
                         }
                     }
                 }
