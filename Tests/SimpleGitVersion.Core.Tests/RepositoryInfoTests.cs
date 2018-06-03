@@ -69,7 +69,7 @@ namespace SimpleGitVersion.Core.Tests
             // The version on the commit point.
             {
                 var i = repoTest.GetRepositoryInfo( tagged.Sha, overrides );
-                Assert.That( i.FinalNuGetVersion, Is.EqualTo( bb1Tag ) );
+                Assert.That( i.FinalNuGetVersion.ToString(), Is.EqualTo( "0.0.0-a" ) );
                 CollectionAssert.AreEqual( CSVersion.FirstPossibleVersions, i.PossibleVersions );
             };
 
