@@ -57,7 +57,7 @@ namespace SimpleGitVersion
             {
                 DateTime timeRelease = commit.Committer.When.ToUniversalTime().UtcDateTime;
                 ciBuildVersion = SVersion.Parse( CreateSemVerZeroTimed( ciBuildName, timeRelease, actualBaseTag?.ToString() ) );
-                ciBuildVersionNuGet = SVersion.Parse( CreateNuGetZeroTimed( ciBuildName, timeRelease ) );
+                ciBuildVersionNuGet = SVersion.Parse( CreateNuGetZeroTimed( ciBuildName, timeRelease ), false );
             }
             else
             {
@@ -74,7 +74,7 @@ namespace SimpleGitVersion
                 else
                 {
                     ciBuildVersion = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.Normalized, ci ) );
-                    ciBuildVersionNuGet = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci ) );
+                    ciBuildVersionNuGet = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci ), false );
                 }
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );
