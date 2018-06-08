@@ -173,11 +173,6 @@ namespace SimpleGitVersion
                 CommitSha = info.CommitSha;
                 CommitDateUtc = info.CommitDateUtc;
                 var t = info.ValidReleaseTag;
-                // Always warn on non standard pre release name.
-                if( t != null && t.IsPrerelease && !t.IsPrereleaseNameStandard )
-                {
-                    logger.Warn( $"Non standard pre release name '{t.ParsedPrereleaseName}' is mapped to '{t.PrereleaseName}'." );
-                }
                 if( info.IsDirty && !info.Options.IgnoreDirtyWorkingFolder )
                 {
                     SetInvalidValuesAndLog( logger, "Working folder has non committed changes.", false );
