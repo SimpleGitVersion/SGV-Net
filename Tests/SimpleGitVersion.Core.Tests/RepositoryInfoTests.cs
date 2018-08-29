@@ -390,7 +390,7 @@ namespace SimpleGitVersion.Core.Tests
 
         }
 
-        [TestCase( "v1.0.0", "alpha", "1.0.1--ci.1.alpha", null, "1.0.1-C0001-alpha" )]
+        [TestCase( "v1.0.0", "alpha", "1.0.1--ci.1.alpha", null, "1.0.1--0001-alpha" )]
         [TestCase( "v1.0.0", "beta", null, null, "content:1.0.0" )]
         [TestCase( "v1.0.0", "gamma", null, null, "content:1.0.0" )]
         [TestCase( "v1.0.0", "parallel-world", null, "parallel", "content:1.0.0")]
