@@ -46,9 +46,14 @@ namespace SimpleGitVersion
         /// </summary>
         public readonly SVersion BuildVersionNuGet;
 
-        internal static CIReleaseInfo Create( Commit commit, CIBranchVersionMode ciVersionMode, string ciBuildName, StringBuilder errors, CommitVersionInfo info )
+        internal static CIReleaseInfo Create(
+            Commit commit,
+            CIBranchVersionMode ciVersionMode,
+            string ciBuildName,
+            StringBuilder errors,
+            BasicCommitInfo info )
         {
-            var actualBaseTag = info.PreviousMaxTag;
+            var actualBaseTag = info?.MaxCommit.ThisTag;
             CSVersion ciBaseTag = actualBaseTag ?? CSVersion.VeryFirstVersion;
             SVersion ciBuildVersionNuGet = null, ciBuildVersion = null;
 
@@ -62,7 +67,7 @@ namespace SimpleGitVersion
             else
             {
                 Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && actualBaseTag != null );
-                CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciBuildName, BuildIndex = info.PreviousMaxCommitDepth };
+                CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciBuildName, BuildIndex = info.BelowDepth };
                 if( !ci.IsValidForShortForm )
                 {
                     errors.AppendLine( "Due to ShortForm (NuGet V2 compliance) limitation, the branch name must not be longer than 8 characters. " );
@@ -78,7 +83,7 @@ namespace SimpleGitVersion
                 }
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );
-            return ciBuildVersion != null ? new CIReleaseInfo( ciBaseTag, info.PreviousMaxCommitDepth, ciBuildVersion, ciBuildVersionNuGet ) : null;
+            return ciBuildVersion != null ? new CIReleaseInfo( ciBaseTag, info.BelowDepth, ciBuildVersion, ciBuildVersionNuGet ) : null;
         }
 
         /// <summary>
@@ -86,7 +91,7 @@ namespace SimpleGitVersion
         /// </summary>
         /// <param name="ciBuildName">The BuildName string (typically "develop").</param>
         /// <param name="timeRelease">The utc date time of the release.</param>
-        /// <returns>A NuGetV2 O.O.O-C version string.</returns>
+        /// <returns>A NuGetV2 O.O.O-- version string.</returns>
         public static string CreateNuGetZeroTimed( string ciBuildName, DateTime timeRelease )
         {
             if( string.IsNullOrWhiteSpace( ciBuildName ) ) throw new ArgumentException( nameof( ciBuildName ) );
@@ -98,7 +103,7 @@ namespace SimpleGitVersion
             long second = (long)delta200.TotalSeconds;
             string b62 = ToBase62( second );
             string ver = new string( '0', 7 - b62.Length ) + b62;
-            ciBuildVersionNuGet = string.Format( "0.0.0-C{0}-{1}", ciBuildName, ver );
+            ciBuildVersionNuGet = string.Format( "0.0.0--{0}-{1}", ciBuildName, ver );
             return ciBuildVersionNuGet;
         }
 

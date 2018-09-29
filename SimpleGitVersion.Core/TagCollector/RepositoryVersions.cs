@@ -1,4 +1,4 @@
-﻿using CSemVer;
+using CSemVer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +12,11 @@ namespace SimpleGitVersion
     {
         readonly IReadOnlyList<TagCommit> _versions;
 
-        internal RepositoryVersions( IEnumerable<TagCommit> collected, StringBuilder errors, CSVersion startingVersionForCSemVer, bool checkCompactExistingVersions )
+        internal RepositoryVersions(
+            IEnumerable<TagCommit> collected,
+            StringBuilder errors,
+            CSVersion startingVersionForCSemVer,
+            bool checkCompactExistingVersions )
         {
             Debug.Assert( collected.All( c => c.ThisTag != null ) );
             _versions = collected.OrderBy( t => t.ThisTag ).ToList();
@@ -21,7 +25,7 @@ namespace SimpleGitVersion
                 var first = _versions[0].ThisTag;
                 if( checkCompactExistingVersions && startingVersionForCSemVer == null && !first.IsDirectPredecessor( null ) )
                 {
-                    errors.AppendFormat( "First existing version is '{0}' (on '{1}'). One or more previous versions are missing.", first, _versions[0].CommitSha )
+                    errors.AppendFormat( $"First existing version is '{first}' (on '{_versions[0].CommitSha}'). One or more previous versions are missing." )
                             .AppendLine();
                 }
                 for( int i = 0; i < _versions.Count - 1; ++i )
@@ -30,12 +34,12 @@ namespace SimpleGitVersion
                     var next = _versions[i + 1].ThisTag;
                     if( next.Equals( prev ) )
                     {
-                        errors.AppendFormat( "Version '{0}' is defined on '{1}' and '{2}'.", prev, _versions[i].CommitSha, _versions[i + 1].CommitSha )
+                        errors.AppendFormat( $"Version '{prev}' is defined on '{_versions[i].CommitSha}' and '{_versions[i + 1].CommitSha}'." )
                                 .AppendLine();
                     }
                     else if( checkCompactExistingVersions && !next.IsDirectPredecessor( prev ) )
                     {
-                        errors.AppendFormat( "Missing one or more version(s) between '{0}' and '{1}'.", prev, next )
+                        errors.AppendFormat( $"Missing one or more version(s) between '{prev}' and '{next}'." )
                                 .AppendLine();
                     }
                 }

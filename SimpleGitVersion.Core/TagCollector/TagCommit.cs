@@ -14,6 +14,7 @@ namespace SimpleGitVersion
         readonly string _commitSha;
         readonly string _contentSha;
         TagCommit _bestTagCommit;
+        TagCommit _altBestTagCommit;
         CSVersion _thisTag;
         List<CSVersion> _extraCollectedTags;
         TagCommit _nextSameTree;
@@ -47,13 +48,21 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets the best commit. This <see cref="IFullTagCommit"/> if no better version exists on the content.
         /// </summary>
-        public IFullTagCommit BestCommit => _headSameTree != null ? _headSameTree._bestTagCommit : this; 
+        public IFullTagCommit BestCommit => _headSameTree != null ? _headSameTree._bestTagCommit : this;
 
         /// <summary>
-        /// Gets <see cref="ThisTag"/> or the best version from the content.
+        /// Gets the best commit tag for this commit, skipping the given version.
+        /// Null if and only if <see cref="ITagCommit.ThisTag"/> is equal to <paramref name="v"/>
+        /// and there is no better <see cref="GetContentTagCommits"/>.
         /// </summary>
-        public CSVersion BestTag => _headSameTree != null ? _headSameTree._bestTagCommit.ThisTag : _thisTag; 
-
+        /// <param name="v">The version to ignore. Can be null (BestCommit is returned).</param>
+        /// <returns>The best commit tag or null.</returns>
+        public ITagCommit GetBestCommitExcept( CSVersion v )
+        {
+            var best = BestCommit;
+            if( best.ThisTag != v ) return best;
+            return _headSameTree != null ? _headSameTree._altBestTagCommit : null;
+        }
 
         /// <summary>
         /// Gets all <see cref="IFullTagCommit"/> with the same content.
@@ -74,7 +83,7 @@ namespace SimpleGitVersion
         /// <summary>
         /// Gets whether the content of this commit is the same as other exitsting tags.
         /// </summary>
-        public bool HasContentTagCommits => _headSameTree != null; 
+        public bool HasContentTagCommits => _headSameTree != null;
 
         #region Step 1: Collect
 
@@ -121,7 +130,8 @@ namespace SimpleGitVersion
             if( best.Count == 0 ) return null;
             if( best.Count > 1 )
             {
-                errors.AppendFormat( "Commit '{0}' has {1} different released version tags. Delete some of them or create +invalid tag(s) if they are already pushed to a remote repository.", CommitSha, best.Count ).AppendLine();
+                errors.AppendFormat( $"Commit '{CommitSha}' has {best.Count} different released version tags. Delete some of them or create +invalid tag(s) if they are already pushed to a remote repository." )
+                      .AppendLine();
                 return null;
             }
             return best[0];
@@ -142,12 +152,19 @@ namespace SimpleGitVersion
                     _headSameTree = this;
                     otherCommit._headSameTree = this;
                     _nextSameTree = otherCommit;
-                    if( _thisTag.CompareTo( otherCommit._thisTag ) < 0 ) _bestTagCommit = otherCommit;
-                    else _bestTagCommit = this;
+                    if( _thisTag.CompareTo( otherCommit._thisTag ) < 0 ) SetBestTagCommit( otherCommit );
+                    else SetBestTagCommit( this );
                 }
                 else otherCommit._headSameTree.AddSameTreeFromHead( this );
             }
             else _headSameTree.AddSameTreeFromHead( otherCommit );
+        }
+
+        void SetBestTagCommit( TagCommit c )
+        {
+            Debug.Assert( c != null );
+            _altBestTagCommit = _bestTagCommit ?? this;
+            _bestTagCommit = c;
         }
 
         void AddSameTreeFromHead( TagCommit other )
@@ -159,13 +176,16 @@ namespace SimpleGitVersion
                 other._nextSameTree = _nextSameTree;
                 _nextSameTree = other;
                 Debug.Assert( other._bestTagCommit == null );
-                if( _bestTagCommit._thisTag.CompareTo( other._thisTag ) < 0 ) _bestTagCommit = other;
+                if( _bestTagCommit._thisTag.CompareTo( other._thisTag ) < 0 ) SetBestTagCommit( other );
             }
             else
             {
                 var firstOther = other._headSameTree;
                 Debug.Assert( firstOther._bestTagCommit != null );
-                if( _bestTagCommit._thisTag.CompareTo( firstOther._bestTagCommit._thisTag ) < 0 ) _bestTagCommit = firstOther;
+                if( _bestTagCommit._thisTag.CompareTo( firstOther._bestTagCommit._thisTag ) < 0 )
+                {
+                    SetBestTagCommit( firstOther );
+                }
                 var n = firstOther;
                 for( ; ; )
                 {
@@ -176,10 +196,21 @@ namespace SimpleGitVersion
                 n._nextSameTree = _nextSameTree;
                 _nextSameTree = firstOther;
             }
-        }        
+        }
 
         #endregion
 
+        public override string ToString()
+        {
+            var s = _thisTag.ToString();
+            if( _headSameTree != null
+                && _headSameTree._bestTagCommit != null
+                && _headSameTree._bestTagCommit != this )
+            {
+                s += " -> " + _headSameTree._bestTagCommit.ThisTag.ToString();
+            }
+            return s;
+        }
     }
 
 }
