@@ -57,7 +57,6 @@ namespace SimpleGitVersion
             Debug.Assert( errors != null && repo != null );
 
             _collector = new Dictionary<string, TagCommit>();
-            _versionsCache = new Dictionary<string, CommitVersionInfo>();
 
             if( startingVersionForCSemVer != null )
             {
