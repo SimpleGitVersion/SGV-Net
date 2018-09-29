@@ -37,12 +37,12 @@ namespace SimpleGitVersion
         /// Gets the errors related to the release tags.
         /// Null if no errors.
         /// </summary>
-        public readonly string ReleaseTagErrorText;
+        public readonly string ReleaseTagError;
 
         /// <summary>
-        /// Gets either <see cref="RepositoryError"/> or <see cref="ReleaseTagErrorText"/>.
+        /// Gets either <see cref="RepositoryError"/> or <see cref="ReleaseTagError"/>.
         /// </summary>
-        public string Error => RepositoryError ?? ReleaseTagErrorText;
+        public string Error => RepositoryError ?? ReleaseTagError;
 
         /// <summary>
         /// Gets whether there are non committed files in the working directory.
@@ -74,46 +74,21 @@ namespace SimpleGitVersion
         public readonly CSVersion ValidReleaseTag;
 
         /// <summary>
-        /// Gets the release tag. If there is error, this is null.
-        /// It is also null if there is actually no release tag on the current commit.
-        /// </summary>
-        public readonly CSVersion ValidReleaseTag2;
-
-        /// <summary>
         /// Gets whether the error is the fact that the release tag on the current commit point
-        /// is not one of the <see cref="PossibleVersions"/>.
-        /// An error that describes this appears in <see cref="ReleaseTagErrorText"/>
+        /// is not one of the <see cref="PossibleVersions"/>. An error that describes this appears 
+        /// in <see cref="ReleaseTagError"/>
         /// </summary>
         public readonly bool ReleaseTagIsNotPossibleError;
 
         /// <summary>
-        /// Gets whether the error is the fact that the release tag on the current commit point
-        /// is not one of the <see cref="PossibleVersions"/>. An error that describes this appears 
-        /// in <see cref="ReleaseTagErrorLines"/> and <see cref="ReleaseTagErrorText"/>
-        /// </summary>
-        public readonly bool ReleaseTagIsNotPossibleError2;
-
-        /// <summary>
-        /// Gets the <see cref="CommitVersionInfo"/> of the current commit point.
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
-        /// prevented its computation.
-        /// </summary>
-        public readonly CommitVersionInfo CommitVersionInfo;
-
-        /// <summary>
         /// Gets the <see cref="SimpleGitVersion.CommitInfo"/> of the current commit point.
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
+        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagError"/> that 
         /// prevented its computation.
         /// </summary>
         public readonly CommitInfo CommitInfo;
 
         /// <summary>
-        /// Gets whether the current commit point's content is already tagged with a version.
-        /// </summary>
-        public readonly bool CommitContentHasTag;
-
-        /// <summary>
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
+        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagError"/> that 
         /// prevented its computation.
         /// When empty, this means that there can not be a valid release tag on the current commit point.
         /// This is the set of filtered versions (<see cref="RepositoryInfoOptions.SingleMajor"/>
@@ -122,31 +97,13 @@ namespace SimpleGitVersion
         public readonly IReadOnlyList<CSVersion> PossibleVersions;
 
         /// <summary>
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
+        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagError"/> that 
         /// prevented its computation.
         /// These are the versions that may be available to any commit above the current one.
         /// This is the set of filtered versions (<see cref="RepositoryInfoOptions.SingleMajor"/>
         /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> are ignored) from <see cref="CommitVersionInfo.NextPossibleVersions"/>.
         /// </summary>
         public readonly IReadOnlyList<CSVersion> NextPossibleVersions;
-
-        /// <summary>
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
-        /// prevented its computation.
-        /// When empty, this means that there can not be a valid release tag on the current commit point.
-        /// This is the set of filtered versions (<see cref="RepositoryInfoOptions.SingleMajor"/>
-        /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> are ignored) from <see cref="CommitVersionInfo.PossibleVersions"/>.
-        /// </summary>
-        public readonly IReadOnlyList<CSVersion> PossibleVersions2;
-
-        /// <summary>
-        /// Null if there is a <see cref="RepositoryError"/> or a <see cref="ReleaseTagErrorText"/> that 
-        /// prevented its computation.
-        /// These are the versions that may be available to any commit above the current one.
-        /// This is the set of filtered versions (<see cref="RepositoryInfoOptions.SingleMajor"/>
-        /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> are ignored) from <see cref="CommitVersionInfo.NextPossibleVersions"/>.
-        /// </summary>
-        public readonly IReadOnlyList<CSVersion> NextPossibleVersions2;
 
         /// <summary>
         /// Gets CI informations if a CI release can be done.
@@ -156,15 +113,6 @@ namespace SimpleGitVersion
         /// on the commit and <see cref="CommitContentHasTag"/> is false.
         /// </summary>
         public readonly CIReleaseInfo CIRelease;
-
-        /// <summary>
-        /// Gets CI informations if a CI release can be done.
-        /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either 
-        /// because it is the current branch or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it),
-        /// the <see cref="RepositoryInfoOptions.StartingCommitSha"/> is null or empty, there is no <see cref="ValidReleaseTag"/>
-        /// on the commit and <see cref="CommitContentHasTag"/> is false.
-        /// </summary>
-        public readonly CIReleaseInfo CIRelease2;
 
         /// <summary>
         /// Gets the NuGet version (short form) that must be used to build this commit point.
@@ -183,13 +131,6 @@ namespace SimpleGitVersion
         /// Never null: defaults to <see cref="InformationalVersion.ZeroInformationalVersion"/> string.
         /// </summary>
         public readonly string FinalInformationalVersion;
-
-        /// <summary>
-        /// Gets the NuGet version (short form) that is the content version if <see cref="CommitContentHasTag"/>
-        /// id true or the <see cref="FinalNuGetVersion"/>.
-        /// Never null: defaults to <see cref="SVersion.ZeroVersion"/>.
-        /// </summary>
-        public readonly SVersion ContentOrFinalNuGetVersion;
 
         /// <summary>
         /// Gets the <see cref="RepositoryInfoOptions"/> that has been used.
@@ -237,146 +178,75 @@ namespace SimpleGitVersion
                                                                    options.SingleMajor );
                         if( errors.Length == 0 )
                         {
-                            CommitVersionInfo = collector.GetVersionInfo( commit );
                             ExistingVersions = collector.ExistingVersions.TagCommits;
 
+                            var info = collector.GetCommitInfo( commit );
+                            Debug.Assert( info != null );
+
+                            CommitInfo = info;
+
+                            var rawPossible = info.PossibleVersions;
+                            IEnumerable<CSVersion> possibles = rawPossible;
+                            if( options.OnlyPatch ) possibles = possibles.Where( v => v.IsPatch );
+                            if( options.SingleMajor.HasValue ) possibles = possibles.Where( v => v.Major == options.SingleMajor.Value );
+                            PossibleVersions = possibles != rawPossible ? possibles.ToList() : rawPossible;
+
+                            var rawNextPossible = info.NextPossibleVersions;
+                            IEnumerable<CSVersion> nextPossibles = rawNextPossible;
+                            if( options.OnlyPatch ) nextPossibles = nextPossibles.Where( v => v.IsPatch );
+                            if( options.SingleMajor.HasValue ) nextPossibles = nextPossibles.Where( v => v.Major == options.SingleMajor.Value );
+                            NextPossibleVersions = nextPossibles != rawNextPossible ? nextPossibles.ToList() : rawNextPossible;
+
+                            var thisCommit = info.BasicInfo?.UnfilteredThisCommit;
+                            if( info.BasicInfo?.BestCommit?.ThisTag > thisCommit?.ThisTag )
                             {
-                                var info = collector.GetCommitInfo( commit );
-                                Debug.Assert( info != null );
-
-                                CommitInfo = info;
-
-                                var rawPossible = info.PossibleVersions;
-                                IEnumerable<CSVersion> possibles = rawPossible;
-                                if( options.OnlyPatch ) possibles = possibles.Where( v => v.IsPatch );
-                                if( options.SingleMajor.HasValue ) possibles = possibles.Where( v => v.Major == options.SingleMajor.Value );
-                                PossibleVersions2 = possibles != rawPossible ? possibles.ToList() : rawPossible;
-
-                                var rawNextPossible = info.NextPossibleVersions;
-                                IEnumerable<CSVersion> nextPossibles = rawNextPossible;
-                                if( options.OnlyPatch ) nextPossibles = nextPossibles.Where( v => v.IsPatch );
-                                if( options.SingleMajor.HasValue ) nextPossibles = nextPossibles.Where( v => v.Major == options.SingleMajor.Value );
-                                NextPossibleVersions2 = nextPossibles != rawNextPossible ? nextPossibles.ToList() : rawNextPossible;
-
-                                var thisCommit = info.BasicInfo?.UnfilteredThisCommit;
-                                if( info.BasicInfo?.BestCommit?.ThisTag > thisCommit?.ThisTag )
-                                {
-                                    BetterExistingVersion = info.BasicInfo.BestCommit;
-                                }
-                                if( thisCommit != null )
-                                {
-                                    if( PossibleVersions2.Contains( thisCommit.ThisTag ) )
-                                    {
-                                        ValidReleaseTag2 = thisCommit.ThisTag;
-                                    }
-                                    else
-                                    {
-                                        ReleaseTagIsNotPossibleError2 = true;
-                                        errors.Append( "Release tag '" )
-                                               .Append( thisCommit.ThisTag.ParsedText )
-                                               .AppendLine( "' is not valid here. " );
-                                        errors.Append( "Valid tags are: " )
-                                                .Append( string.Join( ", ", PossibleVersions2 ) )
-                                                .AppendLine();
-                                        if( PossibleVersions2 != rawPossible
-                                            && rawPossible.Contains( thisCommit.ThisTag ) )
-                                        {
-                                            errors.AppendLine( "Note: this version is invalid because of <SingleMajor> or <OnlyPatch> setting in RepositoryInfo.xml." );
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // There is no release tag on the commit point.
-                                    if( ciBuildName != null )
-                                    {
-                                        CIRelease2 = CIReleaseInfo.Create( commit, ciVersionMode, ciBuildName, errors, CommitVersionInfo );
-                                    }
-                                }
+                                BetterExistingVersion = info.BasicInfo.BestCommit;
                             }
-
-                            var rawPossibleVersions = CommitVersionInfo.PossibleVersions;
-                            IEnumerable<CSVersion> possibleSet = rawPossibleVersions;
-                            if( options.OnlyPatch ) possibleSet = possibleSet.Where( v => v.IsPatch );
-                            if( options.SingleMajor.HasValue ) possibleSet = possibleSet.Where( v => v.Major == options.SingleMajor.Value );
-                            PossibleVersions = possibleSet != rawPossibleVersions ? possibleSet.ToList() : rawPossibleVersions;
-
-                            var rawNextPossibleVersions = CommitVersionInfo.NextPossibleVersions;
-                            IEnumerable<CSVersion> nextPossibleSet = rawNextPossibleVersions;
-                            if( options.OnlyPatch ) nextPossibleSet = nextPossibleSet.Where( v => v.IsPatch );
-                            if( options.SingleMajor.HasValue ) nextPossibleSet = nextPossibleSet.Where( v => v.Major == options.SingleMajor.Value );
-                            NextPossibleVersions = nextPossibleSet != rawNextPossibleVersions ? nextPossibleSet.ToList() : rawNextPossibleVersions;
-
-                            CommitContentHasTag = CommitVersionInfo.ThisContentCommit != null;
-
-                            if( CommitVersionInfo.ThisCommit != null )
+                            if( thisCommit != null )
                             {
-                                if( PossibleVersions.Contains( CommitVersionInfo.ThisTag ) && !CommitContentHasTag )
+                                if( PossibleVersions.Contains( thisCommit.ThisTag ) )
                                 {
-                                    ValidReleaseTag = CommitVersionInfo.ThisTag;
+                                    ValidReleaseTag = thisCommit.ThisTag;
                                 }
                                 else
                                 {
                                     ReleaseTagIsNotPossibleError = true;
                                     errors.Append( "Release tag '" )
-                                           .Append( CommitVersionInfo.ThisTag.ParsedText )
-                                           .Append( "' is not valid here. " );
-                                    if( CommitContentHasTag )
+                                            .Append( thisCommit.ThisTag.ParsedText )
+                                            .AppendLine( "' is not valid here. " );
+                                    errors.Append( "Valid tags are: " )
+                                            .Append( string.Join( ", ", PossibleVersions ) )
+                                            .AppendLine();
+                                    if( PossibleVersions != rawPossible
+                                        && rawPossible.Contains( thisCommit.ThisTag ) )
                                     {
-                                        errors.Append( "This commit's content is the same as the " )
-                                               .Append( CommitVersionInfo.ThisContentCommit.ThisTag )
-                                               .Append( " (sha1: " )
-                                               .Append( CommitVersionInfo.ThisContentCommit.CommitSha )
-                                               .Append( ")." )
-                                               .AppendLine();
-                                    }
-                                    else
-                                    {
-                                        errors.Append( "Valid tags are: " )
-                                               .Append( string.Join( ", ", possibleSet ) )
-                                               .AppendLine();
-                                        if( PossibleVersions != rawPossibleVersions
-                                            && rawPossibleVersions.Contains( CommitVersionInfo.ThisTag ) )
-                                        {
-                                            errors.Append( "Note: this version is invalid because of <SingleMajor> or <OnlyPatch> setting in RepositoryInfo.xml." );
-                                        }
+                                        errors.AppendLine( "Note: this version is invalid because of <SingleMajor> or <OnlyPatch> setting in RepositoryInfo.xml." );
                                     }
                                 }
                             }
                             else
                             {
                                 // There is no release tag on the commit point.
-                                if( ciBuildName != null && !CommitContentHasTag )
+                                if( ciBuildName != null )
                                 {
-                                    CIRelease = CIReleaseInfo.Create( commit, ciVersionMode, ciBuildName, errors, CommitVersionInfo );
+                                    CIRelease = CIReleaseInfo.Create( commit, ciVersionMode, ciBuildName, errors, info.BasicInfo );
                                 }
                             }
                         }
-                        if( errors.Length > 0 ) ReleaseTagErrorText = errors.ToString();
+                        if( errors.Length > 0 ) ReleaseTagError = errors.ToString();
                     }
 
                     // Conclusion:
                     if( CIRelease != null )
                     {
-                        ContentOrFinalNuGetVersion = FinalNuGetVersion = CIRelease.BuildVersionNuGet;
+                        //ContentOrFinalNuGetVersion =
+                        FinalNuGetVersion = CIRelease.BuildVersionNuGet;
                         FinalSemVersion = CIRelease.BuildVersion;
                     }
                     else if( ValidReleaseTag != null )
                     {
-                        ContentOrFinalNuGetVersion = FinalNuGetVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ), false );
+                        FinalNuGetVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.NuGetPackage ), false );
                         FinalSemVersion = ValidReleaseTag;
-                        //FinalSemVersion = SVersion.Parse( ValidReleaseTag.ToString( CSVersionFormat.Normalized ) );
-                    }
-                    else
-                    {
-                        if( CommitContentHasTag )
-                        {
-                            ContentOrFinalNuGetVersion = SVersion.Parse( CommitVersionInfo.ThisContentCommit.ThisTag.ToString( CSVersionFormat.NuGetPackage ) );
-                        }
-                        else
-                        {
-                            ContentOrFinalNuGetVersion = SVersion.ZeroVersion;
-                        }
                     }
                 }
             }

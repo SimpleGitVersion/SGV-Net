@@ -40,12 +40,6 @@ namespace SimpleGitVersion
         /// </summary>
         public ITagCommit MaxCommit => BestCommit?.ThisTag > BestCommitBelow?.ThisTag ? BestCommit : BestCommitBelow;
 
-        /// <summary>
-        /// Gets whether <see cref="BestCommit"/> is not the original <see cref="UnfilteredThisCommit"/> point:
-        /// the commit content is associated to a better version by another commit. 
-        /// </summary>
-        public bool IsBestCommitRedirected => BestCommit != null && UnfilteredThisCommit != BestCommit;
-
         internal BasicCommitInfo( ITagCommit thisCommit, ITagCommit best, BasicCommitInfo parent )
         {
             UnfilteredThisCommit = thisCommit;
