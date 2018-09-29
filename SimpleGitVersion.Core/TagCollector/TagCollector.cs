@@ -18,7 +18,6 @@ namespace SimpleGitVersion
     {
         readonly CSVersion _startingVersionForCSemVer;
         readonly Dictionary<string, TagCommit> _collector;
-        readonly Dictionary<string, CommitVersionInfo> _versionsCache;
         readonly RepositoryVersions _repoVersions;
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace SimpleGitVersion
         /// this existing versions does not contain any version smaller than StartingVersionForCSemVer.
         /// This existing versions must always be compact (ie. no "holes" must exist between them) otherwise an error is added to the collector.
         /// </summary>
-        public RepositoryVersions ExistingVersions => _repoVersions; 
+        public RepositoryVersions ExistingVersions => _repoVersions;
 
         /// <summary>
         /// Initializes a new <see cref="TagCollector"/>.
@@ -42,6 +41,7 @@ namespace SimpleGitVersion
         /// <param name="repo">The Git repository.</param>
         /// <param name="startingVersionForCSemVer">Vesion tags lower than this version will be ignored.</param>
         /// <param name="overriddenTags">Optional commits with associated tags that are applied as if they exist in the repository.</param>
+        /// <param name="singleMajor">Optional major filter.</param>
         /// <param name="checkValidExistingVersions">
         /// When true, existing versions are checked: one of the valid first version must exist and exisitng versions
         /// must be compact.
@@ -51,6 +51,7 @@ namespace SimpleGitVersion
             Repository repo,
             string startingVersionForCSemVer = null,
             IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> overriddenTags = null,
+            int? singleMajor = null,
             bool checkValidExistingVersions = false )
         {
             Debug.Assert( errors != null && repo != null );
@@ -66,9 +67,17 @@ namespace SimpleGitVersion
                     errors.Append( "Invalid StartingVersionForCSemVer. " ).Append( _startingVersionForCSemVer.ErrorMessage ).AppendLine();
                     return;
                 }
+                if( singleMajor.HasValue && _startingVersionForCSemVer.Major != singleMajor )
+                {
+                    errors.Append( "StartingVersionForCSemVer '" )
+                          .Append( _startingVersionForCSemVer )
+                          .Append( "': since it is defined, its major must be " ).Append( singleMajor ).Append( " that is the SingleMajor set." )
+                          .AppendLine();
+                    return;
+                }
             }
             // Register all tags.
-            RegisterAllTags( errors, repo, overriddenTags );
+            RegisterAllTags( errors, repo, overriddenTags, singleMajor );
 
             // Resolves multiple tags on the same commit.
             CloseCollect( errors );
@@ -86,14 +95,14 @@ namespace SimpleGitVersion
             }
         }
 
-        void RegisterAllTags( StringBuilder errors, Repository repo, IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> overriddenTags )
+        void RegisterAllTags( StringBuilder errors, Repository repo, IEnumerable<KeyValuePair<string, IReadOnlyList<string>>> overriddenTags, int? singleMajor )
         {
             bool startingVersionForCSemVerFound = _startingVersionForCSemVer == null;
             foreach( var tag in repo.Tags )
             {
                 Commit tagCommit = tag.ResolveTarget() as Commit;
                 if( tagCommit == null ) continue;
-                RegisterOneTag( errors, tagCommit, tag.FriendlyName, ref startingVersionForCSemVerFound );
+                RegisterOneTag( errors, tagCommit, tag.FriendlyName, singleMajor, ref startingVersionForCSemVerFound );
             }
             // Applies overrides (if any) as if they exist in the repository.
             if( overriddenTags != null )
@@ -122,7 +131,7 @@ namespace SimpleGitVersion
                     {
                         foreach( string tagName in k.Value )
                         {
-                            RegisterOneTag( errors, o, tagName, ref startingVersionForCSemVerFound );
+                            RegisterOneTag( errors, o, tagName, singleMajor, ref startingVersionForCSemVerFound );
                         }
                     }
                 }
@@ -134,10 +143,10 @@ namespace SimpleGitVersion
             }
         }
 
-        void RegisterOneTag( StringBuilder errors, Commit c, string tagName, ref bool startingVersionForCSemVerFound )
+        void RegisterOneTag( StringBuilder errors, Commit c, string tagName, int? singleMajor, ref bool startingVersionForCSemVerFound )
         {
             CSVersion v = CSVersion.TryParse( tagName );
-           if( v.IsValid )
+           if( v.IsValid && (!singleMajor.HasValue || v.Major == singleMajor.Value) )
             {
                 if( _startingVersionForCSemVer != null )
                 {

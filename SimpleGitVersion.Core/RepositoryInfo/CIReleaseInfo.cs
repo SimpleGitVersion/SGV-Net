@@ -98,7 +98,7 @@ namespace SimpleGitVersion
             long second = (long)delta200.TotalSeconds;
             string b62 = ToBase62( second );
             string ver = new string( '0', 7 - b62.Length ) + b62;
-            ciBuildVersionNuGet = string.Format( "0.0.0-C{0}-{1}", ciBuildName, ver );
+            ciBuildVersionNuGet = string.Format( "0.0.0--{0}-{1}", ciBuildName, ver );
             return ciBuildVersionNuGet;
         }
 

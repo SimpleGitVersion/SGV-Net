@@ -11,6 +11,8 @@ namespace SimpleGitVersion
 
     partial class TagCollector
     {
+        readonly Dictionary<string, CommitVersionInfo> _versionsCache;
+
         public CommitVersionInfo GetVersionInfo( Commit c )
         {
             string commitSha = c.Sha;

@@ -266,11 +266,11 @@ namespace SimpleGitVersion
 
         bool HandleRepositoryInfoError( ILogger logger, RepositoryInfo info )
         {
-            if( !info.HasError ) return false;
-            string allText = info.RepositoryError ?? info.ReleaseTagErrorText;
-            string oneLine = info.ErrorHeaderText;
-            logger.Error( allText );
-            SetInvalidValues( oneLine );
+            if( info.Error == null ) return false;
+            logger.Error( info.Error );
+            int index = info.Error.IndexOfAny( new char[] { '\r', '\n' } );
+            string firstline = index == -1 ? info.Error : info.Error.Substring( 0, index );
+            SetInvalidValues( firstline );
             return true;
         }
 

@@ -13,14 +13,6 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="possibleVersionsMode">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="Default" />
-            <xs:enumeration value="AllSuccessors" />
-            <xs:enumeration value="Restricted" />
-        </xs:restriction>
-    </xs:simpleType>
-
     <xs:simpleType name="StringMax8">
         <xs:restriction base="xs:string">
             <xs:maxLength value="8" />
