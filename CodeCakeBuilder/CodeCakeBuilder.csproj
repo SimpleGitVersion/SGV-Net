@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NuGet.CommandLine" Version="4.6.2" />
-    <PackageReference Include="CK.Text" Version="7.1.1--0006-develop" />
+    <PackageReference Include="CK.Text" Version="0.0.0-0" />
     <ProjectReference Include="../SimpleGitVersion.Cake/SimpleGitVersion.Cake.csproj" />
   </ItemGroup>
 </Project>
