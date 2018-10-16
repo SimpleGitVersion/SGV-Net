@@ -323,8 +323,8 @@ namespace SimpleGitVersion.Core.Tests
                         new RepositoryInfoOptionsBranch() { Name = "gamma", CIVersionMode = CIBranchVersionMode.ZeroTimed }
                     }
                 } );
-                Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedText, Is.EqualTo( "0.0.0--gamma-009y09h" ) );
-                Assert.That( i.CIRelease.BuildVersion.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--ci-gamma.2015-07-13T07-46-29-00+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--009y09h-gamma+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersion.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--ci.2015-07-13T07-46-29-00.gamma+v2.0.0" ) );
             }
             // On "alpha" branch, the head is 6 commits ahead of the v2.0.0 tag (always the take the longest path). 
             {
@@ -351,8 +351,8 @@ namespace SimpleGitVersion.Core.Tests
                         new RepositoryInfoOptionsBranch() { Name = "alpha", VersionName="ALPH", CIVersionMode = CIBranchVersionMode.ZeroTimed }
                     }
                 } );
-                Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedText, Is.EqualTo( "0.0.0--ALPH-009y6hm" ) );
-                Assert.That( i.CIRelease.BuildVersion.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--ci-ALPH.2015-07-13T10-00-58-00+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--009y6hm-ALPH+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersion.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--ci.2015-07-13T10-00-58-00.ALPH+v2.0.0" ) );
             }
             // On "beta" branch, the head is 6 commits ahead of the v2.0.0 tag. 
             {
@@ -379,8 +379,8 @@ namespace SimpleGitVersion.Core.Tests
                         new RepositoryInfoOptionsBranch() { Name = "beta", VersionName="beta", CIVersionMode = CIBranchVersionMode.ZeroTimed }
                     }
                 } );
-                Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedText, Is.EqualTo( "0.0.0--beta-009y087" ) );
-                Assert.That( i.CIRelease.BuildVersion.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--ci-beta.2015-07-13T07-45-43-00+v2.0.0" ) );
+                Assert.That( i.CIRelease.BuildVersionNuGet.NormalizedText, Is.EqualTo( "0.0.0--009y087-beta" ) );
+                Assert.That( i.CIRelease.BuildVersion.NormalizedTextWithBuildMetaData, Is.EqualTo( "0.0.0--ci.2015-07-13T07-45-43-00.beta+v2.0.0" ) );
             }
 
         }

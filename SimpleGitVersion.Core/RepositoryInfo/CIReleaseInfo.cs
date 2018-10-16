@@ -61,8 +61,16 @@ namespace SimpleGitVersion
             if( ciVersionMode == CIBranchVersionMode.ZeroTimed || actualBaseTag == null )
             {
                 DateTime timeRelease = commit.Committer.When.ToUniversalTime().UtcDateTime;
-                ciBuildVersion = SVersion.Parse( CIBuildDescriptor.CreateSemVerZeroTimed( ciBuildName, timeRelease, actualBaseTag?.ToString() ) );
-                ciBuildVersionNuGet = SVersion.Parse( CIBuildDescriptor.CreateShortFormZeroTimed( ciBuildName, timeRelease ), false );
+                string vS = CIBuildDescriptor.CreateSemVerZeroTimed( ciBuildName, timeRelease );
+                string vN = CIBuildDescriptor.CreateShortFormZeroTimed( ciBuildName, timeRelease );
+                if( actualBaseTag != null )
+                {
+                    string buildMetaData = "+v" + actualBaseTag;
+                    vS += buildMetaData;
+                    vN += buildMetaData;
+                }
+                ciBuildVersion = SVersion.Parse( vS );
+                ciBuildVersionNuGet = SVersion.Parse( vN, false );
             }
             else
             {
