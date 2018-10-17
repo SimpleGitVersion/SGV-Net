@@ -59,7 +59,7 @@
                                     <xs:attribute name="VersionName" type="StringMax8">
                                         <xs:annotation>
                                             <xs:documentation>
-                                                Defines the name of the branch to use in the version (SemVer and NuGet).
+                                                Defines the name of the branch to use in the version (SemVer long and short form).
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:attribute>

@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
+
+    /// <summary>
+    /// Commit info that exposes raw <see cref="PossibleVersions"/> and <see cref="NextPossibleVersions"/>
+    /// (<see cref="RepositoryInfoOptions.SingleMajor"/> and <see cref="RepositoryInfoOptions.OnlyPatch"/>
+    /// are ignored at this level).
+    /// </summary>
     public class CommitInfo
     {
         /// <summary>

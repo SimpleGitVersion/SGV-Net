@@ -92,7 +92,8 @@ namespace SimpleGitVersion
         /// prevented its computation.
         /// When empty, this means that there can not be a valid release tag on the current commit point.
         /// This is the set of filtered versions (<see cref="RepositoryInfoOptions.SingleMajor"/>
-        /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> are ignored) from <see cref="CommitVersionInfo.PossibleVersions"/>.
+        /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> options are applied
+        /// on <see cref="CommitInfo"/>.<see cref="CommitInfo.PossibleVersions">PossibleVersions</see>).
         /// </summary>
         public readonly IReadOnlyList<CSVersion> PossibleVersions;
 
@@ -101,7 +102,8 @@ namespace SimpleGitVersion
         /// prevented its computation.
         /// These are the versions that may be available to any commit above the current one.
         /// This is the set of filtered versions (<see cref="RepositoryInfoOptions.SingleMajor"/>
-        /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> are ignored) from <see cref="CommitVersionInfo.NextPossibleVersions"/>.
+        /// and <see cref="RepositoryInfoOptions.OnlyPatch"/> options are applied
+        /// on <see cref="CommitInfo"/>.<see cref="CommitInfo.NextPossibleVersions">NextPossibleVersions</see>).
         /// </summary>
         public readonly IReadOnlyList<CSVersion> NextPossibleVersions;
 
@@ -109,8 +111,7 @@ namespace SimpleGitVersion
         /// Gets CI informations if a CI release can be done.
         /// Not null only if we are on a branch that is enabled in <see cref="RepositoryInfoOptions.Branches"/> (either 
         /// because it is the current branch or <see cref="RepositoryInfoOptions.StartingBranchName"/> specifies it),
-        /// the <see cref="RepositoryInfoOptions.StartingCommitSha"/> is null or empty, there is no <see cref="ValidReleaseTag"/>
-        /// on the commit and <see cref="CommitContentHasTag"/> is false.
+        /// the <see cref="RepositoryInfoOptions.StartingCommitSha"/> is null or empty and there is no <see cref="ValidReleaseTag"/>.
         /// </summary>
         public readonly CIReleaseInfo CIRelease;
 

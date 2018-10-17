@@ -11,8 +11,8 @@ namespace SimpleGitVersion
 {
 
     /// <summary>
-    /// Discovers existing tags in the repository, resolves them by applying <see cref="CSVersion.DefinitionStrength"/>, detects some of the possible inconsistencies
-    /// and provide a <see cref="GetVersionInfo"/> to retrieve commit information.
+    /// Discovers existing tags in the repository and provide a <see cref="GetCommitInfo"/> to
+    /// retrieve commit information.
     /// </summary>
     partial class TagCollector
     {
