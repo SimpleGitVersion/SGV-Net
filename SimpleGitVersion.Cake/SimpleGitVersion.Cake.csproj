@@ -1,5 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Common\Shared.props" />
+  
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Cake extension that enables Cake scripts to obtain SimpleGitVersion information from current Git repository.</Description>
