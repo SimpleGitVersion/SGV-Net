@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +17,8 @@ namespace SimpleGitVersion
         None,
 
         /// <summary>
-        /// The version will be a 0.0.0--ci-BranchName-SortableUtcDateTime+PreviousReleaseVersion.
+        /// The version will be a 0.0.0--ci.SortableUtcDateTime.BranchName (long form)
+        /// or 0.0.0--NumberOfSecondsFrom20150101-BranchName (short form).
         /// </summary>
         ZeroTimed,
 

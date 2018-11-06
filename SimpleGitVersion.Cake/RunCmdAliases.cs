@@ -1,4 +1,4 @@
-﻿using Cake.Core;
+using Cake.Core;
 using Cake.Core.Diagnostics;
 using System;
 using System.Diagnostics;
@@ -46,8 +46,9 @@ namespace Code.Cake
 
             using( Process cmdProcess = new Process() )
             {
+                StringBuilder stdError = new StringBuilder();
                 cmdProcess.StartInfo = cmdStartInfo;
-                cmdProcess.ErrorDataReceived += ( o, e ) => { if( !string.IsNullOrEmpty( e.Data ) ) context.Log.Error( e.Data ); };
+                cmdProcess.ErrorDataReceived += ( o, e ) => { if( !string.IsNullOrEmpty( e.Data ) ) stdError.Append( "<STDERR>" ).AppendLine( e.Data ); };
                 cmdProcess.OutputDataReceived += ( o, e ) =>
                 {
                     if( e.Data != null )
@@ -60,6 +61,7 @@ namespace Code.Cake
                 cmdProcess.BeginErrorReadLine();
                 cmdProcess.BeginOutputReadLine();
                 cmdProcess.WaitForExit();
+                if( stdError.Length > 0 ) context.Log.Error( stdError.ToString() );
                 return cmdProcess.ExitCode;
             }
         }

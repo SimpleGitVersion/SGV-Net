@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace SimpleGitVersion
 {
+    /// <summary>
+    /// Low level commit info (internally cached).
+    /// </summary>
     public class BasicCommitInfo
     {
         /// <summary>
