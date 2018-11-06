@@ -1,8 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NuGet.Protocol" Version="4.8.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NuGet.Credentials" Version="4.8.0" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NuGet.CommandLine" Version="4.6.2" />
     <PackageReference Include="CK.Text" Version="0.0.0-0" />
