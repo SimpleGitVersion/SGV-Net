@@ -1,31 +1,26 @@
-<Project >
-
-    <!-- SharedDir is the /Common directory. -->
-    <PropertyGroup>
-        <SharedDir>$(MSBuildThisFileDirectory)</SharedDir>
-        <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests'))">true</IsTestProject>
-        <IsInTestsFolder Condition="$(MSBuildProjectDirectoryNoRoot.Contains('\Tests\'))">true</IsInTestsFolder>
-    </PropertyGroup>
-
-    <!-- Xml documentation is generated in Release or during Cake builds (except for tests projects). -->
-    <PropertyGroup Condition=" '$(IsInTestsFolder)' != 'true' And ('$(CakeBuild)' == 'true' Or '$(Configuration)' == 'Release') ">
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
-
-    <!-- 
+<Project>
+  <!-- SharedDir is the /Common directory. -->
+  <PropertyGroup>
+    <SharedDir>$(MSBuildThisFileDirectory)</SharedDir>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests'))">true</IsTestProject>
+    <IsInTestsFolder Condition="$(MSBuildProjectDirectoryNoRoot.Contains('\Tests\'))">true</IsInTestsFolder>
+  </PropertyGroup>
+  <!-- Xml documentation is generated in Release or during Cake builds (except for tests projects). -->
+  <PropertyGroup Condition=" '$(IsInTestsFolder)' != 'true' And ('$(CakeBuild)' == 'true' Or '$(Configuration)' == 'Release') ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <!-- 
     When building from the CI (ie. from Cake, hence directly with the msbuild tool, SolutionDir is not defined),
     we unify the behavior here.
   -->
-    <PropertyGroup Condition=" '$(CakeBuild)' == 'true' ">
-        <SolutionDir>$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))))\</SolutionDir>
-    </PropertyGroup>
-    <!-- When not building from the CI, assemblies do not have any AssemblyInfo attributes. -->
-    <PropertyGroup Condition=" '$(CakeBuild)' != 'true' ">
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    </PropertyGroup>
-
-
-    <!-- Reproducible builds. See: http://blog.paranoidcoding.com/2016/04/05/deterministic-builds-in-roslyn.html
+  <PropertyGroup Condition=" '$(CakeBuild)' == 'true' ">
+    <SolutionDir>$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))))\</SolutionDir>
+  </PropertyGroup>
+  <!-- When not building from the CI, assemblies do not have any AssemblyInfo attributes. -->
+  <PropertyGroup Condition=" '$(CakeBuild)' != 'true' ">
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <!-- Reproducible builds. See: http://blog.paranoidcoding.com/2016/04/05/deterministic-builds-in-roslyn.html
     On appveyor, the clone folder MUST be set to the solution path in the CK-World.
     For this solution, it is:
 
@@ -33,29 +28,33 @@
 
     This must be adapted for each solution/repository.
   -->
-    <PropertyGroup Condition=" '$(CakeBuild)' == 'true' ">
-        <Deterministic>true</Deterministic>
-        <CKWorldPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), CK-World))</CKWorldPath>
-        <PathMap Condition=" '$(CKWorldPath)' != '' ">$(CKWorldPath)=C:\CK-World</PathMap>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <!-- Standard properties. -->
-        <AssemblyOriginatorKeyFile>$(SharedDir)SharedKey.snk</AssemblyOriginatorKeyFile>
-        <SignAssembly>true</SignAssembly>
-        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-        <RepositoryType>git</RepositoryType>
-
-        <!-- Invenietis standard properties. -->
-        <Company>Invenietis</Company>
-        <Authors>Invenietis</Authors>
-
-        <!-- Properties that are solution depdendents. -->
-        <Copyright>Copyright Invenietis 2015-$([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
-        <ProductName>SimpleGitVersion</ProductName>
-
-        <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/SimpleGitVersion/SGV-Net</RepositoryUrl>
-
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(CakeBuild)' == 'true' ">
+    <Deterministic>true</Deterministic>
+    <CKWorldPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), CK-World))</CKWorldPath>
+    <PathMap Condition=" '$(CKWorldPath)' != '' ">$(CKWorldPath)=C:\CK-World</PathMap>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Standard properties. -->
+    <AssemblyOriginatorKeyFile>$(SharedDir)SharedKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <RepositoryType>git</RepositoryType>
+    <!-- Invenietis standard properties. -->
+    <Company>Invenietis</Company>
+    <Authors>Invenietis</Authors>
+    <!-- Properties that are solution depdendents. -->
+    <Copyright>Copyright Invenietis 2015-$([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
+    <ProductName>SimpleGitVersion</ProductName>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/SimpleGitVersion/SGV-Net</RepositoryUrl>
+  </PropertyGroup>
+  <!--<SourceLink>: is enabled only for Cake build. -->
+  <PropertyGroup Condition=" '$(CakeBuild)' == 'true' ">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+</PropertyGroup>
+  <ItemGroup Condition=" '$(CakeBuild)' == 'true' ">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
+</ItemGroup>
+  <!--</SourceLink>-->
 </Project>
