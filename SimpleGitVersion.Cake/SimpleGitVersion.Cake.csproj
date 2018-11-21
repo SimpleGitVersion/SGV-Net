@@ -12,6 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
-    <PackageReference Include="Code.Cake" Version="0.28.1--0022-develop" />
+    <PackageReference Include="Code.Cake" Version="0.28.1--0023-develop" />
   </ItemGroup>
 </Project>
