@@ -7,7 +7,7 @@
     <PackageTags>Versioning, SemVer, NuGet, CSemVer, InformationalVersion</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CSemVer" Version="4.0.1--0023-local" />
+    <PackageReference Include="CSemVer" Version="4.0.1--0024-develop" />
     <PackageReference Include="LibGit2Sharp" Version="0.25.3" />
   </ItemGroup>
 </Project>
