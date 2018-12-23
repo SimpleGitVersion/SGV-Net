@@ -140,11 +140,13 @@ namespace SimpleGitVersion
 
         /// <summary>
         /// The UTC date and time of the commit.
+        /// Defaults to <see cref="InformationalVersion.ZeroCommitDate"/>.
         /// </summary>
         public readonly DateTime CommitDateUtc;
 
         /// <summary>
         /// The Sha of the commit.
+        /// Null if the commit is not valid.
         /// </summary>
         public readonly string CommitSha;
 
@@ -156,6 +158,7 @@ namespace SimpleGitVersion
         public RepositoryInfo( Repository r, RepositoryInfoOptions options = null )
         {
             Options = options ?? new RepositoryInfoOptions();
+            CommitDateUtc = InformationalVersion.ZeroCommitDate;
             if( r == null ) RepositoryError = "No Git repository.";
             else
             {
