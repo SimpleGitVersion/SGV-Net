@@ -36,6 +36,7 @@ namespace CodeCake
                              CSProjPath = p.Path,
                              ProjectPath = p.Path.GetDirectory(),
                              NetCoreAppDll21 = p.Path.GetDirectory().CombineWithFilePath( "bin/" + globalInfo.BuildConfiguration + "/netcoreapp2.1/" + p.Name + ".dll" ),
+                             NetCoreAppDll22 = p.Path.GetDirectory().CombineWithFilePath( "bin/" + globalInfo.BuildConfiguration + "/netcoreapp2.2/" + p.Name + ".dll" ),
                              Net461Dll = p.Path.GetDirectory().CombineWithFilePath( "bin/" + globalInfo.BuildConfiguration + "/net461/" + p.Name + ".dll" ),
                              Net461Exe = p.Path.GetDirectory().CombineWithFilePath( "bin/" + globalInfo.BuildConfiguration + "/net461/" + p.Name + ".exe" ),
                          } );
@@ -63,6 +64,10 @@ namespace CodeCake
                 if( Cake.FileExists( test.NetCoreAppDll21 ) )
                 {
                     TestNetCore( test.CSProjPath.FullPath, test.NetCoreAppDll21, "netcoreapp2.1" );
+                }
+                if( Cake.FileExists( test.NetCoreAppDll22 ) )
+                {
+                    TestNetCore( test.CSProjPath.FullPath, test.NetCoreAppDll22, "netcoreapp2.2" );
                 }
             }
 
