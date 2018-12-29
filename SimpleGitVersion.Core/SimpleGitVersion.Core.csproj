@@ -8,6 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CSemVer" Version="4.0.1--0031-develop" />
-    <PackageReference Include="LibGit2Sharp" Version="0.25.3" />
+    <PackageReference Include="LibGit2Sharp" Version="0.25.4" />
   </ItemGroup>
 </Project>
