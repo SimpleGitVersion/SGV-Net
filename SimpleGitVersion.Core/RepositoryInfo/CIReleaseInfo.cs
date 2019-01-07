@@ -71,27 +71,28 @@ namespace SimpleGitVersion
                 }
                 ciBuildVersion = SVersion.Parse( vS );
                 ciBuildVersionNuGet = SVersion.Parse( vN, false );
+                return new CIReleaseInfo( ciBaseTag, 0, ciBuildVersion, ciBuildVersionNuGet );
+
+            }
+            Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && actualBaseTag != null );
+            CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciBuildName, BuildIndex = info.BelowDepth };
+            if( !ci.IsValidForShortForm )
+            {
+                errors.AppendLine( "Due to ShortForm (NuGet V2 compliance) limitation, the branch name must not be longer than 8 characters. " );
+                errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
+                      .AppendLine()
+                      .Append( $@"<Branch Name=""{ci.BranchName}"" VersionName=""{ci.BranchName.Substring( 0, 8 )}"" ... />." )
+                      .AppendLine();
             }
             else
             {
-                Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && actualBaseTag != null );
-                CIBuildDescriptor ci = new CIBuildDescriptor { BranchName = ciBuildName, BuildIndex = info.BelowDepth };
-                if( !ci.IsValidForShortForm )
-                {
-                    errors.AppendLine( "Due to ShortForm (NuGet V2 compliance) limitation, the branch name must not be longer than 8 characters. " );
-                    errors.Append( "Adds a VersionName attribute to the branch element in RepositoryInfo.xml with a shorter name: " )
-                          .AppendLine()
-                          .Append( $@"<Branch Name=""{ci.BranchName}"" VersionName=""{ci.BranchName.Substring( 0, 8 )}"" ... />." )
-                          .AppendLine();
-                }
-                else
-                {
-                    ciBuildVersion = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.Normalized, ci ) );
-                    ciBuildVersionNuGet = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci ), false );
-                }
+                ciBuildVersion = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.Normalized, ci ) );
+                ciBuildVersionNuGet = SVersion.Parse( actualBaseTag.ToString( CSVersionFormat.NuGetPackage, ci ), false );
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );
-            return ciBuildVersion != null ? new CIReleaseInfo( ciBaseTag, info.BelowDepth, ciBuildVersion, ciBuildVersionNuGet ) : null;
+            return ciBuildVersion != null
+                    ? new CIReleaseInfo( ciBaseTag, info.BelowDepth, ciBuildVersion, ciBuildVersionNuGet )
+                    : null;
         }
     }
 
