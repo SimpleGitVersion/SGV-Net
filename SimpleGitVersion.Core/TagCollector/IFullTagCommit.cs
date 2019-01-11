@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+using CSemVer;
+using System;
+using System.Collections.Generic;
 
 namespace SimpleGitVersion
 {
@@ -13,9 +15,19 @@ namespace SimpleGitVersion
         string ContentSha { get; }
 
         /// <summary>
-        /// Gets the best commit. It is this <see cref="IFullTagCommit"/> if no better version exists on the content.
+        /// Gets the best commit.
+        /// It is this <see cref="IFullTagCommit"/> if no better version exists on the content.
         /// </summary>
         IFullTagCommit BestCommit { get; }
+
+        /// <summary>
+        /// Gets the best commit tag for this commit, skipping the given version.
+        /// Null if and only if <see cref="ITagCommit.ThisTag"/> is equal to <paramref name="v"/>
+        /// and there is no better <see cref="GetContentTagCommits"/>.
+        /// </summary>
+        /// <param name="v">The version to ignore.</param>
+        /// <returns>The best commit tag or null.</returns>
+        ITagCommit GetBestCommitExcept( CSVersion v );
 
         /// <summary>
         /// Gets all <see cref="IFullTagCommit"/> with the same content.
@@ -28,6 +40,5 @@ namespace SimpleGitVersion
         /// Gets whether the content of this commit is the same as other exitsting tags.
         /// </summary>
         bool HasContentTagCommits { get; }
-
     }
 }

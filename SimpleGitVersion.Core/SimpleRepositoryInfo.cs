@@ -164,7 +164,7 @@ namespace SimpleGitVersion
         /// <param name="info">The simplified repository information.</param>
         public SimpleRepositoryInfo( ILogger logger, RepositoryInfo info )
         {
-            if( logger == null ) throw new ArgumentNullException( nameof(logger) );
+            if( logger == null ) throw new ArgumentNullException( nameof( logger ) );
             if( info == null ) throw new ArgumentNullException( nameof( info ) );
 
             Info = info;
@@ -186,17 +186,19 @@ namespace SimpleGitVersion
                         logger.Warn( "Working folder is Dirty! Checking this has been disabled since RepositoryInfoOptions.IgnoreDirtyWorkingFolder is true." );
                         logger.Warn( info.IsDirtyExplanations );
                     }
-                    if( info.CommitVersionInfo.PreviousCommit != null )
+                    var basic = info.CommitInfo.BasicInfo;
+                    if( basic == null )
                     {
-                        logger.Trace( $"Previous release found '{info.CommitVersionInfo.PreviousTag}' on commit '{info.CommitVersionInfo.PreviousCommit.CommitSha}'." );
+                        logger.Trace( $"No version information found." );
                     }
-                    if( info.CommitVersionInfo.PreviousMaxCommit != null && info.CommitVersionInfo.PreviousMaxCommit != info.CommitVersionInfo.PreviousCommit )
+                    else
                     {
-                        logger.Trace( $"Previous max release found '{info.CommitVersionInfo.PreviousMaxTag}' on commit '{info.CommitVersionInfo.PreviousMaxCommit.CommitSha}'." );
-                    }
-                    if( info.CommitVersionInfo.PreviousCommit == null && info.CommitVersionInfo.PreviousMaxCommit == null )
-                    {
-                        logger.Trace( "No previous release found'." );
+                        var tag = basic.UnfilteredThisCommit?.ThisTag;
+                        logger.Trace( tag != null ? $"Tag: {tag}" : "No tag found on commit itself." );
+                        var bestContent = info.BetterExistingVersion;
+                        if( bestContent != null ) logger.Trace( $"Better version found: {bestContent.ThisTag}, sha: {bestContent.CommitSha}" );
+                        var baseTag = basic.BestCommitBelow?.ThisTag;
+                        logger.Trace( baseTag != null ? $"Base tag below: {baseTag}" : "No base tag found below." );
                     }
 
                     // Will be replaced by SetInvalidValuesAndLog if needed.
@@ -214,7 +216,7 @@ namespace SimpleGitVersion
                     {
                         if( t == null )
                         {
-                            SetInvalidValuesAndLog( logger, "No release tag found on the commit.", false );
+                            SetInvalidValuesAndLog( logger, "No valid release tag found on the commit.", false );
                             LogValidVersions( logger, info );
                         }
                         else
@@ -266,11 +268,11 @@ namespace SimpleGitVersion
 
         bool HandleRepositoryInfoError( ILogger logger, RepositoryInfo info )
         {
-            if( !info.HasError ) return false;
-            string allText = info.RepositoryError ?? info.ReleaseTagErrorText;
-            string oneLine = info.ErrorHeaderText;
-            logger.Error( allText );
-            SetInvalidValues( oneLine );
+            if( info.Error == null ) return false;
+            logger.Error( info.Error );
+            int index = info.Error.IndexOfAny( new char[] { '\r', '\n' } );
+            string firstline = index == -1 ? info.Error : info.Error.Substring( 0, index );
+            SetInvalidValues( firstline );
             return true;
         }
 

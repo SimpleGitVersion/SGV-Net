@@ -1,11 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Exe</OutputType>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NuGet.CommandLine" Version="4.6.2" />
-    <PackageReference Include="CK.Text" Version="7.0.1-C0048-develop" />
+    <PackageReference Include="NuGet.Protocol" Version="4.9.2" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.9.0" />
+    <PackageReference Include="NUnit.Runners.Net4" Version="2.6.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NuGet.Credentials" Version="4.9.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CK.Text" Version="8.0.0" />
     <ProjectReference Include="../SimpleGitVersion.Cake/SimpleGitVersion.Cake.csproj" />
   </ItemGroup>
 </Project>
