@@ -208,7 +208,22 @@ namespace SimpleGitVersion
                     if( info.CIRelease != null )
                     {
                         IsValidCIBuild = true;
-                        SetNumericalVersionValues( info.CIRelease.BaseTag, true );
+                        if( !info.CIRelease.IsZeroTimed )
+                        {
+                            SetNumericalVersionValues( info.CIRelease.BaseTag, true );
+                        }
+                        else
+                        {
+                            Major = info.CIRelease.BuildVersion.Major;
+                            Minor = info.CIRelease.BuildVersion.Minor;
+                            Patch = info.CIRelease.BuildVersion.Patch;
+
+                            PreReleaseName = String.Empty;
+                            PreReleaseNumber = 0;
+                            PreReleaseFix = 0;
+                            FileVersion = InformationalVersion.ZeroFileVersion;
+                            OrderedVersion = 0;
+                        }
                         logger.Info( $"CI release: '{SafeNuGetVersion}'." );
                         LogValidVersions( logger, info );
                     }
