@@ -24,15 +24,7 @@ namespace SimpleGitVersion
         /// Gets whether a release can be produced from the current commit point.
         /// It is either a release or a CI build (see <see cref="IsValidRelease"/> and <see cref="IsValidCIBuild"/>).
         /// </summary>
-        public bool IsValid
-        {
-            get
-            {
-                Debug.Assert( OrderedVersion >= 0m );
-                Debug.Assert( OrderedVersion == 0m || (IsValidRelease || IsValidCIBuild), "IsValid (== OrderedVersion != 0) => IsValidRelease || IsValidCIBuild" );
-                return OrderedVersion != 0m;
-            }
-        }
+        public bool IsValid => IsValidCIBuild || IsValidRelease;
 
         /// <summary>
         /// Gets whether this is a valid, normal, release (not a CI build).
@@ -208,7 +200,22 @@ namespace SimpleGitVersion
                     if( info.CIRelease != null )
                     {
                         IsValidCIBuild = true;
-                        SetNumericalVersionValues( info.CIRelease.BaseTag, true );
+                        if( !info.CIRelease.IsZeroTimed )
+                        {
+                            SetNumericalVersionValues( info.CIRelease.BaseTag, true );
+                        }
+                        else
+                        {
+                            Major = info.CIRelease.BuildVersion.Major;
+                            Minor = info.CIRelease.BuildVersion.Minor;
+                            Patch = info.CIRelease.BuildVersion.Patch;
+
+                            PreReleaseName = String.Empty;
+                            PreReleaseNumber = 0;
+                            PreReleaseFix = 0;
+                            FileVersion = InformationalVersion.ZeroFileVersion;
+                            OrderedVersion = 0;
+                        }
                         logger.Info( $"CI release: '{SafeNuGetVersion}'." );
                         LogValidVersions( logger, info );
                     }

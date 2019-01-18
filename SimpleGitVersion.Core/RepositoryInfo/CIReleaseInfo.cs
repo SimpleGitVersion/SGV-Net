@@ -16,12 +16,18 @@ namespace SimpleGitVersion
     /// </summary>
     public class CIReleaseInfo
     {
-        CIReleaseInfo( CSVersion ciBaseTag, int ciBaseDepth, SVersion ciBuildVersion, SVersion ciBuildVersionNuGet )
+        CIReleaseInfo(
+            CSVersion ciBaseTag,
+            int ciBaseDepth,
+            SVersion ciBuildVersion,
+            SVersion ciBuildVersionNuGet,
+            bool isZeroTimed )
         {
             BaseTag = ciBaseTag;
             Depth = ciBaseDepth;
             BuildVersion = ciBuildVersion;
             BuildVersionNuGet = ciBuildVersionNuGet;
+            IsZeroTimed = isZeroTimed;
         }
 
         /// <summary>
@@ -45,6 +51,12 @@ namespace SimpleGitVersion
         /// Never null: this is the CSemVer-CI version in <see cref="CSVersionFormat.NuGetPackage"/> format.
         /// </summary>
         public readonly SVersion BuildVersionNuGet;
+
+        /// <summary>
+        /// Gets whether this version is a Zero timed based. See <see cref="CIBranchVersionMode.ZeroTimed"/>,
+        /// <see cref="CIBuildDescriptor.CreateSemVerZeroTimed"/> and <see cref="CIBuildDescriptor.CreateShortFormZeroTimed"/>.
+        /// </summary>
+        public readonly bool IsZeroTimed;
 
         internal static CIReleaseInfo Create(
             Commit commit,
@@ -71,7 +83,7 @@ namespace SimpleGitVersion
                 }
                 ciBuildVersion = SVersion.Parse( vS );
                 ciBuildVersionNuGet = SVersion.Parse( vN, false );
-                return new CIReleaseInfo( ciBaseTag, 0, ciBuildVersion, ciBuildVersionNuGet );
+                return new CIReleaseInfo( ciBaseTag, 0, ciBuildVersion, ciBuildVersionNuGet, true );
 
             }
             Debug.Assert( ciVersionMode == CIBranchVersionMode.LastReleaseBased && actualBaseTag != null );
@@ -91,7 +103,7 @@ namespace SimpleGitVersion
             }
             Debug.Assert( ciBuildVersion == null || errors.Length == 0 );
             return ciBuildVersion != null
-                    ? new CIReleaseInfo( ciBaseTag, info.BelowDepth, ciBuildVersion, ciBuildVersionNuGet )
+                    ? new CIReleaseInfo( ciBaseTag, info.BelowDepth, ciBuildVersion, ciBuildVersionNuGet, false )
                     : null;
         }
     }

@@ -256,3 +256,4 @@ Tests/**/TestResult*.xml
 CodeCakeBuilder/UnitTestsDone.*.txt
 Tests/**/Logs/
 Tests/**/CKSetup-WorkingDir/
+/.vscode/
