@@ -13,7 +13,7 @@
     <PackageReference Include="NuGet.Credentials" Version="4.9.2" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CK.Text" Version="8.0.3--0011-develop" />
+    <PackageReference Include="CK.Text" Version="0.0.0--027nykk-local" />
     <ProjectReference Include="../SimpleGitVersion.Cake/SimpleGitVersion.Cake.csproj" />
   </ItemGroup>
 </Project>
