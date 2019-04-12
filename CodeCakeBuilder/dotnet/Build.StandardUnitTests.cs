@@ -4,6 +4,7 @@ using Cake.Common.Solution;
 using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.Test;
 using Cake.Common.Tools.NUnit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -12,9 +13,14 @@ namespace CodeCake
 {
     public partial class Build
     {
-        void StandardUnitTests( CheckRepositoryInfo globalInfo, IEnumerable<SolutionProject> testProjects )
+        [Obsolete]
+        void StandardUnitTests(CheckRepositoryInfo globalInfo, IEnumerable<SolutionProject> solutionProjects)
         {
-            string memoryFilePath = $"CodeCakeBuilder/UnitTestsDone.{globalInfo.GitInfo.CommitSha}.txt";
+            StandardUnitTests(globalInfo.BuildConfiguration, solutionProjects);//This awful but it work !
+        }
+        void StandardUnitTests( NuGetRepositoryInfo globalInfo, IEnumerable<SolutionProject> testProjects )
+        {
+            string memoryFilePath = $"CodeCakeBuilder/UnitTestsDone.{globalInfo.CheckRepositoryInfo.GitInfo.CommitSha}.txt";
 
             void WriteTestDone( Cake.Core.IO.FilePath test )
             {
