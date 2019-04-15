@@ -20,8 +20,12 @@ namespace CodeCake
                 appVeyor.UpdateBuildVersion( $"{gitInfo.SafeNuGetVersion} ({appVeyor.Environment.Build.Number})" );
             }
         }
-        void VSTSUpdateBuildVersion( SimpleRepositoryInfo gitInfo )
+
+        void AzurePipelineUpdateBuildVersion( SimpleRepositoryInfo gitInfo )
         {
+            // Azure (formerly VSTS, formerly VSO) analyzes the stdout to set its build number.
+            // On clash, the default Azure/VSTS/VSO build number is used: to ensure that the actual
+            // version will be always be available we need to inject a uniquifier.
             string buildVersion = $"{gitInfo.SafeNuGetVersion}_{DateTime.UtcNow:yyyyMMdd-HHmmss}";
             Cake.Information( $"Using VSTS build number: {buildVersion}" );
             string buildInstruction = $"##vso[build.updatebuildnumber]{buildVersion}";
@@ -43,9 +47,9 @@ namespace CodeCake
                 //damned, we can't tag the pipeline/job
             }
             ITFBuildProvider vsts = Cake.TFBuild();
-            if( vsts.IsRunningOnVSTS || vsts.IsRunningOnTFS )
+            if( vsts.IsRunningOnAzurePipelinesHosted || vsts.IsRunningOnAzurePipelines )
             {
-                VSTSUpdateBuildVersion( checkInfo.GitInfo );
+                AzurePipelineUpdateBuildVersion( checkInfo.GitInfo );
             }
         }
     }
