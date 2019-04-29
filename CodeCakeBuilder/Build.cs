@@ -29,16 +29,16 @@ namespace CodeCake
                                         .Where( p => !p.Path.Segments.Contains( "Tests" ) );
 
             SimpleRepositoryInfo gitInfo = Cake.GetSimpleRepositoryInfo();
-            StandardGlobalInfo globalInfo = null;
+            StandardGlobalInfo globalInfo = CreateStandardGlobalInfo( gitInfo )
+                                                .AddNuGet( projectsToPublish )
+                                                .SetCIBuildTag();
 
             Task( "Check-Repository" )
                 .Does( () =>
                 {
-                    globalInfo = CreateStandardGlobalInfo( gitInfo )
-                                    .AddNuGet( projectsToPublish )
-                                    .SetCIBuildTag()
-                                    .TerminateIfShouldStop();
+                    globalInfo.TerminateIfShouldStop();
                 } );
+                
             Task( "Clean" )
                 .IsDependentOn( "Check-Repository" )
                 .Does( () =>
