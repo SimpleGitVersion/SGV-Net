@@ -13,14 +13,10 @@ namespace CodeCake
 {
     public partial class Build
     {
-        [Obsolete]
-        void StandardUnitTests(CheckRepositoryInfo globalInfo, IEnumerable<SolutionProject> solutionProjects)
+
+        void StandardUnitTests( StandardGlobalInfo globalInfo, IEnumerable<SolutionProject> testProjects )
         {
-            StandardUnitTests(globalInfo.BuildConfiguration, solutionProjects);//This awful but it work !
-        }
-        void StandardUnitTests( NuGetRepositoryInfo globalInfo, IEnumerable<SolutionProject> testProjects )
-        {
-            string memoryFilePath = $"CodeCakeBuilder/UnitTestsDone.{globalInfo.CheckRepositoryInfo.GitInfo.CommitSha}.txt";
+            string memoryFilePath = $"CodeCakeBuilder/UnitTestsDone.{globalInfo.GitInfo.CommitSha}.txt";
 
             void WriteTestDone( Cake.Core.IO.FilePath test )
             {
