@@ -85,7 +85,8 @@ namespace CodeCake
                         Configuration = globalInfo.BuildConfiguration,
                         Framework = framework,
                         NoRestore = true,
-                        NoBuild = true
+                        NoBuild = true,
+                        Logger = "trx"
                     } );
                 }
                 else
