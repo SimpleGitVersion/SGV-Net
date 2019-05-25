@@ -11,7 +11,7 @@
     <PublicSign>false</PublicSign>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SimpleGitVersion.Core" Version="0.0.0-0" />
+    <ProjectReference Include="../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Code.Cake" Version="1.0.2--0017-develop" />
