@@ -1,13 +1,13 @@
 using Cake.Common.IO;
 using Cake.Common.Solution;
 using Cake.Core;
-using Cake.Npm;
+
 using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using SimpleGitVersion;
 using System.Linq;
-using Cake.Npm.Install;
-using Cake.Npm.RunScript;
+
+
 
 namespace CodeCake
 {
