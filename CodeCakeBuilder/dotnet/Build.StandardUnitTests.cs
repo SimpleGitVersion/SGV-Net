@@ -4,6 +4,7 @@ using Cake.Common.Solution;
 using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.Test;
 using Cake.Common.Tools.NUnit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -12,7 +13,8 @@ namespace CodeCake
 {
     public partial class Build
     {
-        void StandardUnitTests( CheckRepositoryInfo globalInfo, IEnumerable<SolutionProject> testProjects )
+
+        void StandardUnitTests( StandardGlobalInfo globalInfo, IEnumerable<SolutionProject> testProjects )
         {
             string memoryFilePath = $"CodeCakeBuilder/UnitTestsDone.{globalInfo.GitInfo.CommitSha}.txt";
 
@@ -83,7 +85,8 @@ namespace CodeCake
                         Configuration = globalInfo.BuildConfiguration,
                         Framework = framework,
                         NoRestore = true,
-                        NoBuild = true
+                        NoBuild = true,
+                        Logger = "trx"
                     } );
                 }
                 else
