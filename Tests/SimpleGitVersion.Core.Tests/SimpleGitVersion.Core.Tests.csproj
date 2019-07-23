@@ -2,6 +2,7 @@
   <Import Project="..\..\Common\Shared.props" />
   <PropertyGroup>
     <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
+    <IsPackable>False</IsPackable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' != 'net461' ">
     <OutputType>Exe</OutputType>
