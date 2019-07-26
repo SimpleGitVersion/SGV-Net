@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using NUnit.Framework;
 using CSemVer;
+using FluentAssertions;
 
 namespace SimpleGitVersion.Core.Tests
 {
@@ -774,6 +775,33 @@ namespace SimpleGitVersion.Core.Tests
                 // But the v10.0.0 tag exits, the versions above cExtra are
                 CollectionAssert.AreEqual( v10.GetDirectSuccessors(), i.NextPossibleVersions );
 
+            }
+        }
+
+        [Test]
+        public void multiple_version_tags_on_the_same_commit()
+        {
+            var repoTest = TestHelper.TestGitRepository;
+            var cRealDevInAlpha = repoTest.Commits.Single( sc => sc.Message.StartsWith( "Real Dev in Alpha." ) );
+            var overrides = new TagsOverride().MutableAdd( cRealDevInAlpha.Sha, "1.0.0" )
+                                              .MutableAdd( cRealDevInAlpha.Sha, "2.0.0" );
+            {
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
+                    StartingCommitSha = cRealDevInAlpha.Sha,
+                    OverriddenTags = overrides.Overrides,
+                } );
+                i.ValidReleaseTag.Should().BeNull();
+                i.Error.Trim().Should().Be( $"Commit '{cRealDevInAlpha.Sha}' has 2 different released version tags. Delete some of them or create +invalid tag(s) if they are already pushed to a remote repository." );
+            }
+            {
+                RepositoryInfo i = repoTest.GetRepositoryInfo( new RepositoryInfoOptions
+                {
+                    StartingCommitSha = cRealDevInAlpha.Sha,
+                    OverriddenTags = overrides.Overrides,
+                    StartingVersionForCSemVer = "2.0.0"
+                } );
+                i.ValidReleaseTag.Should().Be( CSVersion.Parse( "2.0.0" ) );
             }
         }
     }
