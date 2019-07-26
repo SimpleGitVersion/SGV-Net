@@ -14,6 +14,6 @@
     <ProjectReference Include="../SimpleGitVersion.Core/SimpleGitVersion.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Code.Cake" Version="1.0.3--0002-develop" />
+    <PackageReference Include="Code.Cake" Version="1.0.3" />
   </ItemGroup>
 </Project>
