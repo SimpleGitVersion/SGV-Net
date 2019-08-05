@@ -1,3 +1,4 @@
+⚠️This repository has moved to https://github.com/CK-Build/SGV-Net.
 # SGV-Net
 Contains SimpleGitVersion.Core and SimpleGitVersion.Cake that support CSemver on .Net platform.
 
